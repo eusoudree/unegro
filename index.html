@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNEGRO | VALE DO PARAÍBA - Ancestralidade e Luta</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <style>
+        :root {
+            --preto: #000000;
+            --laranja-fogo: linear-gradient(135deg, #ff8c00 0%, #ff4500 100%);
+            --cinza-deep: #080808;
+            --cinza-card: #0d0d0d;
+            --texto: #ffffff;
+            --laranja-solid: #ff8c00;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+        body {
+            background-color: var(--preto); color: var(--texto); font-family: 'Inter', sans-serif;
+            background-image: linear-gradient(rgba(0,0,0,0.92), rgba(0,0,0,0.95)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 100 100"><g fill="%23222" fill-opacity="0.3"><path d="M50 20 L40 35 H60 L50 20 M50 80 L60 65 H40 L50 80 M20 50 L35 40 V60 L20 50 M80 50 L65 60 V40 L80 50"/></g></svg>');
+        }
+
+        /* MENU */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,140,0,0.2);
+            padding: 15px 0;
+        }
+        .nav-container { max-width: 1200px; margin: auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        .nav-links { display: flex; gap: 25px; }
+        .nav-links a { color: #fff; text-decoration: none; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; font-weight: bold; }
+        .nav-links a:hover { color: var(--laranja-solid); }
+
+        section { padding: 120px 20px; max-width: 1100px; margin: auto; }
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .titulo-ancestral { font-size: clamp(3.5rem, 10vw, 6.5rem); font-weight: 900; background: var(--laranja-fogo); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 12px; filter: drop-shadow(0 0 20px rgba(255, 140, 0, 0.4)); }
+
+        .secao-titulo { color: var(--laranja-solid); text-transform: uppercase; letter-spacing: 5px; margin-bottom: 50px; font-size: 2.2rem; font-weight: 900; text-align: center; }
+        .texto-longo { font-size: 1.15rem; line-height: 2; color: #ccc; text-align: justify; margin-bottom: 30px; }
+
+        /* LIDERANÇAS */
+        .perso-container { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+        .perso-card { background: var(--cinza-card); border: 1px solid #222; border-radius: 25px; width: 350px; overflow: hidden; transition: 0.5s; text-align: center; }
+        .perso-img { width: 100%; height: 350px; background-size: cover; background-position: top center; filter: grayscale(1); transition: 0.6s; border-bottom: 3px solid var(--laranja-solid); }
+        .perso-card:hover { border-color: var(--laranja-solid); transform: translateY(-15px); }
+        .perso-card:hover .perso-img { filter: grayscale(0); }
+        .insta-btn { display: inline-block; margin: 20px 0; color: var(--laranja-solid); border: 1px solid var(--laranja-solid); padding: 8px 25px; border-radius: 30px; text-decoration: none; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; }
+        .insta-btn:hover { background: var(--laranja-solid); color: #000; }
+
+        /* CARROSSEL MÍDIA */
+        .na-midia { padding: 80px 20px; background: #050505; text-align: center; }
+        .swiper { width: 100%; max-width: 1100px; padding: 50px 0; }
+        .midia-card { background: #111; border: 1px solid #222; border-radius: 20px; padding: 30px; height: 250px; display: flex; flex-direction: column; justify-content: space-between; text-align: left; }
+        .btn-ler { color: var(--laranja-solid); text-decoration: none; font-weight: bold; font-size: 0.85rem; }
+
+        /* FICHA NACIONAL - GRID 3 COLUNAS SEM RESUMO */
+        .filiacao-box { max-width: 1000px; margin: 50px auto; background: var(--cinza-card); padding: 50px; border-radius: 40px; border: 1px solid rgba(255,140,0,0.1); }
+        .grid-form { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .span-2 { grid-column: span 2; }
+        .span-3 { grid-column: span 3; }
+        .input-group { margin-bottom: 5px; text-align: left; }
+        .input-group label { display: block; color: #888; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
+        .input-style { width: 100%; padding: 14px; background: #000; border: 1px solid #222; color: #fff; border-radius: 10px; font-size: 0.95rem; }
+        .input-style:focus { border-color: var(--laranja-solid); outline: none; box-shadow: 0 0 10px rgba(255, 140, 0, 0.15); }
+
+        .desafio-box { grid-column: span 3; background: rgba(255,140,0,0.03); padding: 25px; border: 1px dashed rgba(255,140,0,0.2); border-radius: 20px; margin-top: 20px; }
+        .btn-enviar { width: 100%; padding: 22px; background: var(--laranja-fogo); border: none; border-radius: 15px; font-weight: 900; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; color: #000; transition: 0.4s; letter-spacing: 2px; }
+
+        @media (max-width: 900px) { .grid-form { grid-template-columns: 1fr 1fr; } .span-3, .span-2 { grid-column: span 2; } }
+        @media (max-width: 600px) { .grid-form { grid-template-columns: 1fr; } .span-3, .span-2 { grid-column: span 1; } }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-container">
+            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="height: 40px;">
+            <div class="nav-links">
+                <a href="#unegro">História</a>
+                <a href="#liderancas">Lideranças</a>
+                <a href="#midia">Na Mídia</a>
+                <a href="#filiacao">Filiação</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1 class="titulo-ancestral">UNEGRO</h1>
+        <p style="letter-spacing: 8px; color: #888; text-transform: uppercase; font-weight: bold; margin-top: 15px;">Vale do Paraíba • SP</p>
+    </section>
+
+    <section id="unegro">
+        <h2 class="secao-titulo">História e Luta</h2>
+        <div class="texto-longo">
+            <p>A União de Negros pela Igualdade (UNEGRO) é uma entidade nacional suprapartidária fundada em 1988, em Salvador. Nascemos no calor da redemocratização para combater o racismo estrutural e transformar um povo escravizado em construtores de uma nova nação.</p>
+            <p>Surgida a partir da integridade de fundadores comunistas, a UNEGRO defende um programa classista e marxista contra o sexismo, a homofobia e a intolerância religiosa, resgatando a bússola da nossa ancestralidade.</p>
+        </div>
+    </section>
+
+    <section id="liderancas" style="background: #050505; border-radius: 50px;">
+        <h2 class="secao-titulo">Nossas Referências</h2>
+        <div class="perso-container">
+            <div class="perso-card">
+                <div class="perso-img" style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQd-iTVw7Wna6Hk1Y7dVTIsXTO6dhvdUAVD5w&s');"></div>
+                <div class="perso-info">
+                    <h4>Leci Brandão</h4>
+                    <p>Referência na cultura e voz da militância na ALESP.</p>
+                    <a href="https://www.instagram.com/lecibrandao/" target="_blank" class="insta-btn">Instagram</a>
+                </div>
+            </div>
+            <div class="perso-card">
+                <div class="perso-img" style="background-image: url('https://jornalempoderado.com.br/wp-content/uploads/2025/09/Imagem-do-WhatsApp-de-2025-09-06-as-10.35.50_0e8c4375.jpg');"></div>
+                <div class="perso-info">
+                    <h4>Orlando Silva</h4>
+                    <p>Liderança do PCdoB e voz da Igualdade Racial no Congresso.</p>
+                    <a href="https://www.instagram.com/orlandosilvasp/" target="_blank" class="insta-btn">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="midia">
+        <h2 class="secao-titulo">Na Mídia</h2>
+        <div class="swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide"><div class="midia-card"><span>Vermelho</span><h4>UNEGRO: 30 anos de resistência e luta.</h4><a href="https://vermelho.org.br" class="btn-ler">Ler Matéria →</a></div></div>
+                <div class="swiper-slide"><div class="midia-card"><span>Geledés</span><h4>O combate ao racismo religioso no Brasil.</h4><a href="https://geledes.org.br" class="btn-ler">Ler Matéria →</a></div></div>
+                <div class="swiper-slide"><div class="midia-card"><span>Brasil de Fato</span><h4>A juventude negra contra o genocídio.</h4><a href="https://brasildefato.com.br" class="btn-ler">Ler Matéria →</a></div></div>
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </section>
+
+    <section id="filiacao">
+        <div class="filiacao-box">
+            <h2 class="secao-titulo">Ficha Nacional de Filiação</h2>
+            <form id="formFiliacao">
+                <div class="grid-form">
+                    <div class="input-group span-3"><label>Nome Completo</label><input type="text" id="nome" class="input-style" required></div>
+
+                    <div class="input-group span-2"><label>Endereço Residencial</label><input type="text" id="endereco" class="input-style" required></div>
+                    <div class="input-group"><label>Número</label><input type="text" id="numero" class="input-style" required></div>
+
+                    <div class="input-group"><label>Complemento</label><input type="text" id="complemento" class="input-style"></div>
+                    <div class="input-group"><label>Bairro</label><input type="text" id="bairro" class="input-style" required></div>
+                    <div class="input-group"><label>CEP</label><input type="text" id="cep" class="input-style" required></div>
+
+                    <div class="input-group">
+                        <label>Cidade no Vale</label>
+                        <select id="cidade" class="input-style">
+    <option value="" disabled selected>Selecione sua cidade</option>
+    <option value="Aparecida">Aparecida</option>
+    <option value="Areias">Areias</option>
+    <option value="Bananal">Bananal</option>
+    <option value="Caçapava">Caçapava</option>
+    <option value="Cachoeira Paulista">Cachoeira Paulista</option>
+    <option value="Campos do Jordão">Campos do Jordão</option>
+    <option value="Caraguatatuba">Caraguatatuba</option>
+    <option value="Cruzeiro">Cruzeiro</option>
+    <option value="Cunha">Cunha</option>
+    <option value="Guaratinguetá">Guaratinguetá</option>
+    <option value="Igaratá">Igaratá</option>
+    <option value="Ilhabela">Ilhabela</option>
+    <option value="Jacareí">Jacareí</option>
+    <option value="Jambeiro">Jambeiro</option>
+    <option value="Lagoinha">Lagoinha</option>
+    <option value="Lavrinhas">Lavrinhas</option>
+    <option value="Lorena">Lorena</option>
+    <option value="Monteiro Lobato">Monteiro Lobato</option>
+    <option value="Natividade da Serra">Natividade da Serra</option>
+    <option value="Paraibuna">Paraibuna</option>
+    <option value="Pindamonhangaba">Pindamonhangaba</option>
+    <option value="Piquete">Piquete</option>
+    <option value="Potim">Potim</option>
+    <option value="Praia Grande">Praia Grande</option>
+    <option value="Queluz">Queluz</option>
+    <option value="Redenção da Serra">Redenção da Serra</option>
+    <option value="Roseira">Roseira</option>
+    <option value="Santa Branca">Santa Branca</option>
+    <option value="Santo Antônio do Pinhal">Santo Antônio do Pinhal</option>
+    <option value="São Bento do Sapucaí">São Bento do Sapucaí</option>
+    <option value="São José do Barreiro">São José do Barreiro</option>
+    <option value="São José dos Campos">São José dos Campos</option>
+    <option value="São Luiz do Paraitinga">São Luiz do Paraitinga</option>
+    <option value="São Sebastião">São Sebastião</option>
+    <option value="Silveiras">Silveiras</option>
+    <option value="Taubaté">Taubaté</option>
+    <option value="Tremembé">Tremembé</option>
+    <option value="Ubatuba">Ubatuba</option>
+</select>
+                    </div>
+                    <div class="input-group"><label>Data de Nascimento</label><input type="date" id="nascimento" class="input-style" required></div>
+                    <div class="input-group">
+                        <label>Sexo</label>
+                        <select id="sexo" class="input-style">
+                            <option value="Masculino">Masculino</option>
+                            <option value="Feminino">Feminino</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group"><label>RG</label><input type="text" id="rg" class="input-style" required></div>
+                    <div class="input-group"><label>CPF</label><input type="text" id="cpf" class="input-style" required></div>
+                    <div class="input-group"><label>WhatsApp</label><input type="tel" id="whatsapp" class="input-style" required></div>
+
+                    <div class="input-group span-3"><label>Profissão / Ocupação</label><input type="text" id="profissao" class="input-style"></div>
+
+                    <div class="input-group span-2">
+                        <label>Escolaridade</label>
+                        <select id="escolaridade" class="input-style">
+                            <option value="Ensino Médio">Ensino Médio Completo</option>
+                            <option value="Superior">Superior Completo</option>
+                            <option value="Pos">Pós-Graduação</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Movimento Social</label>
+                        <select id="movimento" class="input-style">
+                            <option value="Sindical">Sindical</option>
+                            <option value="Estudantil">Estudantil</option>
+                            <option value="Comunitário">Comunitário</option>
+                            <option value="Cultural">Cultural</option>
+                            <option value="Não participa">Não participa</option>
+                        </select>
+                    </div>
+
+                    <div class="desafio-box">
+                        <p style="margin-bottom: 15px;">Segurança: 5 + 5 = ? <input type="number" id="quiz" style="width: 70px; background: #000; color: #fff; border: 1px solid #333; text-align: center;"></p>
+                        <label style="font-size: 0.85rem; color: #888; display: flex; gap: 10px; cursor: pointer;"><input type="checkbox" id="aceite" required style="width: 20px; height: 20px; accent-color: var(--laranja-solid);"><span>Aceito os termos da Carta de Princípios da UNEGRO.</span></label>
+                    </div>
+                </div>
+                <button type="button" onclick="processarCadastro()" class="btn-enviar">Filiar-se e Gerar PDF</button>
+            </form>
+        </div>
+    </section>
+
+    <footer style="text-align: center; padding: 40px; color: #444;">
+        UNEGRO VALE • 2026 | Tecnologia por DREE.ONE HUB
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        // Inicialização do Carrossel e Animações
+        const swiper = new Swiper('.swiper', { slidesPerView: 1, spaceBetween: 20, pagination: { el: '.swiper-pagination', clickable: true }, breakpoints: { 768: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } } });
+        ScrollReveal().reveal('section', { delay: 200, distance: '50px', origin: 'bottom', opacity: 0 });
+
+        async function processarCadastro() {
+            const quiz = document.getElementById('quiz').value;
+            const aceite = document.getElementById('aceite').checked;
+
+            if(quiz !== "10" || !aceite) {
+                alert("Valide o desafio e aceite os termos.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const margin = 15;
+            let y = 20;
+
+            const drawField = (label, value, x) => {
+                doc.setFont("helvetica", "bold");
+                doc.text(`${label}:`, x, y);
+                const labelWidth = doc.getTextWidth(`${label}: `);
+                doc.setFont("helvetica", "normal");
+                doc.text(`${value || ""}`, x + labelWidth, y);
+            };
+
+            // CABEÇALHO
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.text("FICHA DE FILIAÇÃO :", 105, y, { align: "center" });
+            y += 7;
+            doc.text("UNIÃO DE NEGRAS E NEGROS PELA IGUALDADE - UNEGRO", 105, y, { align: "center" });
+            y += 10;
+            doc.line(margin, y, 195, y);
+            y += 10;
+
+            // BLOCO 1
+            doc.setFontSize(11);
+            drawField("Nome Completo", document.getElementById('nome').value.toUpperCase(), margin);
+            y += 8;
+            drawField("Data de Nascimento", document.getElementById('nascimento').value, margin);
+            drawField("Sexo", document.getElementById('sexo').value, 120);
+            y += 8;
+            drawField("RG", document.getElementById('rg').value, margin);
+            drawField("CPF", document.getElementById('cpf').value, 120);
+            y += 12;
+
+            // BLOCO 2
+            drawField("Endereço Residencial", document.getElementById('endereco').value, margin);
+            y += 8;
+            drawField("Número", document.getElementById('numero').value, margin);
+            drawField("Complemento", document.getElementById('complemento').value, 70);
+            drawField("Bairro", document.getElementById('bairro').value, 130);
+            y += 8;
+            drawField("Cidade", document.getElementById('cidade').value, margin);
+            drawField("CEP", document.getElementById('cep').value, 130);
+            y += 8;
+            drawField("WhatsApp", document.getElementById('whatsapp').value, margin);
+            y += 15;
+
+            // BLOCO 3
+            drawField("Grau de escolaridade", document.getElementById('escolaridade').value, margin);
+            y += 8;
+            drawField("Ocupação/Profissão", document.getElementById('profissao').value, margin);
+            y += 8;
+            drawField("Movimento Social", document.getElementById('movimento').value, margin);
+            y += 20;
+
+            // ASSINATURAS
+            doc.setFont("helvetica", "bold");
+            const termo = "Declaro estar de acordo com a Carta de Princípios da Entidade e que as informações prestadas são expressão da verdade.";
+            doc.text(doc.splitTextToSize(termo, 180), margin, y);
+            y += 15;
+
+          doc.text(`Local e data: ${document.getElementById('cidade').value}, ${new Date().toLocaleDateString('pt-BR')}`, margin, y);
+            y += 25;
+
+            doc.line(margin, y, 100, y);
+            doc.line(110, y, 195, y);
+            y += 5;
+            doc.text("Assinatura do filiado", margin + 15, y);
+            doc.text("Responsável pela filiação", 125, y);
+
+            y += 15;
+            doc.setTextColor(200, 0, 0);
+            doc.text("IMPORTANTE: Assinar e enviar para o e-mail filia@unegrovale.com.br", 105, y, { align: "center" });
+
+            window.open(doc.output('bloburl'), '_blank');
+
+            // LOGICA DE ENVIO AO SUPABASE (EDGE FUNCTION)
+            try {
+                await fetch('https://gmyrhvyidkfskumwlhpc.supabase.co/functions/v1/filiacao-unegro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nome: document.getElementById('nome').value,
+                        whatsapp: document.getElementById('whatsapp').value,
+                        cidade: document.getElementById('cidade').value
+                    })
+                });
+            } catch (e) { console.log("Erro de rede ao salvar."); }
+        }
+    </script>
+</body>
+</html>
