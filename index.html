@@ -243,7 +243,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-   <script>
+  <script>
     // Inicialização do Carrossel e Animações
     const swiper = new Swiper('.swiper', { 
         slidesPerView: 1, 
@@ -258,12 +258,13 @@
         const aceite = document.getElementById('aceite').checked;
 
         if(quiz !== "10" || !aceite) {
-            alert("Valide o desafio e aceite os termos.");
+            alert("Valide o desafio (5+5=10) e aceite os termos.");
             return;
         }
 
-        // CAPTURA COMPLETA DOS DADOS PARA O BANCO E PDF
         const cidadeFiliado = document.getElementById('cidade').value;
+        
+        // Mapeamento dos dados para o Banco de Dados
         const payload = {
             nome: document.getElementById('nome').value,
             nascimento: document.getElementById('nascimento').value,
@@ -272,34 +273,44 @@
             cpf: document.getElementById('cpf').value,
             endereco: document.getElementById('endereco').value,
             numero: document.getElementById('numero').value,
-            complemento: document.getElementById('complemento').value,
+            complemento: document.getElementById('complemento').value || "",
             bairro: document.getElementById('bairro').value,
             cep: document.getElementById('cep').value,
             cidade: cidadeFiliado,
             whatsapp: document.getElementById('whatsapp').value,
-            email: document.getElementById('email').value,
-            profissao: document.getElementById('profissao').value,
+            email: document.getElementById('email')?.value || "", 
+            profissao: document.getElementById('profissao').value || "",
             escolaridade: document.getElementById('escolaridade').value,
             movimento_social: document.getElementById('movimento').value
         };
 
-        // 1. LOGICA DE ENVIO AO NOVO PROJETO SUPABASE (huxemmuzhlntwimgiukt)
+        // --- CHAVES INSERIDAS E CONFERIDAS ---
+        const SUPABASE_URL = 'https://huxemmuzhlntwimgiukt.supabase.co/rest/v1/unegro_filiados';
+        const SUPABASE_KEY = 'sb_publishable_keA2ue25F2Ese-yR5F7Sog_3dSjY7GD'; 
+
         try {
-            await fetch('https://huxemmuzhlntwimgiukt.supabase.co/rest/v1/unegro_filiados', {
+            const response = await fetch(SUPABASE_URL, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
-                    'apikey': 'sb_publishable_keA2ue25F2Ese-yR5F7Sog_3dSjY7GD',
-                    'Authorization': 'Bearer sb_publishable_keA2ue25F2Ese-yR5F7Sog_3dSjY7GD'
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Prefer': 'return=minimal'
                 },
                 body: JSON.stringify(payload)
             });
-            console.log("Militância registrada com sucesso no banco de dados.");
+
+            if(response.ok) {
+                console.log("Militância salva no banco com sucesso!");
+            } else {
+                const errorData = await response.json();
+                console.error("Erro no Supabase:", errorData);
+            }
         } catch (e) { 
-            console.log("Erro ao salvar digitalmente. Verifique a tabela unegro_filiados."); 
+            console.log("Erro de conexão com o banco de dados."); 
         }
 
-        // 2. GERAÇÃO DA FICHA PDF (ESTILO OFICIAL P&B)
+        // GERAÇÃO DO PDF (ESTILO P&B SOLICITADO)
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const margin = 15;
@@ -313,7 +324,6 @@
             doc.text(`${value || ""}`, x + labelWidth, y);
         };
 
-        // CABEÇALHO
         doc.setFont("helvetica", "bold");
         doc.setFontSize(14);
         doc.text("FICHA DE FILIAÇÃO :", 105, y, { align: "center" });
@@ -323,7 +333,6 @@
         doc.line(margin, y, 195, y);
         y += 10;
 
-        // BLOCO 1: DADOS PESSOAIS
         doc.setFontSize(11);
         drawField("Nome Completo", payload.nome.toUpperCase(), margin);
         y += 8;
@@ -334,7 +343,6 @@
         drawField("CPF", payload.cpf, 120);
         y += 12;
 
-        // BLOCO 2: ENDEREÇO
         drawField("Endereço Residencial", payload.endereco, margin);
         y += 8;
         drawField("Número", payload.numero, margin);
@@ -347,21 +355,18 @@
         drawField("WhatsApp", payload.whatsapp, margin);
         y += 15;
 
-        // BLOCO 3: FORMAÇÃO E MILITÂNCIA
         drawField("Grau de escolaridade", payload.escolaridade, margin);
         y += 8;
         drawField("Ocupação/Profissão", payload.profissao, margin);
         y += 8;
-        drawField("Movimento Social Principal", payload.movimento_social, margin);
+        drawField("Movimento Social", payload.movimento_social, margin);
         y += 20;
 
-        // ASSINATURAS E DECLARAÇÃO
         doc.setFont("helvetica", "bold");
         const termo = "Declaro estar de acordo com a Carta de Princípios da Entidade e que as informações prestadas são expressão da verdade.";
         doc.text(doc.splitTextToSize(termo, 180), margin, y);
         y += 15;
 
-        // LOCAL E DATA DINÂMICO (Capturando a cidade selecionada)
         doc.text(`Local e data: ${cidadeFiliado}, ${new Date().toLocaleDateString('pt-BR')}`, margin, y);
         y += 25;
 
@@ -375,9 +380,8 @@
         doc.setTextColor(200, 0, 0);
         doc.text("IMPORTANTE: Assinar e enviar para o e-mail filia@unegrovale.com.br", 105, y, { align: "center" });
 
-        // ABRIR PDF EM NOVA ABA
         window.open(doc.output('bloburl'), '_blank');
     }
-</script>
+    </script>
 </body>
 </html>
