@@ -243,109 +243,141 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script>
-        // Inicialização do Carrossel e Animações
-        const swiper = new Swiper('.swiper', { slidesPerView: 1, spaceBetween: 20, pagination: { el: '.swiper-pagination', clickable: true }, breakpoints: { 768: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } } });
-        ScrollReveal().reveal('section', { delay: 200, distance: '50px', origin: 'bottom', opacity: 0 });
+   <script>
+    // Inicialização do Carrossel e Animações
+    const swiper = new Swiper('.swiper', { 
+        slidesPerView: 1, 
+        spaceBetween: 20, 
+        pagination: { el: '.swiper-pagination', clickable: true }, 
+        breakpoints: { 768: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } } 
+    });
+    ScrollReveal().reveal('section', { delay: 200, distance: '50px', origin: 'bottom', opacity: 0 });
 
-        async function processarCadastro() {
-            const quiz = document.getElementById('quiz').value;
-            const aceite = document.getElementById('aceite').checked;
+    async function processarCadastro() {
+        const quiz = document.getElementById('quiz').value;
+        const aceite = document.getElementById('aceite').checked;
 
-            if(quiz !== "10" || !aceite) {
-                alert("Valide o desafio e aceite os termos.");
-                return;
-            }
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const margin = 15;
-            let y = 20;
-
-            const drawField = (label, value, x) => {
-                doc.setFont("helvetica", "bold");
-                doc.text(`${label}:`, x, y);
-                const labelWidth = doc.getTextWidth(`${label}: `);
-                doc.setFont("helvetica", "normal");
-                doc.text(`${value || ""}`, x + labelWidth, y);
-            };
-
-            // CABEÇALHO
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(14);
-            doc.text("FICHA DE FILIAÇÃO :", 105, y, { align: "center" });
-            y += 7;
-            doc.text("UNIÃO DE NEGRAS E NEGROS PELA IGUALDADE - UNEGRO", 105, y, { align: "center" });
-            y += 10;
-            doc.line(margin, y, 195, y);
-            y += 10;
-
-            // BLOCO 1
-            doc.setFontSize(11);
-            drawField("Nome Completo", document.getElementById('nome').value.toUpperCase(), margin);
-            y += 8;
-            drawField("Data de Nascimento", document.getElementById('nascimento').value, margin);
-            drawField("Sexo", document.getElementById('sexo').value, 120);
-            y += 8;
-            drawField("RG", document.getElementById('rg').value, margin);
-            drawField("CPF", document.getElementById('cpf').value, 120);
-            y += 12;
-
-            // BLOCO 2
-            drawField("Endereço Residencial", document.getElementById('endereco').value, margin);
-            y += 8;
-            drawField("Número", document.getElementById('numero').value, margin);
-            drawField("Complemento", document.getElementById('complemento').value, 70);
-            drawField("Bairro", document.getElementById('bairro').value, 130);
-            y += 8;
-            drawField("Cidade", document.getElementById('cidade').value, margin);
-            drawField("CEP", document.getElementById('cep').value, 130);
-            y += 8;
-            drawField("WhatsApp", document.getElementById('whatsapp').value, margin);
-            y += 15;
-
-            // BLOCO 3
-            drawField("Grau de escolaridade", document.getElementById('escolaridade').value, margin);
-            y += 8;
-            drawField("Ocupação/Profissão", document.getElementById('profissao').value, margin);
-            y += 8;
-            drawField("Movimento Social", document.getElementById('movimento').value, margin);
-            y += 20;
-
-            // ASSINATURAS
-            doc.setFont("helvetica", "bold");
-            const termo = "Declaro estar de acordo com a Carta de Princípios da Entidade e que as informações prestadas são expressão da verdade.";
-            doc.text(doc.splitTextToSize(termo, 180), margin, y);
-            y += 15;
-
-          doc.text(`Local e data: ${document.getElementById('cidade').value}, ${new Date().toLocaleDateString('pt-BR')}`, margin, y);
-            y += 25;
-
-            doc.line(margin, y, 100, y);
-            doc.line(110, y, 195, y);
-            y += 5;
-            doc.text("Assinatura do filiado", margin + 15, y);
-            doc.text("Responsável pela filiação", 125, y);
-
-            y += 15;
-            doc.setTextColor(200, 0, 0);
-            doc.text("IMPORTANTE: Assinar e enviar para o e-mail filia@unegrovale.com.br", 105, y, { align: "center" });
-
-            window.open(doc.output('bloburl'), '_blank');
-
-            // LOGICA DE ENVIO AO SUPABASE (EDGE FUNCTION)
-            try {
-                await fetch('https://gmyrhvyidkfskumwlhpc.supabase.co/functions/v1/filiacao-unegro', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        nome: document.getElementById('nome').value,
-                        whatsapp: document.getElementById('whatsapp').value,
-                        cidade: document.getElementById('cidade').value
-                    })
-                });
-            } catch (e) { console.log("Erro de rede ao salvar."); }
+        if(quiz !== "10" || !aceite) {
+            alert("Valide o desafio e aceite os termos.");
+            return;
         }
-    </script>
+
+        // CAPTURA COMPLETA DOS DADOS PARA O BANCO E PDF
+        const cidadeFiliado = document.getElementById('cidade').value;
+        const payload = {
+            nome: document.getElementById('nome').value,
+            nascimento: document.getElementById('nascimento').value,
+            sexo: document.getElementById('sexo').value,
+            rg: document.getElementById('rg').value,
+            cpf: document.getElementById('cpf').value,
+            endereco: document.getElementById('endereco').value,
+            numero: document.getElementById('numero').value,
+            complemento: document.getElementById('complemento').value,
+            bairro: document.getElementById('bairro').value,
+            cep: document.getElementById('cep').value,
+            cidade: cidadeFiliado,
+            whatsapp: document.getElementById('whatsapp').value,
+            email: document.getElementById('email').value,
+            profissao: document.getElementById('profissao').value,
+            escolaridade: document.getElementById('escolaridade').value,
+            movimento_social: document.getElementById('movimento').value
+        };
+
+        // 1. LOGICA DE ENVIO AO NOVO PROJETO SUPABASE (huxemmuzhlntwimgiukt)
+        try {
+            await fetch('https://huxemmuzhlntwimgiukt.supabase.co/rest/v1/unegro_filiados', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'apikey': 'sb_publishable_keA2ue25F2Ese-yR5F7Sog_3dSjY7GD',
+                    'Authorization': 'Bearer sb_publishable_keA2ue25F2Ese-yR5F7Sog_3dSjY7GD'
+                },
+                body: JSON.stringify(payload)
+            });
+            console.log("Militância registrada com sucesso no banco de dados.");
+        } catch (e) { 
+            console.log("Erro ao salvar digitalmente. Verifique a tabela unegro_filiados."); 
+        }
+
+        // 2. GERAÇÃO DA FICHA PDF (ESTILO OFICIAL P&B)
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const margin = 15;
+        let y = 20;
+
+        const drawField = (label, value, x) => {
+            doc.setFont("helvetica", "bold");
+            doc.text(`${label}:`, x, y);
+            const labelWidth = doc.getTextWidth(`${label}: `);
+            doc.setFont("helvetica", "normal");
+            doc.text(`${value || ""}`, x + labelWidth, y);
+        };
+
+        // CABEÇALHO
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.text("FICHA DE FILIAÇÃO :", 105, y, { align: "center" });
+        y += 7;
+        doc.text("UNIÃO DE NEGRAS E NEGROS PELA IGUALDADE - UNEGRO", 105, y, { align: "center" });
+        y += 10;
+        doc.line(margin, y, 195, y);
+        y += 10;
+
+        // BLOCO 1: DADOS PESSOAIS
+        doc.setFontSize(11);
+        drawField("Nome Completo", payload.nome.toUpperCase(), margin);
+        y += 8;
+        drawField("Data de Nascimento", payload.nascimento, margin);
+        drawField("Sexo", payload.sexo, 120);
+        y += 8;
+        drawField("RG", payload.rg, margin);
+        drawField("CPF", payload.cpf, 120);
+        y += 12;
+
+        // BLOCO 2: ENDEREÇO
+        drawField("Endereço Residencial", payload.endereco, margin);
+        y += 8;
+        drawField("Número", payload.numero, margin);
+        drawField("Complemento", payload.complemento, 70);
+        drawField("Bairro", payload.bairro, 130);
+        y += 8;
+        drawField("Cidade", payload.cidade, margin);
+        drawField("CEP", payload.cep, 130);
+        y += 8;
+        drawField("WhatsApp", payload.whatsapp, margin);
+        y += 15;
+
+        // BLOCO 3: FORMAÇÃO E MILITÂNCIA
+        drawField("Grau de escolaridade", payload.escolaridade, margin);
+        y += 8;
+        drawField("Ocupação/Profissão", payload.profissao, margin);
+        y += 8;
+        drawField("Movimento Social Principal", payload.movimento_social, margin);
+        y += 20;
+
+        // ASSINATURAS E DECLARAÇÃO
+        doc.setFont("helvetica", "bold");
+        const termo = "Declaro estar de acordo com a Carta de Princípios da Entidade e que as informações prestadas são expressão da verdade.";
+        doc.text(doc.splitTextToSize(termo, 180), margin, y);
+        y += 15;
+
+        // LOCAL E DATA DINÂMICO (Capturando a cidade selecionada)
+        doc.text(`Local e data: ${cidadeFiliado}, ${new Date().toLocaleDateString('pt-BR')}`, margin, y);
+        y += 25;
+
+        doc.line(margin, y, 100, y);
+        doc.line(110, y, 195, y);
+        y += 5;
+        doc.text("Assinatura do filiado", margin + 15, y);
+        doc.text("Responsável pela filiação", 125, y);
+
+        y += 15;
+        doc.setTextColor(200, 0, 0);
+        doc.text("IMPORTANTE: Assinar e enviar para o e-mail filia@unegrovale.com.br", 105, y, { align: "center" });
+
+        // ABRIR PDF EM NOVA ABA
+        window.open(doc.output('bloburl'), '_blank');
+    }
+</script>
 </body>
 </html>
