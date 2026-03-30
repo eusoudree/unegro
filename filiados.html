@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADM | UNEGRO Vale do Paraíba</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root { --gold: #f1b434; --red: #8b0000; --black: #0a0a0a; --gray: #1a1a1a; }
+        body { font-family: 'Inter', sans-serif; background: var(--black); color: white; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* Login Overlay */
+        #login-screen { position: fixed; inset: 0; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .login-box { background: var(--gray); padding: 40px; border-radius: 12px; border: 1px solid var(--gold); text-align: center; width: 300px; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: none; box-sizing: border-box; }
+
+        /* Dashboard */
+        #admin-content { display: none; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
+        header { border-bottom: 2px solid var(--gold); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; }
+        h1 { color: var(--gold); margin: 0; text-transform: uppercase; font-size: 1.5rem; }
+
+        .stats-card { background: var(--gray); padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+
+        table { width: 100%; border-collapse: collapse; background: var(--gray); border-radius: 8px; overflow: hidden; }
+        th { background: #252525; color: var(--gold); padding: 15px; text-align: left; font-size: 12px; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid #333; font-size: 14px; }
+        tr:hover { background: #222; }
+
+        .btn { cursor: pointer; border: none; border-radius: 4px; padding: 10px 18px; font-weight: 700; transition: 0.2s; text-transform: uppercase; font-size: 11px; }
+        .btn-gold { background: var(--gold); color: var(--black); }
+        .btn-red { background: var(--red); color: white; }
+        .btn:hover { opacity: 0.8; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 style="color: var(--gold); margin-top: 0;">Restrito</h2>
+            <input type="text" id="user" placeholder="Usuário">
+            <input type="password" id="pass" placeholder="Senha">
+            <button class="btn btn-gold" style="width: 100%; margin-top: 10px;" onclick="checkLogin()">Entrar</button>
+            <p id="error-msg" style="color: var(--red); font-size: 12px; margin-top: 15px; display: none;">Credenciais inválidas.</p>
+        </div>
+    </div>
+
+    <div id="admin-content">
+        <header>
+            <div>
+                <h1>Lista de Filiados</h1>
+                <small style="color: #666;">UNEGRO VALE DO PARAÍBA - SP</small>
+            </div>
+            <button class="btn btn-gold" onclick="generateAllPDFs()">Gerar Todos (Consolidado)</button>
+        </header>
+
+        <div class="stats-card">
+            <span id="counter">Carregando registros...</span>
+            <span style="font-size: 12px; color: var(--gold);">● Base de Dados Supabase</span>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome Completo</th>
+                    <th>Cidade</th>
+                    <th>WhatsApp</th>
+                    <th>Profissão</th>
+                    <th style="text-align: right;">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+<script>
+    const CONFIG = {
+        URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
+        KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
+    };
+
+    const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
+    let dataList = [];
+
+    function checkLogin() {
+        const u = document.getElementById('user').value;
+        const p = document.getElementById('pass').value;
+
+        if(u === 'unegro' && p === 'Unegr0Vale!') {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'block';
+            loadData();
+        } else {
+            const err = document.getElementById('error-msg');
+            err.style.display = 'block';
+            setTimeout(() => err.style.display = 'none', 3000);
+        }
+    }
+
+    async function loadData() {
+        const { data, error } = await _supabase
+            .from('unegro_filiados')
+            .select('*')
+            .order('nome', { ascending: true });
+
+        if (error) return console.error(error);
+
+        // Garantia de não duplicidade por Nome no Front-end (caso o banco ainda permita)
+        const uniqueData = Array.from(new Map(data.map(item => [item.nome.toLowerCase(), item])).values());
+        dataList = uniqueData;
+        render(uniqueData);
+    }
+
+    function render(list) {
+        const tbody = document.getElementById('tableBody');
+        document.getElementById('counter').innerText = `${list.length} filiados registrados sem duplicidade.`;
+
+        tbody.innerHTML = list.map(item => `
+            <tr>
+                <td><b>${item.nome.toUpperCase()}</b></td>
+                <td>${item.cidade}</td>
+                <td>${item.whatsapp}</td>
+                <td>${item.profissao}</td>
+                <td style="text-align: right;">
+                    <button class="btn btn-red" onclick='generateSinglePDF(${JSON.stringify(item)})'>Gerar PDF</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function drawPage(doc, payload) {
+        const { jsPDF } = window.jspdf;
+        let y = 20;
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.text("FICHA DE FILIAÇÃO NACIONAL - UNEGRO", 105, y, { align: "center" });
+        y += 15;
+        doc.setDrawColor(139, 0, 0);
+        doc.line(20, y, 190, y);
+        y += 10;
+
+        doc.setFontSize(10);
+        const row = (label, val) => {
+            doc.setFont("helvetica", "bold"); doc.text(`${label}:`, 20, y);
+            doc.setFont("helvetica", "normal"); doc.text(`${val || '---'}`, 60, y);
+            y += 8;
+        };
+
+        row("Nome Completo", payload.nome.toUpperCase());
+        row("Nascimento", payload.nascimento);
+        row("Sexo", payload.sexo);
+        row("RG / CPF", `${payload.rg} / ${payload.cpf}`);
+        row("Endereço", `${payload.endereco}, ${payload.numero}`);
+        row("Bairro / CEP", `${payload.bairro} / ${payload.cep}`);
+        row("Cidade", payload.cidade);
+        row("Contato", `${payload.whatsapp} / ${payload.email}`);
+        row("Profissão", payload.profissao);
+        row("Escolaridade", payload.escolaridade);
+        row("Movimento", payload.movimento_social);
+
+        y += 10;
+        doc.setFont("helvetica", "bold");
+        doc.text(`Local e data: ${payload.cidade}, ${new Date().toLocaleDateString('pt-BR')}`, 20, y);
+
+        y += 25;
+        doc.setDrawColor(0);
+        doc.line(20, y, 90, y); doc.line(110, y, 180, y);
+        y += 5;
+        doc.text("Assinatura do Filiado", 35, y);
+        doc.text("Responsável UNEGRO", 125, y);
+
+        y += 20;
+        doc.setTextColor(150, 150, 150);
+        doc.setFontSize(8);
+        doc.text("DOCUMENTO GERADO VIA SISTEMA ADMINISTRATIVO UNEGRO VALE", 105, y, { align: "center" });
+    }
+
+    function generateSinglePDF(item) {
+        const doc = new jspdf.jsPDF();
+        drawPage(doc, item);
+        window.open(doc.output('bloburl'), '_blank');
+    }
+
+    function generateAllPDFs() {
+        const doc = new jspdf.jsPDF();
+        dataList.forEach((item, i) => {
+            drawPage(doc, item);
+            if (i < dataList.length - 1) doc.addPage();
+        });
+        window.open(doc.output('bloburl'), '_blank');
+    }
+</script>
+</body>
+</html>
