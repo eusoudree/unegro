@@ -153,21 +153,75 @@
           font-size: 1.8rem;
       }
   }
+
+
+/* Navbar e Dropdown UNEGRO */
+.nav-unegro {
+    background: #1a1a1a;
+    border-bottom: 2px solid #f1b434;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    height: 60px;
+}
+
+.nav-links { display: flex; gap: 20px; align-items: center; }
+.nav-links a { color: white; text-decoration: none; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+.nav-links a:hover { color: #f1b434; }
+
+/* Dropdown */
+.dropdown { position: relative; display: inline-block; }
+.dropbtn {
+    background: none; border: none; color: white;
+    font-size: 13px; font-weight: 700; text-transform: uppercase;
+    cursor: pointer; display: flex; align-items: center; gap: 5px;
+}
+.dropdown-content {
+    display: none; position: absolute; background: #1a1a1a;
+    min-width: 200px; box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+    border: 1px solid #f1b434; z-index: 1000; top: 100%;
+}
+.dropdown-content a {
+    color: white; padding: 12px 16px; text-decoration: none;
+    display: block; font-size: 12px; border-bottom: 1px solid #333;
+}
+.dropdown-content a:hover { background: #252525; color: #f1b434; }
+.dropdown:hover .dropdown-content { display: block; }
+
+/* Botão Live */
+.btn-live { background: #8b0000; padding: 8px 12px; border-radius: 4px; color: white !important; }
+
+        
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="nav-container">
-            <!--img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="height: 40px;" alt="Logo UNEGRO"-->
-            <div class="nav-links">
-                <a href="#unegro">História</a>
-                <a href="#liderancas">Lideranças</a>
-                <a href="#midia">Mídia</a>
-                <a href="#filiacao">Filiação</a>
+    <nav class="nav-unegro">
+    <div class="logo">
+        <a href="index.html">
+            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" height="40">
+        </a>
+    </div>
+
+    <div class="nav-links">
+        <a href="index.html">Início</a>
+
+        <div class="dropdown">
+            <button class="dropbtn">Filiados ▼</button>
+            <div class="dropdown-content">
+                <a href="filiados.html">Todos</a>
+                <a href="filiados-cruzeiro.html">Cruzeiro</a>
+                <a href="filiados-jacarei.html">Jacareí</a>
+                <a href="filiados-sjc.html">S.J. Campos</a>
+                <a href="filiados-taubate.html">Taubaté</a>
+                <a href="adm.html" style="color: #f1b434;">Painel ADM</a>
             </div>
         </div>
-    </nav>
+
+        <a href="live.html" class="btn-live">🔴 LIVE</a>
+    </div>
+</nav>
 
     <section class="hero">
           <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="max-width:400px;" alt="Logo UNEGRO">
