@@ -608,37 +608,80 @@
 
                 if (error) throw error;
 
+                // Separamos quem é coordenação e quem é vale
                 const coord = data.filter(i => i.tipo === 'COORDENACAO')[0];
                 const vale = data.filter(i => i.tipo === 'VALE');
+                
                 let htmlFinal = "";
 
-                // Card Destaque (Coordenação Geral)
+                // 1. Primeiro renderizamos a Coordenação (se existir) com o efeito de deslise
                 if (coord) {
-                   htmlFinal += vale.map(v => `
-    <div class="card-lider" onclick='abrirModal(${JSON.stringify(v)})'>
-        <div class="img-bg" style="background-image: url('${v.foto_url}')"></div>
-        <div class="card-static-info">
-            <span class="info-city">${v.cidade}</span>
-            <h3 class="info-name">${v.nome}</h3>
-        </div>
-        <div class="card-hover-overlay">
-            <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">
-                ${v.cargo || 'Liderança Vale'}
-            </span>
-            <h2 style="font-weight: 900; text-transform: uppercase; margin-bottom: 5px;">${v.nome}</h2>
-            
-            <p class="hover-bio">
-                ${v['mini_descricão'] || (v.biografia ? v.biografia.substring(0, 180) + '...' : 'Construindo o legado da UNEGRO no Vale.')}
-            </p>
-            
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <a href="${v.instagram_url}" target="_blank" onclick="event.stopPropagation();" class="btn-insta-mosaico">@Instagram</a>
-                <span style="font-size: 10px; font-weight: 900;">VER BIO ➔</span>
-            </div>
-        </div>
-    </div>
-`).join('');
+                    htmlFinal += `
+                        <div class="card-lider" onclick='abrirModal(${JSON.stringify(coord)})'>
+                            <div class="img-bg" style="background-image: url('${coord.foto_url}')"></div>
+                            <div class="card-static-info">
+                                <span class="info-city">${coord.cidade}</span>
+                                <h3 class="info-name">${coord.nome}</h3>
+                            </div>
+                            <div class="card-hover-overlay">
+                                <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">
+                                    COORDENAÇÃO GERAL
+                                </span>
+                                <h2 style="font-weight: 900; text-transform: uppercase; margin-bottom: 5px;">${coord.nome}</h2>
+                                <p class="hover-bio">${coord['mini_descricão'] || coord.mini_descricao || 'Articulação e legado no Vale do Paraíba.'}</p>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <a href="${coord.instagram_url}" target="_blank" onclick="event.stopPropagation();" class="btn-insta-mosaico">@Instagram</a>
+                                    <span style="font-size: 10px; font-weight: 900;">VER BIO ➔</span>
+                                </div>
+                            </div>
+                        </div>`;
                 }
+
+                // 2. Depois renderizamos as demais lideranças do Vale
+                htmlFinal += vale.map(v => `
+                    <div class="card-lider" onclick='abrirModal(${JSON.stringify(v)})'>
+                        <div class="img-bg" style="background-image: url('${v.foto_url}')"></div>
+                        <div class="card-static-info">
+                            <span class="info-city">${v.cidade}</span>
+                            <h3 class="info-name">${v.nome}</h3>
+                        </div>
+                        <div class="card-hover-overlay">
+                            <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">
+                                ${v.cargo || 'Liderança Vale'}
+                            </span>
+                            <h2 style="font-weight: 900; text-transform: uppercase; margin-bottom: 5px;">${v.nome}</h2>
+                            <p class="hover-bio">${v['mini_descricão'] || v.mini_descricao || 'Construindo o legado da UNEGRO.'}</p>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <a href="${v.instagram_url}" target="_blank" onclick="event.stopPropagation();" class="btn-insta-mosaico">@Instagram</a>
+                                <span style="font-size: 10px; font-weight: 900;">VER BIO ➔</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('mosaico-completo').innerHTML = htmlFinal;
+            } catch (err) {
+                console.error("Erro ao carregar mosaico:", err.message);
+            }
+        };
+
+        // Ajuste no Modal para garantir que a descrição apareça lá também
+        window.abrirModal = (lider) => {
+            // Se você tiver um modal no HTML com esses IDs, ele vai preencher
+            const modalFoto = document.getElementById('modal-foto');
+            const modalNome = document.getElementById('modal-nome');
+            const modalBio = document.getElementById('modal-bio');
+            
+            if(modalFoto) modalFoto.style.backgroundImage = `url("${lider.foto_url}")`;
+            if(modalNome) modalNome.innerText = lider.nome;
+            if(modalBio) modalBio.innerText = lider.biografia || lider['mini_descricão'] || lider.mini_descricao;
+            
+            const modalElement = document.getElementById('modal-lider');
+            if(modalElement) {
+                modalElement.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        };
 
                 // Cards Mosaico (Cidades)
                htmlFinal += vale.map(v => `
