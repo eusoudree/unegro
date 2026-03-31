@@ -14,22 +14,24 @@
         .login-card h2 { color: var(--gold); margin-bottom: 25px; text-transform: uppercase; font-size: 1.1rem; }
         .login-card input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 6px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; }
         
-        #main-content { display: none; height: 100vh; grid-template-columns: 1fr 380px; }
-        .video-section { background: #000; position: relative; }
+        #main-content { display: none; height: 100vh; grid-template-columns: 1fr 400px; }
+        .video-section { background: #000; display: flex; align-items: center; justify-content: center; position: relative; }
         iframe { width: 100%; height: 100%; border: none; }
 
         .chat-section { background: var(--gray); display: flex; flex-direction: column; border-left: 1px solid #333; }
-        .chat-header { padding: 20px; border-bottom: 1px solid #333; color: var(--gold); font-weight: bold; font-size: 12px; }
-        #chat-display { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .msg-box { background: #222; padding: 10px; border-radius: 8px; border-left: 3px solid var(--gold); }
-        .msg-user { font-weight: 800; color: var(--gold); font-size: 10px; display: block; }
+        .chat-header { padding: 20px; border-bottom: 1px solid #333; color: var(--gold); font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 10px; }
+        .chat-header::before { content: ''; width: 8px; height: 8px; background: #00ff00; border-radius: 50%; box-shadow: 0 0 8px #00ff00; }
+        
+        #chat-display { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .msg-box { background: #222; padding: 12px; border-radius: 8px; border-left: 3px solid var(--gold); }
+        .msg-user { font-weight: 800; color: var(--gold); font-size: 10px; display: block; text-transform: uppercase; }
         .msg-text { font-size: 14px; color: #eee; }
 
-        .chat-controls { padding: 20px; background: #151515; border-top: 1px solid #333; display: flex; gap: 10px; }
-        #chat-input { flex: 1; background: #000; border: 1px solid #444; color: white; padding: 12px; border-radius: 6px; }
+        .chat-controls { padding: 20px; border-top: 1px solid #333; display: flex; gap: 10px; }
+        #chat-input { flex: 1; background: #000; border: 1px solid #444; color: white; padding: 12px; border-radius: 6px; outline: none; }
 
-        .btn { cursor: pointer; border: none; border-radius: 4px; padding: 14px; font-weight: 700; background: var(--gold); color: var(--black); width: 100%; }
-        
+        .btn { cursor: pointer; border: none; border-radius: 4px; padding: 14px; font-weight: 700; background: var(--gold); color: var(--black); width: 100%; text-transform: uppercase; }
+
         @media (max-width: 900px) {
             #main-content { grid-template-columns: 1fr; grid-template-rows: 50% 50%; }
             .chat-section { border-left: none; border-top: 1px solid #333; }
@@ -40,27 +42,29 @@
 
     <div id="lock-screen">
         <div class="login-card">
-            <h2>ACESSO À LIVE</h2>
+            <img src="https://unegro.org.br/wp-content/uploads/2021/04/logo-unegro.png" width="70" style="margin-bottom: 15px;">
+            <h2>Validar Filiado</h2>
             <input type="text" id="user-name" placeholder="Nome Completo">
             <input type="email" id="user-email" placeholder="E-mail Cadastrado">
-            <button class="btn" onclick="validarAcesso()">Entrar agora</button>
-            <p id="error-msg" style="color: var(--red); font-size: 12px; margin-top: 20px; display: none;">Dados não conferem.</p>
+            <button class="btn" id="btn-login" onclick="validarAcesso()">Entrar na Roda</button>
+            <p id="error-msg" style="color: var(--red); font-size: 12px; margin-top: 20px; display: none; font-weight: bold;">DADOS NÃO ENCONTRADOS.</p>
         </div>
     </div>
 
     <div id="main-content">
-        <div class="video-section" id="video-wrapper"></div>
+        <div class="video-section" id="video-wrapper">Aguardando sinal...</div>
         <div class="chat-section">
-            <div class="chat-header">CHAT AO VIVO</div>
+            <div class="chat-header">AO VIVO</div>
             <div id="chat-display"></div>
             <div class="chat-controls">
                 <input type="text" id="chat-input" placeholder="Diga algo...">
-                <button class="btn" style="width: auto;" onclick="enviarMsg()">➤</button>
+                <button class="btn" style="width: auto;" onclick="enviarMensagem()">➤</button>
             </div>
         </div>
     </div>
 
 <script>
+    // CHAVES FORNECIDAS
     const CONFIG = {
         URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
         KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
@@ -70,20 +74,26 @@
     let usuarioAtivo = null;
 
     async function validarAcesso() {
+        const btn = document.getElementById('btn-login');
         const nomeIn = document.getElementById('user-name').value.trim();
         const emailIn = document.getElementById('user-email').value.trim();
+
+        if(!nomeIn || !emailIn) return alert("Preencha nome e e-mail.");
+
+        btn.innerText = "CONECTANDO AO BANCO...";
+        btn.disabled = true;
 
         try {
             const { data, error } = await _supabase
                 .from('unegro_filiados')
                 .select('nome')
-                .ilike('nome', `%${nomeIn}%`)
-                .ilike('email', `%${emailIn}%`)
+                .ilike('nome', nomeIn)
+                .ilike('email', emailIn)
                 .maybeSingle();
 
             if (error) {
-                // Se der erro de conexão, ele vai avisar o motivo real aqui
-                alert("Erro técnico: " + error.message + "\nCódigo: " + error.code);
+                // Se der erro de conexão real, vai pular para o catch ou mostrar aqui
+                alert("ERRO TÉCNICO SUPABASE:\n" + error.message + "\nCódigo: " + error.code);
                 return;
             }
 
@@ -95,38 +105,48 @@
             } else {
                 document.getElementById('error-msg').style.display = 'block';
             }
-        } catch (e) {
-            alert("Falha crítica de rede. Verifique sua internet.");
+        } catch (err) {
+            alert("ERRO DE REDE: O navegador não conseguiu falar com o Supabase. Verifique se as chaves URL/KEY estão corretas nas configurações.");
+            console.error(err);
+        } finally {
+            btn.innerText = "ENTRAR NA RODA";
+            btn.disabled = false;
         }
     }
 
     async function iniciar() {
-        const { data } = await _supabase.from('configuracoes').select('valor').eq('chave', 'url_live_atual').single();
-        if (data) document.getElementById('video-wrapper').innerHTML = `<iframe src="${data.valor}" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
-        
-        // Carregar Chat
+        // 1. Carrega Live
+        try {
+            const { data: config } = await _supabase.from('configuracoes').select('valor').eq('chave', 'url_live_atual').single();
+            if (config) document.getElementById('video-wrapper').innerHTML = `<iframe src="${config.valor}" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
+        } catch(e) { console.log("Erro ao carregar link da live"); }
+
+        // 2. Carrega Chat
         const { data: msgs } = await _supabase.from('live_chat').select('*').order('created_at', { ascending: false }).limit(30);
-        if (msgs) msgs.reverse().forEach(render);
+        if (msgs) msgs.reverse().forEach(renderizar);
 
-        _supabase.channel('live').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'live_chat' }, p => render(p.new)).subscribe();
+        // 3. Escuta Realtime
+        _supabase.channel('unegro_live_chat').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'live_chat' }, p => renderizar(p.new)).subscribe();
     }
 
-    function render(m) {
-        const div = document.createElement('div');
-        div.className = 'msg-box';
-        div.innerHTML = `<span class="msg-user">${m.user_name}</span><span class="msg-text">${m.content}</span>`;
-        const c = document.getElementById('chat-display');
-        c.appendChild(div);
-        c.scrollTop = c.scrollHeight;
+    function renderizar(m) {
+        const d = document.createElement('div');
+        d.className = 'msg-box';
+        d.innerHTML = `<span class="msg-user">${m.user_name}</span><span class="msg-text">${m.content}</span>`;
+        const display = document.getElementById('chat-display');
+        display.appendChild(d);
+        display.scrollTop = display.scrollHeight;
     }
 
-    async function enviarMsg() {
-        const i = document.getElementById('chat-input');
-        const t = i.value.trim();
-        if (!t) return;
-        i.value = '';
-        await _supabase.from('live_chat').insert([{ user_name: usuarioAtivo, content: t }]);
+    async function enviarMensagem() {
+        const inp = document.getElementById('chat-input');
+        const txt = inp.value.trim();
+        if (!txt) return;
+        inp.value = '';
+        await _supabase.from('live_chat').insert([{ user_name: usuarioAtivo, content: txt }]);
     }
+
+    document.getElementById('chat-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') enviarMensagem(); });
 </script>
 </body>
 </html>
