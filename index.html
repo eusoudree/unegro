@@ -267,6 +267,21 @@
         </div>
     </section>
 
+
+
+
+
+
+    <section class="secao-referencias">
+        <div id="container-referencias" class="grid-referencias"></div>
+        <div id="container-coordenacao" class="bloco-coordenacao"></div>
+        <h4 class="titulo-mosaico">Lideranças Territoriais</h4>
+        <div id="container-vale" class="grid-vale"></div>
+    </section>
+
+    <div id="modal-lider" class="modal-overlay" onclick="fecharModal()">
+        </div>
+
     <section id="midia" style="background: #050505; border-radius: 50px;">
     <h2 class="secao-titulo">Na Mídia</h2>
 
@@ -507,6 +522,67 @@
 
             window.open(doc.output('bloburl'), '_blank');
         }
+
+
+
+///
+
+        async function carregarLiderancas() {
+    const { data, error } = await _supabase
+        .from('liderancas_unegro')
+        .select('*')
+        .order('ordem', { ascending: true });
+
+    if (error) return;
+
+    const refs = data.filter(i => i.tipo === 'REFERENCIA');
+    const coord = data.filter(i => i.tipo === 'COORDENACAO');
+    const vale = data.filter(i => i.tipo === 'VALE');
+
+    // Renderiza Referências
+    document.getElementById('container-referencias').innerHTML = refs.map(r => `
+        <div class="card-ref" onclick="abrirModalPorDados(${JSON.stringify(r).replace(/"/g, '&quot;')})">
+            <div class="img-ref" style="background-image: url('${r.foto_url}')"></div>
+            <div class="name-ref">${r.nome}</div>
+        </div>
+    `).join('');
+
+    // Renderiza Você (Coordenação)
+    if (coord.length > 0) {
+        const c = coord[0];
+        document.getElementById('container-coordenacao').innerHTML = `
+            <div class="card-coord" onclick="abrirModalPorDados(${JSON.stringify(c).replace(/"/g, '&quot;')})">
+                <div class="img-coord" style="background-image: url('${c.foto_url}')"></div>
+                <div class="info-coord">
+                    <span class="lider-city" style="color:#f1b434">${c.cidade}</span>
+                    <h3 class="lider-name" style="margin: 5px 0;">${c.nome}</h3>
+                    <span style="font-size:11px; color:#666; text-transform:uppercase;">${c.cargo}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    // Renderiza Mosaico do Vale
+    document.getElementById('container-vale').innerHTML = vale.map(v => `
+        <div class="card-vale" onclick="abrirModalPorDados(${JSON.stringify(v).replace(/"/g, '&quot;')})">
+            <div class="img-vale" style="background-image: url('${v.foto_url}')"></div>
+            <div class="lider-name" style="font-size:12px;">${v.nome}</div>
+            <div style="font-size:9px; color:#555;">${v.cidade}</div>
+        </div>
+    `).join('');
+}
+
+// Função auxiliar para abrir o modal de pertencimento que criamos antes
+function abrirModalPorDados(lider) {
+    document.getElementById('modal-foto').style.backgroundImage = `url('${lider.foto_url}')`;
+    document.getElementById('modal-nome').innerText = lider.nome;
+    document.getElementById('modal-cidade').innerText = lider.cidade;
+    document.getElementById('modal-bio').innerText = lider.biografia || lider.mini_descricao;
+    document.getElementById('modal-insta').href = lider.instagram_url;
+    document.getElementById('modal-lider').style.display = 'flex';
+}
+
+        
     </script>
 </body>
 </html>
