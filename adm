@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADM Live | UNEGRO Vale</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --gold: #f1b434; --red: #8b0000; --black: #0a0a0a; --gray: #1a1a1a; }
+        body { font-family: 'Inter', sans-serif; background: var(--black); color: white; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+
+        /* Login */
+        #login-admin { background: var(--gray); padding: 40px; border-radius: 12px; border: 1px solid var(--gold); width: 350px; text-align: center; }
+        
+        /* Painel */
+        #panel-admin { display: none; background: var(--gray); padding: 40px; border-radius: 12px; border: 1px solid var(--gold); width: 500px; }
+
+        h2 { color: var(--gold); text-transform: uppercase; margin-top: 0; font-size: 1.2rem; letter-spacing: 1px; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; font-family: monospace; }
+        
+        .btn { cursor: pointer; border: none; border-radius: 4px; padding: 12px; font-weight: 700; transition: 0.2s; text-transform: uppercase; width: 100%; margin-top: 10px; }
+        .btn-gold { background: var(--gold); color: var(--black); }
+        .btn-red { background: var(--red); color: white; margin-top: 20px; }
+        
+        .status { font-size: 12px; margin-top: 15px; padding: 10px; border-radius: 4px; display: none; }
+        .success { background: rgba(0, 255, 0, 0.1); color: #00ff00; border: 1px solid #00ff00; }
+    </style>
+</head>
+<body>
+
+    <div id="login-admin">
+        <h2>Painel de Transmissão</h2>
+        <input type="text" id="user" placeholder="Usuário">
+        <input type="password" id="pass" placeholder="Senha">
+        <button class="btn btn-gold" onclick="handleLogin()">Acessar Controles</button>
+        <p id="err" style="color: var(--red); font-size: 12px; margin-top: 15px; display: none;">Acesso negado.</p>
+    </div>
+
+    <div id="panel-admin">
+        <h2>Configurar Transmissão</h2>
+        <p style="font-size: 13px; color: #aaa;">Cole abaixo a URL do Embed da Live (Ex: link de incorporação do YouTube ou Instagram).</p>
+        
+        <label style="font-size: 11px; color: var(--gold);">URL ATUAL DA LIVE:</label>
+        <textarea id="live-url" rows="4" placeholder="https://www.youtube.com/embed/XXXXX"></textarea>
+        
+        <button class="btn btn-gold" onclick="updateLive()">Atualizar Live Agora</button>
+        <div id="msg-ok" class="status success">Link atualizado! Os filiados já podem assistir.</div>
+
+        <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
+        
+        <button class="btn btn-red" onclick="clearChat()">Limpar Histórico do Chat</button>
+        <p style="font-size: 10px; color: #666; text-align: center; margin-top: 5px;">Cuidado: Isso apaga todas as mensagens enviadas.</p>
+    </div>
+
+<script>
+    const CONFIG = {
+        URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
+        KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
+    };
+
+    const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
+
+    function handleLogin() {
+        const u = document.getElementById('user').value;
+        const p = document.getElementById('pass').value;
+
+        if(u === 'unegro' && p === 'Unegrovale2026!') {
+            document.getElementById('login-admin').style.display = 'none';
+            document.getElementById('panel-admin').style.display = 'block';
+            fetchCurrentUrl();
+        } else {
+            document.getElementById('err').style.display = 'block';
+        }
+    }
+
+    async function fetchCurrentUrl() {
+        const { data } = await _supabase
+            .from('configuracoes')
+            .select('valor')
+            .eq('chave', 'url_live_atual')
+            .single();
+        
+        if (data) document.getElementById('live-url').value = data.valor;
+    }
+
+    async function updateLive() {
+        const newUrl = document.getElementById('live-url').value.trim();
+        
+        const { error } = await _supabase
+            .from('configuracoes')
+            .update({ valor: newUrl, updated_at: new Date() })
+            .eq('chave', 'url_live_atual');
+
+        if (!error) {
+            const box = document.getElementById('msg-ok');
+            box.style.display = 'block';
+            setTimeout(() => box.style.display = 'none', 4000);
+        } else {
+            alert("Erro ao conectar com a base de dados.");
+        }
+    }
+
+    async function clearChat() {
+        if(!confirm("Tem certeza que deseja apagar todas as mensagens do chat?")) return;
+
+        const { error } = await _supabase
+            .from('live_chat')
+            .delete()
+            .neq('id', 0); // Deleta tudo onde ID não é zero
+
+        if (!error) alert("Chat limpo com sucesso!");
+    }
+</script>
+</body>
+</html>
