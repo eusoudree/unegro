@@ -589,74 +589,60 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // 2. INICIALIZAÇÃO DE PLUGINS VIZUAIS
-        ScrollReveal().reveal('section', { delay: 200, distance: '50px', origin: 'bottom', opacity: 0 });
 
-       window.carregarLiderancas = async function() {
-    try {
-        const { data, error } = await _supabase
-            .from('liderancas_unegro')
-            .select('*')
-            .order('ordem', { ascending: true });
+window.carregarLiderancas = async function() {
+            try {
+                const { data, error } = await _supabase
+                    .from('liderancas_unegro')
+                    .select('*')
+                    .order('ordem', { ascending: true });
 
-        if (error) throw error;
+                if (error) throw error;
 
-        const coord = data.filter(i => i.tipo === 'COORDENACAO')[0];
-        const vale = data.filter(i => i.tipo === 'VALE');
-        let htmlFinal = "";
+                const coord = data.filter(i => i.tipo === 'COORDENACAO')[0];
+                const vale = data.filter(i => i.tipo === 'VALE');
+                let htmlFinal = "";
 
-        // Função interna para extrair a bio independente do nome da coluna (proteção extra)
-        const getBio = (item) => {
-            return item['mini_descricão'] || item['mini_descricao'] || item.mini_descricao || item.biografia?.substring(0, 150) || "Liderança UNEGRO Vale.";
+                // FUNÇÃO BLINDADA: Ela busca qualquer coluna que tenha 'mini' no nome
+                const getBio = (item) => {
+                    // Tenta achar a chave que contém 'mini' (resolve o problema do ã)
+                    const chaveMini = Object.keys(item).find(key => key.includes('mini'));
+                    const valorMini = chaveMini ? item[chaveMini] : null;
+                    
+                    return valorMini || item.biografia?.substring(0, 150) || "Liderança UNEGRO Vale.";
+                };
+
+                const gerarCardHTML = (lider, extraLabel = "") => {
+                    const label = extraLabel || lider.cargo || 'Liderança Vale';
+                    return `
+                        <div class="card-lider" onclick='abrirModal(${JSON.stringify(lider)})'>
+                            <div class="img-bg" style="background-image: url('${lider.foto_url}')"></div>
+                            <div class="card-static-info">
+                                <span class="info-city">${lider.cidade}</span>
+                                <h3 class="info-name">${lider.nome}</h3>
+                            </div>
+                            <div class="card-hover-overlay">
+                                <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">${label}</span>
+                                <h2 style="font-weight: 900; text-transform: uppercase; margin-bottom: 5px;">${lider.nome}</h2>
+                                <p class="hover-bio">${getBio(lider)}</p>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <a href="${lider.instagram_url}" target="_blank" onclick="event.stopPropagation();" class="btn-insta-mosaico">@Instagram</a>
+                                    <span style="font-size: 10px; font-weight: 900;">VER BIO ➔</span>
+                                </div>
+                            </div>
+                        </div>`;
+                };
+
+                if (coord) htmlFinal += gerarCardHTML(coord, "COORDENAÇÃO GERAL");
+                htmlFinal += vale.map(v => gerarCardHTML(v)).join('');
+
+                document.getElementById('mosaico-completo').innerHTML = htmlFinal;
+            } catch (err) {
+                console.error("Erro ao carregar mosaico:", err.message);
+            }
         };
 
-        if (coord) {
-            htmlFinal += `
-                <div class="card-lider" onclick='abrirModal(${JSON.stringify(coord)})'>
-                    <div class="img-bg" style="background-image: url('${coord.foto_url}')"></div>
-                    <div class="card-static-info">
-                        <span class="info-city">${coord.cidade}</span>
-                        <h3 class="info-name">${coord.nome}</h3>
-                    </div>
-                    <div class="card-hover-overlay">
-                        <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">COORDENAÇÃO GERAL</span>
-                        <h2 style="font-weight: 900; text-transform: uppercase; margin-bottom: 5px;">${coord.nome}</h2>
-                        <p class="hover-bio">${getBio(coord)}</p>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <a href="${coord.instagram_url}" target="_blank" onclick="event.stopPropagation();" class="btn-insta-mosaico">@Instagram</a>
-                            <span style="font-size: 10px; font-weight: 900;">VER BIO ➔</span>
-                        </div>
-                    </div>
-                </div>`;
-        }
-
-        htmlFinal += vale.map(v => `
-            <div class="card-lider" onclick='abrirModal(${JSON.stringify(v)})'>
-                <div class="img-bg" style="background-image: url('${v.foto_url}')"></div>
-                <div class="card-static-info">
-                    <span class="info-city">${v.cidade}</span>
-                    <h3 class="info-name">${v.nome}</h3>
-                </div>
-                <div class="card-hover-overlay">
-                    <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">${v.cargo || 'Liderança Vale'}</span>
-                    <h2 style="font-weight: 900; text-transform: uppercase; margin-bottom: 5px;">${v.nome}</h2>
-                    <p class="hover-bio">${getBio(v)}</p>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <a href="${v.instagram_url}" target="_blank" onclick="event.stopPropagation();" class="btn-insta-mosaico">@Instagram</a>
-                        <span style="font-size: 10px; font-weight: 900;">VER BIO ➔</span>
-                    </div>
-                </div>
-            </div>
-        `).join('');
-
-        document.getElementById('mosaico-completo').innerHTML = htmlFinal;
-    } catch (err) {
-        console.error("Erro ao carregar mosaico:", err.message);
-    }
-};
-
-              
-
+       
         window.abrirModal = (lider) => {
             // IDs do Modal precisam existir no seu HTML (ID="modal-lider", etc)
             const modalFoto = document.getElementById('modal-foto');
