@@ -214,41 +214,58 @@
 .dropdown:hover .dropdown-content { display: block; }
 
 
-    /* SEÇÃO DAS LIDERANÇAS */
-    .secao-referencias { padding: 80px 20px; background: #0a0a0a; text-align: center; }
-    .grid-referencias { display: flex; justify-content: center; gap: 40px; margin-bottom: 60px; flex-wrap: wrap; }
-    .card-ref { width: 150px; opacity: 0.6; transition: 0.4s; cursor: pointer; }
-    .card-ref:hover { opacity: 1; transform: scale(1.05); }
-    .img-ref { width: 90px; height: 90px; border-radius: 50%; margin: 0 auto 10px; background-size: cover; background-position: center; border: 1px solid #333; filter: grayscale(1); }
-    .card-ref:hover .img-ref { filter: grayscale(0); border-color: #f1b434; }
-    .name-ref { font-size: 11px; color: #f1b434; text-transform: uppercase; letter-spacing: 1px; }
+   /* MÓDULO LIDERANÇAS DO VALE */
+.secao-liderancas { padding: 80px 20px; background: #0a0a0a; }
 
-    /* CARD COORDENAÇÃO (DREE) */
-    .bloco-coordenacao { margin-bottom: 70px; display: flex; justify-content: center; }
-    .card-coord { 
-        width: 100%; max-width: 400px; background: #111; padding: 25px; 
-        border-radius: 12px; border: 1px solid #222; display: flex; align-items: center; gap: 20px;
-        cursor: pointer; transition: 0.4s;
-    }
-    .card-coord:hover { border-color: #f1b434; background: #151515; transform: translateY(-5px); }
-    .img-coord { width: 100px; height: 100px; border-radius: 8px; background-size: cover; background-position: center; filter: grayscale(1); }
-    .card-coord:hover .img-coord { filter: grayscale(0); }
+.grid-mosaico-vale { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+    gap: 20px; 
+    max-width: 1200px; 
+    margin: 0 auto; 
+}
 
-    /* MOSAICO VALE */
-    .grid-vale { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; }
-    .card-vale { background: #0d0d0d; padding: 15px; border-radius: 8px; border: 1px solid #1a1a1a; cursor: pointer; transition: 0.3s; }
-    .card-vale:hover { border-color: #333; background: #151515; }
-    .img-vale { width: 100%; aspect-ratio: 1/1; background-size: cover; background-position: center; border-radius: 4px; filter: grayscale(1); margin-bottom: 10px; }
-    .card-vale:hover .img-vale { filter: grayscale(0); }
+/* SEU CARD (COORDENAÇÃO) - DESTAQUE */
+.card-coord { 
+    grid-column: span 2; 
+    background: #111; 
+    padding: 30px; 
+    border-radius: 15px; 
+    border: 1px solid #f1b434; 
+    display: flex; 
+    align-items: center; 
+    gap: 25px;
+    cursor: pointer; 
+    transition: 0.4s;
+}
+.card-coord:hover { background: #151515; transform: translateY(-5px); box-shadow: 0 10px 40px rgba(241, 180, 52, 0.1); }
+.img-coord { width: 120px; height: 120px; border-radius: 10px; background-size: cover; background-position: center; border: 1px solid #222; }
 
-    /* MODAL DE PERTENCIMENTO */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-    .modal-content { background: #151515; width: 90%; max-width: 750px; border-radius: 16px; border: 1px solid #333; position: relative; overflow: hidden; display: flex; flex-wrap: wrap; }
-    .modal-img { flex: 1; min-width: 300px; height: 400px; background-size: cover; background-position: center; }
-    .modal-text { flex: 1.2; padding: 40px; min-width: 300px; text-align: left; }
-    .close-btn { position: absolute; top: 15px; right: 20px; background: none; border: none; color: #fff; font-size: 30px; cursor: pointer; z-index: 10; }
+/* DEMAIS CARDS DO MOSAICO */
+.card-vale { 
+    background: #0d0d0d; 
+    padding: 15px; 
+    border-radius: 10px; 
+    border: 1px solid #1a1a1a; 
+    cursor: pointer; 
+    transition: 0.3s;
+    text-align: center;
+}
+.card-vale:hover { border-color: #333; background: #151515; transform: translateY(-3px); }
+.img-vale { width: 100%; aspect-ratio: 1/1; background-size: cover; background-position: center; border-radius: 6px; filter: grayscale(1); margin-bottom: 12px; transition: 0.5s; }
+.card-vale:hover .img-vale { filter: grayscale(0); }
 
+/* MODAL DE BIOGRAFIA */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+.modal-content { background: #151515; width: 90%; max-width: 800px; border-radius: 20px; border: 1px solid #333; position: relative; overflow: hidden; display: flex; flex-wrap: wrap; }
+.modal-img { flex: 1; min-width: 300px; height: 450px; background-size: cover; background-position: center; }
+.modal-text { flex: 1.2; padding: 45px; min-width: 300px; text-align: left; }
+.close-btn { position: absolute; top: 15px; right: 25px; background: none; border: none; color: #fff; font-size: 35px; cursor: pointer; z-index: 10; }
 
+@media (max-width: 768px) {
+    .card-coord { grid-column: span 1; flex-direction: column; text-align: center; padding: 20px; }
+    .grid-mosaico-vale { grid-template-columns: repeat(2, 1fr); }
+}
         
     </style>
 </head>
@@ -306,11 +323,11 @@
     </section>
 
 
-<section class="secao-referencias">
-    <div id="container-referencias" class="grid-referencias"></div>
-    <div id="container-coordenacao" class="bloco-coordenacao"></div>
-    <h4 style="color:#333; text-transform:uppercase; letter-spacing:4px; font-size:10px; margin-bottom:30px;">Lideranças Territoriais</h4>
-    <div id="container-vale" class="grid-vale"></div>
+<section class="secao-liderancas">
+    <h4 style="color:#222; text-transform:uppercase; letter-spacing:6px; font-size:11px; margin-bottom:50px; text-align:center;">Lideranças do Vale do Paraíba</h4>
+    
+    <div id="mosaico-completo" class="grid-mosaico-vale">
+        </div>
 </section>
 
 <div id="modal-lider" class="modal-overlay" onclick="fecharModal()">
@@ -318,10 +335,10 @@
         <button class="close-btn" onclick="fecharModal()">&times;</button>
         <div class="modal-img" id="modal-foto"></div>
         <div class="modal-text">
-            <span id="modal-cidade" style="color:#f1b434; font-size:10px; text-transform:uppercase; letter-spacing:2px;"></span>
-            <h3 id="modal-nome" style="margin:10px 0; font-size:24px; color:#fff;"></h3>
-            <p id="modal-bio" style="color:#888; font-size:14px; line-height:1.6; margin-bottom:25px;"></p>
-            <a id="modal-insta" href="#" target="_blank" class="insta-btn">Instagram</a>
+            <span id="modal-cidade" style="color:#f1b434; font-size:10px; text-transform:uppercase; letter-spacing:2px; font-weight:800;"></span>
+            <h3 id="modal-nome" style="margin:12px 0; font-size:26px; color:#fff; font-weight:900;"></h3>
+            <p id="modal-bio" style="color:#999; font-size:15px; line-height:1.7; margin-bottom:30px;"></p>
+            <a id="modal-insta" href="#" target="_blank" class="insta-btn">VER INSTAGRAM</a>
         </div>
     </div>
 </div>
@@ -571,68 +588,64 @@
 
 ///
 
-      // BIBLIOTECA SUPABASE (Se você ainda não tiver no topo do HTML, coloque aqui)
-const scriptSupabase = document.createElement('script');
-scriptSupabase.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-document.head.appendChild(scriptSupabase);
+     window.carregarLiderancas = async function() {
+    // Busca as lideranças do Supabase
+    const { data, error } = await _supabase
+        .from('liderancas_unegro')
+        .select('*')
+        .order('ordem', { ascending: true });
 
-scriptSupabase.onload = () => {
-    // CONEXÃO OFICIAL
-    const _supabase = supabase.createClient('https://huxemmuzhlntwimgiukt.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs');
+    if (error) return console.error("Erro ao carregar mosaico:", error);
 
-    window.carregarLiderancas = async function() {
-        const { data, error } = await _supabase.from('liderancas_unegro').select('*').order('ordem', { ascending: true });
-        if (error) return;
+    // Filtra Coordenação e o restante (ignorando tipo REFERENCIA se houver)
+    const coord = data.filter(i => i.tipo === 'COORDENACAO')[0];
+    const vale = data.filter(i => i.tipo === 'VALE');
 
-        const refs = data.filter(i => i.tipo === 'REFERENCIA');
-        const coord = data.filter(i => i.tipo === 'COORDENACAO');
-        const vale = data.filter(i => i.tipo === 'VALE');
+    let htmlFinal = "";
 
-        document.getElementById('container-referencias').innerHTML = refs.map(r => `
-            <div class="card-ref" onclick='abrirModal(${JSON.stringify(r)})'>
-                <div class="img-ref" style="background-image: url("${r.foto_url}")"></div>
-                <div class="name-ref">${r.nome}</div>
-            </div>`).join('');
+    // Adiciona Dree (Você) primeiro
+    if (coord) {
+        htmlFinal += `
+            <div class="card-coord" onclick='abrirModal(${JSON.stringify(coord)})'>
+                <div class="img-coord" style="background-image: url("${coord.foto_url}")"></div>
+                <div class="info-coord">
+                    <span style="color:#f1b434; font-size:10px; text-transform:uppercase; font-weight:800;">${coord.cidade}</span>
+                    <h3 style="margin:8px 0; font-size:22px; color:#fff; font-weight:900;">${coord.nome}</h3>
+                    <span style="font-size:11px; color:#555; text-transform:uppercase; font-weight:bold;">${coord.cargo}</span>
+                </div>
+            </div>`;
+    }
 
-        if (coord.length > 0) {
-            const c = coord[0];
-            document.getElementById('container-coordenacao').innerHTML = `
-                <div class="card-coord" onclick='abrirModal(${JSON.stringify(c)})'>
-                    <div class="img-coord" style="background-image: url("${c.foto_url}")"></div>
-                    <div class="info-coord" style="text-align:left;">
-                        <span style="color:#f1b434; font-size:9px; text-transform:uppercase;">${c.cidade}</span>
-                        <h3 style="margin:5px 0; font-size:18px;">${c.nome}</h3>
-                        <span style="font-size:10px; color:#555; text-transform:uppercase;">${c.cargo}</span>
-                    </div>
-                </div>`;
-        }
+    // Adiciona o restante das cidades no mesmo grid
+    htmlFinal += vale.map(v => `
+        <div class="card-vale" onclick='abrirModal(${JSON.stringify(v)})'>
+            <div class="img-vale" style="background-image: url("${v.foto_url}")"></div>
+            <div style="font-size:13px; font-weight:800; color:#eee; text-transform:uppercase;">${v.nome}</div>
+            <div style="font-size:9px; color:#444; text-transform:uppercase; margin-top:5px;">${v.cidade}</div>
+        </div>
+    `).join('');
 
-        document.getElementById('container-vale').innerHTML = vale.map(v => `
-            <div class="card-vale" onclick='abrirModal(${JSON.stringify(v)})'>
-                <div class="img-vale" style="background-image: url("${v.foto_url}")"></div>
-                <div style="font-size:12px; font-weight:700;">${v.nome}</div>
-                <div style="font-size:9px; color:#555; text-transform:uppercase;">${v.cidade}</div>
-            </div>`).join('');
-    };
-
-    window.abrirModal = (lider) => {
-        document.getElementById('modal-foto').style.backgroundImage = `url("${lider.foto_url}")`;
-        document.getElementById('modal-nome').innerText = lider.nome;
-        document.getElementById('modal-cidade').innerText = lider.cidade;
-        document.getElementById('modal-bio').innerText = lider.biografia || lider.mini_descricao;
-        document.getElementById('modal-insta').href = lider.instagram_url;
-        document.getElementById('modal-lider').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    };
-
-    window.fecharModal = () => {
-        document.getElementById('modal-lider').style.display = 'none';
-        document.body.style.overflow = 'auto';
-    };
-
-    carregarLiderancas();
+    document.getElementById('mosaico-completo').innerHTML = htmlFinal;
 };
 
+// Funções do Modal
+window.abrirModal = (lider) => {
+    document.getElementById('modal-foto').style.backgroundImage = `url("${lider.foto_url}")`;
+    document.getElementById('modal-nome').innerText = lider.nome;
+    document.getElementById('modal-cidade').innerText = lider.cidade;
+    document.getElementById('modal-bio').innerText = lider.biografia || lider.mini_descricao;
+    document.getElementById('modal-insta').href = lider.instagram_url;
+    document.getElementById('modal-lider').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+};
+
+window.fecharModal = () => {
+    document.getElementById('modal-lider').style.display = 'none';
+    document.body.style.overflow = 'auto';
+};
+
+// Dispara o carregamento
+carregarLiderancas();
         
     </script>
 </body>
