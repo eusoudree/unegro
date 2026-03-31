@@ -583,19 +583,13 @@
    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-    <script>
+   <script>
         // 1. CONFIGURAÇÃO UNIFICADA DO SUPABASE
         const SUPABASE_URL = 'https://huxemmuzhlntwimgiukt.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // 2. INICIALIZAÇÃO DE PLUGINS VIZUAIS
-        const swiper = new Swiper('.swiper', { 
-            slidesPerView: 1, 
-            spaceBetween: 20, 
-            pagination: { el: '.swiper-pagination', clickable: true }, 
-            breakpoints: { 768: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } } 
-        });
         ScrollReveal().reveal('section', { delay: 200, distance: '50px', origin: 'bottom', opacity: 0 });
 
         // 3. FUNÇÕES DO MOSAICO DE LIDERANÇAS
@@ -608,13 +602,11 @@
 
                 if (error) throw error;
 
-                // Separamos quem é coordenação e quem é vale
                 const coord = data.filter(i => i.tipo === 'COORDENACAO')[0];
                 const vale = data.filter(i => i.tipo === 'VALE');
-                
                 let htmlFinal = "";
 
-                // 1. Primeiro renderizamos a Coordenação (se existir) com o efeito de deslise
+                // Renderiza Coordenador
                 if (coord) {
                     htmlFinal += `
                         <div class="card-lider" onclick='abrirModal(${JSON.stringify(coord)})'>
@@ -624,11 +616,9 @@
                                 <h3 class="info-name">${coord.nome}</h3>
                             </div>
                             <div class="card-hover-overlay">
-                                <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">
-                                    COORDENAÇÃO GERAL
-                                </span>
+                                <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">COORDENAÇÃO GERAL</span>
                                 <h2 style="font-weight: 900; text-transform: uppercase; margin-bottom: 5px;">${coord.nome}</h2>
-                                <p class="hover-bio">${coord['mini_descricão'] || coord.mini_descricao || 'Articulação e legado no Vale do Paraíba.'}</p>
+                                <p class="hover-bio">${coord['mini_descricão'] || coord.mini_descricao || 'Liderança UNEGRO Vale.'}</p>
                                 <div style="display: flex; gap: 10px; align-items: center;">
                                     <a href="${coord.instagram_url}" target="_blank" onclick="event.stopPropagation();" class="btn-insta-mosaico">@Instagram</a>
                                     <span style="font-size: 10px; font-weight: 900;">VER BIO ➔</span>
@@ -637,7 +627,7 @@
                         </div>`;
                 }
 
-                // 2. Depois renderizamos as demais lideranças do Vale
+                // Renderiza Demais Lideranças
                 htmlFinal += vale.map(v => `
                     <div class="card-lider" onclick='abrirModal(${JSON.stringify(v)})'>
                         <div class="img-bg" style="background-image: url('${v.foto_url}')"></div>
@@ -646,11 +636,9 @@
                             <h3 class="info-name">${v.nome}</h3>
                         </div>
                         <div class="card-hover-overlay">
-                            <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">
-                                ${v.cargo || 'Liderança Vale'}
-                            </span>
+                            <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">${v.cargo || 'Liderança Vale'}</span>
                             <h2 style="font-weight: 900; text-transform: uppercase; margin-bottom: 5px;">${v.nome}</h2>
-                            <p class="hover-bio">${v['mini_descricão'] || v.mini_descricao || 'Construindo o legado da UNEGRO.'}</p>
+                            <p class="hover-bio">${v['mini_descricão'] || v.mini_descricao || 'Construindo legado no Vale.'}</p>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <a href="${v.instagram_url}" target="_blank" onclick="event.stopPropagation();" class="btn-insta-mosaico">@Instagram</a>
                                 <span style="font-size: 10px; font-weight: 900;">VER BIO ➔</span>
@@ -665,17 +653,18 @@
             }
         };
 
-        // Ajuste no Modal para garantir que a descrição apareça lá também
         window.abrirModal = (lider) => {
-            // Se você tiver um modal no HTML com esses IDs, ele vai preencher
+            // IDs do Modal precisam existir no seu HTML (ID="modal-lider", etc)
             const modalFoto = document.getElementById('modal-foto');
             const modalNome = document.getElementById('modal-nome');
             const modalBio = document.getElementById('modal-bio');
-            
+            const modalInsta = document.getElementById('modal-insta');
+
             if(modalFoto) modalFoto.style.backgroundImage = `url("${lider.foto_url}")`;
             if(modalNome) modalNome.innerText = lider.nome;
-            if(modalBio) modalBio.innerText = lider.biografia || lider['mini_descricão'] || lider.mini_descricao;
-            
+            if(modalBio) modalBio.innerText = lider.biografia || lider['mini_descricão'];
+            if(modalInsta) modalInsta.href = lider.instagram_url;
+
             const modalElement = document.getElementById('modal-lider');
             if(modalElement) {
                 modalElement.style.display = 'flex';
@@ -683,46 +672,9 @@
             }
         };
 
-                // Cards Mosaico (Cidades)
-               htmlFinal += vale.map(v => `
-    <div class="card-lider" onclick='abrirModal(${JSON.stringify(v)})'>
-        <div class="img-bg" style="background-image: url('${v.foto_url}')"></div>
-        <div class="card-static-info">
-            <span class="info-city">${v.cidade}</span>
-            <h3 class="info-name">${v.nome}</h3>
-        </div>
-        <div class="card-hover-overlay">
-            <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">
-                ${v.cargo || 'Liderança Vale'}
-            </span>
-            <h2 style="font-weight: 900; text-transform: uppercase; margin-bottom: 5px;">${v.nome}</h2>
-            <p class="hover-bio">${v.mini_descricao || (v.biografia ? v.biografia.substring(0, 180) + '...' : 'Descrição em breve.')}</p>
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <a href="${v.instagram_url}" target="_blank" onclick="event.stopPropagation();" class="btn-insta-mosaico">@Instagram</a>
-                <span style="font-size: 10px; font-weight: 900;">CLIQUE PARA BIO COMPLETA ➔</span>
-            </div>
-        </div>
-    </div>
-`).join('');
-
-                document.getElementById('mosaico-completo').innerHTML = htmlFinal;
-            } catch (err) {
-                console.error("Erro ao carregar mosaico:", err.message);
-            }
-        };
-
-        window.abrirModal = (lider) => {
-            document.getElementById('modal-foto').style.backgroundImage = `url("${lider.foto_url}")`;
-            document.getElementById('modal-nome').innerText = lider.nome;
-            document.getElementById('modal-cidade').innerText = lider.cidade;
-            document.getElementById('modal-bio').innerText = lider.biografia || lider.mini_descricao;
-            document.getElementById('modal-insta').href = lider.instagram_url;
-            document.getElementById('modal-lider').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        };
-
         window.fecharModal = () => {
-            document.getElementById('modal-lider').style.display = 'none';
+            const modalElement = document.getElementById('modal-lider');
+            if(modalElement) modalElement.style.display = 'none';
             document.body.style.overflow = 'auto';
         };
 
