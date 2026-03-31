@@ -266,6 +266,78 @@
     .card-coord { grid-column: span 1; flex-direction: column; text-align: center; padding: 20px; }
     .grid-mosaico-vale { grid-template-columns: repeat(2, 1fr); }
 }
+
+
+
+/* SEÇÃO Mosaico UNEGRO Vale */
+.secao-liderancas { padding: 60px 20px; background: #000; }
+
+.grid-mosaico-vale { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 10px; 
+    max-width: 1300px; 
+    margin: 0 auto; 
+}
+
+/* CARD BASE - Tamanho fixo para não quebrar o mosaico */
+.card-lider { 
+    position: relative; 
+    height: 400px; 
+    background: #111;
+    overflow: hidden; 
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* DESTAQUE COORDENADOR (OCUPA 2 COLUNAS NO DESKTOP) */
+@media (min-width: 900px) {
+    .card-coord { grid-column: span 2; }
+}
+
+/* IMAGEM DE FUNDO */
+.img-bg { 
+    width: 100%; height: 100%; 
+    background-size: cover; background-position: center; 
+    filter: grayscale(100%) brightness(0.6); 
+    transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-lider:hover .img-bg { filter: grayscale(0%) brightness(0.4); transform: scale(1.1); }
+
+/* TEXTO FIXO (CIDADE E NOME) */
+.card-static-info {
+    position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px;
+    background: linear-gradient(transparent, rgba(0,0,0,1));
+    z-index: 2; transition: 0.5s;
+}
+.card-lider:hover .card-static-info { opacity: 0; transform: translateY(20px); }
+
+.info-city { color: #f1b434; font-size: 10px; text-transform: uppercase; letter-spacing: 3px; font-weight: 800; }
+.info-name { color: #fff; font-size: 20px; font-weight: 900; text-transform: uppercase; margin-top: 5px; }
+
+/* CONTEÚDO NO HOVER (BIO E INSTA) */
+.card-hover-overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 40px; text-align: center;
+    background: rgba(241, 180, 52, 0.9); /* Dourado UNEGRO */
+    color: #000;
+    transform: translateY(100%); 
+    transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 3;
+}
+.card-lider:hover .card-hover-overlay { transform: translateY(0); }
+
+.hover-bio { font-size: 14px; line-height: 1.6; font-weight: 700; margin-bottom: 25px; }
+.btn-insta-mosaico {
+    background: #000; color: #fff; padding: 12px 25px;
+    border-radius: 30px; text-decoration: none; font-size: 11px;
+    font-weight: 900; text-transform: uppercase; display: inline-block;
+    transition: 0.3s;
+}
+.btn-insta-mosaico:hover { background: #333; transform: scale(1.05); }
+
+
         
     </style>
 </head>
@@ -324,24 +396,9 @@
 
 
 <section class="secao-liderancas">
-    <h4 style="color:#222; text-transform:uppercase; letter-spacing:6px; font-size:11px; margin-bottom:50px; text-align:center;">Lideranças do Vale do Paraíba</h4>
-    
     <div id="mosaico-completo" class="grid-mosaico-vale">
         </div>
 </section>
-
-<div id="modal-lider" class="modal-overlay" onclick="fecharModal()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <button class="close-btn" onclick="fecharModal()">&times;</button>
-        <div class="modal-img" id="modal-foto"></div>
-        <div class="modal-text">
-            <span id="modal-cidade" style="color:#f1b434; font-size:10px; text-transform:uppercase; letter-spacing:2px; font-weight:800;"></span>
-            <h3 id="modal-nome" style="margin:12px 0; font-size:26px; color:#fff; font-weight:900;"></h3>
-            <p id="modal-bio" style="color:#999; font-size:15px; line-height:1.7; margin-bottom:30px;"></p>
-            <a id="modal-insta" href="#" target="_blank" class="insta-btn">VER INSTAGRAM</a>
-        </div>
-    </div>
-</div>
 
     <section id="midia" style="background: #050505; border-radius: 50px;">
     <h2 class="secao-titulo">Na Mídia</h2>
@@ -491,33 +548,48 @@
         });
         ScrollReveal().reveal('section', { delay: 200, distance: '50px', origin: 'bottom', opacity: 0 });
 
-        // 3. FUNÇÕES DO MOSAICO DE LIDERANÇAS
-        window.carregarLiderancas = async function() {
-            try {
-                const { data, error } = await _supabase
-                    .from('liderancas_unegro')
-                    .select('*')
-                    .order('ordem', { ascending: true });
+       window.carregarLiderancas = async function() {
+    try {
+        const { data, error } = await _supabase
+            .from('liderancas_unegro')
+            .select('*')
+            .order('ordem', { ascending: true });
 
-                if (error) throw error;
+        if (error) throw error;
 
-                const coord = data.filter(i => i.tipo === 'COORDENACAO')[0];
-                const vale = data.filter(i => i.tipo === 'VALE');
-                let htmlFinal = "";
+        const container = document.getElementById('mosaico-completo');
+        container.innerHTML = data.map(lider => {
+            const isCoord = lider.tipo === 'COORDENACAO';
+            
+            return `
+                <div class="card-lider ${isCoord ? 'card-coord' : ''}">
+                    <div class="img-bg" style="background-image: url('${lider.foto_url}')"></div>
+                    
+                    <div class="card-static-info">
+                        <span class="info-city">${lider.cidade}</span>
+                        <h3 class="info-name">${lider.nome}</h3>
+                    </div>
 
-                // Card Destaque (Dree)
-                if (coord) {
-                    htmlFinal += `
-                        <div class="card-coord" onclick='abrirModal(${JSON.stringify(coord)})'>
-                            <div class="img-coord" style="background-image: url("${coord.foto_url}")"></div>
-                            <div class="info-coord">
-                                <span style="color:#f1b434; font-size:10px; text-transform:uppercase; font-weight:800;">${coord.cidade}</span>
-                                <h3 style="margin:8px 0; font-size:22px; color:#fff; font-weight:900;">${coord.nome}</h3>
-                                <span style="font-size:11px; color:#555; text-transform:uppercase; font-weight:bold;">${coord.cargo}</span>
-                            </div>
-                        </div>`;
-                }
-
+                    <div class="card-hover-overlay">
+                        <h4 style="text-transform:uppercase; font-size:11px; letter-spacing:2px; margin-bottom:15px; border-bottom:1px solid rgba(0,0,0,0.2); padding-bottom:10px;">
+                            ${lider.cargo || 'Liderança Vale'}
+                        </h4>
+                        <p class="hover-bio">${lider.mini_descricao || lider.biografia.substring(0, 120) + '...'}</p>
+                        <div style="display:flex; flex-direction:column; gap:10px;">
+                            <a href="${lider.instagram_url}" target="_blank" class="btn-insta-mosaico">@Instagram</a>
+                            <button onclick='abrirModal(${JSON.stringify(lider)})' 
+                                    style="background:none; border:2px solid #000; padding:10px; border-radius:30px; font-size:10px; cursor:pointer; font-weight:900; text-transform:uppercase;">
+                                Ver Trajetória Completa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (err) {
+        console.error("Erro na montagem do mosaico:", err.message);
+    }
+};
                 // Cards Mosaico (Cidades)
                 htmlFinal += vale.map(v => `
                     <div class="card-vale" onclick='abrirModal(${JSON.stringify(v)})'>
