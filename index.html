@@ -269,76 +269,128 @@
 
 
 
-/* SEÇÃO Mosaico UNEGRO Vale - Ajustado para 1:1 */
-.secao-liderancas { padding: 60px 20px; background: #000; }
+/* CONTAINER EM FLEX PARA O EFEITO DE DESLISE */
+.secao-liderancas { 
+    padding: 60px 20px; 
+    background: #000; 
+    overflow-x: hidden; /* Evita scroll se expandir muito */
+}
 
 .grid-mosaico-vale { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
-    gap: 15px; 
-    max-width: 1300px; 
+    display: flex; 
+    flex-wrap: nowrap; /* Mantém na mesma linha para o efeito lateral */
+    gap: 10px; 
+    max-width: 1400px; 
     margin: 0 auto; 
+    height: 450px; /* Altura fixa para todos os cards */
 }
 
 .card-lider { 
     position: relative; 
-    aspect-ratio: 1 / 1; /* Garante que seja sempre quadrado */
+    flex: 0 0 200px; /* Largura inicial estreita */
+    height: 100%;
     background: #111;
     overflow: hidden; 
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); /* Transição suave do deslise */
 }
 
-/* Destaque Coordenador (Ocupa 2 colunas se houver espaço) */
-@media (min-width: 900px) {
-    .card-coord { 
-        grid-column: span 2; 
-        aspect-ratio: 2 / 1; /* Retangular para destaque, mas mantendo a altura do grid */
-    }
+/* EFEITO DE EXPANSÃO NO HOVER */
+.card-lider:hover { 
+    flex: 0 0 500px; /* Alarga o card no hover */
 }
 
 .img-bg { 
-    width: 100%; height: 100%; 
+    position: absolute;
+    inset: 0;
+    width: 100%; 
+    height: 100%; 
     background-size: cover; 
-    background-position: center top; /* Foca na parte superior/centro para o rosto */
-    filter: grayscale(100%) brightness(0.7); 
-    transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    background-position: center; 
+    filter: grayscale(100%) brightness(0.6); 
+    transition: 0.8s;
 }
 
-.card-lider:hover .img-bg { filter: grayscale(0%) brightness(0.5); transform: scale(1.05); }
+.card-lider:hover .img-bg { 
+    filter: grayscale(0%) brightness(0.3); 
+    transform: scale(1.05); 
+}
 
+/* INFO ESTÁTICA (NOME E CIDADE) - SOME NO HOVER */
 .card-static-info {
-    position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px;
+    position: absolute; 
+    bottom: 0; 
+    left: 0; 
+    width: 100%; 
+    padding: 25px;
     background: linear-gradient(transparent, rgba(0,0,0,0.9));
-    z-index: 2; transition: 0.4s;
+    z-index: 2; 
+    transition: opacity 0.3s;
 }
 
 .card-lider:hover .card-static-info { opacity: 0; }
 
-.info-city { color: #f1b434; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; }
-.info-name { color: #fff; font-size: 18px; font-weight: 900; text-transform: uppercase; margin-top: 4px; }
-
+/* CONTEÚDO QUE DESLIZA AO LADO */
 .card-hover-overlay {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    padding: 25px; text-align: center;
-    background: rgba(241, 180, 52, 0.95); 
+    position: absolute; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    padding: 40px; 
+    background: rgba(241, 180, 52, 0.9); /* Dourado UNEGRO */
     color: #000;
-    transform: translateY(100%); 
-    transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    transform: translateX(-20px); /* Começa um pouco recuado */
+    transition: all 0.5s ease 0.2s; /* Delayzinho para esperar o card abrir */
     z-index: 3;
 }
 
-.card-lider:hover .card-hover-overlay { transform: translateY(0); }
+.card-lider:hover .card-hover-overlay { 
+    opacity: 1; 
+    transform: translateX(0); 
+}
 
-.hover-bio { font-size: 13px; line-height: 1.5; font-weight: 700; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.info-city { color: #f1b434; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; }
+.info-name { color: #fff; font-size: 22px; font-weight: 900; text-transform: uppercase; }
+
+.hover-bio { 
+    font-size: 15px; 
+    line-height: 1.6; 
+    font-weight: 700; 
+    margin: 20px 0; 
+}
 
 .btn-insta-mosaico {
-    background: #000; color: #fff; padding: 10px 20px;
-    border-radius: 30px; text-decoration: none; font-size: 10px;
-    font-weight: 900; text-transform: uppercase;
+    align-self: flex-start;
+    background: #000; 
+    color: #fff; 
+    padding: 12px 25px;
+    border-radius: 30px; 
+    text-decoration: none; 
+    font-size: 11px;
+    font-weight: 900; 
+    text-transform: uppercase;
 }
-        
+
+/* RESPONSIVIDADE: No mobile vira grid normal para não quebrar */
+@media (max-width: 900px) {
+    .grid-mosaico-vale { 
+        flex-direction: column; 
+        height: auto;
+    }
+    .card-lider { 
+        flex: 0 0 350px; 
+        width: 100%;
+    }
+    .card-lider:hover { 
+        flex: 0 0 350px; 
+    }
+}
     </style>
 </head>
 <body>
@@ -585,27 +637,26 @@
                 }
 
                 // Cards Mosaico (Cidades)
-                htmlFinal += vale.map(v => `
-                    <div class="card-lider" onclick='abrirModal(${JSON.stringify(v)})'>
-                        <div class="img-bg" style="background-image: url('${v.foto_url}')"></div>
-                        <div class="card-static-info">
-                            <span class="info-city">${v.cidade}</span>
-                            <h3 class="info-name">${v.nome}</h3>
-                        </div>
-                        <div class="card-hover-overlay">
-                            <h4 style="text-transform:uppercase; font-size:11px; letter-spacing:2px; margin-bottom:15px; border-bottom:1px solid rgba(0,0,0,0.2); padding-bottom:10px;">
-                                ${v.cargo || 'Liderança Vale'}
-                            </h4>
-                            <p class="hover-bio">${v.mini_descricao || (v.biografia ? v.biografia.substring(0, 120) + '...' : 'Construindo o legado da UNEGRO no Vale.')}</p>
-                            <div style="display:flex; flex-direction:column; gap:10px;">
-                                <a href="${v.instagram_url}" target="_blank" class="btn-insta-mosaico">@Instagram</a>
-                                <button onclick='abrirModal(${JSON.stringify(v)})' style="background:none; border:2px solid #000; padding:10px; border-radius:30px; font-size:10px; cursor:pointer; font-weight:900; text-transform:uppercase;">
-                                    Ver Trajetória Completa
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
+               htmlFinal += vale.map(v => `
+    <div class="card-lider" onclick='abrirModal(${JSON.stringify(v)})'>
+        <div class="img-bg" style="background-image: url('${v.foto_url}')"></div>
+        <div class="card-static-info">
+            <span class="info-city">${v.cidade}</span>
+            <h3 class="info-name">${v.nome}</h3>
+        </div>
+        <div class="card-hover-overlay">
+            <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">
+                ${v.cargo || 'Liderança Vale'}
+            </span>
+            <h2 style="font-weight: 900; text-transform: uppercase; margin-bottom: 5px;">${v.nome}</h2>
+            <p class="hover-bio">${v.mini_descricao || (v.biografia ? v.biografia.substring(0, 180) + '...' : 'Descrição em breve.')}</p>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <a href="${v.instagram_url}" target="_blank" onclick="event.stopPropagation();" class="btn-insta-mosaico">@Instagram</a>
+                <span style="font-size: 10px; font-weight: 900;">CLIQUE PARA BIO COMPLETA ➔</span>
+            </div>
+        </div>
+    </div>
+`).join('');
 
                 document.getElementById('mosaico-completo').innerHTML = htmlFinal;
             } catch (err) {
