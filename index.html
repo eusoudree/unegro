@@ -269,75 +269,75 @@
 
 
 
-/* SEÇÃO Mosaico UNEGRO Vale */
+/* SEÇÃO Mosaico UNEGRO Vale - Ajustado para 1:1 */
 .secao-liderancas { padding: 60px 20px; background: #000; }
 
 .grid-mosaico-vale { 
     display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-    gap: 10px; 
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+    gap: 15px; 
     max-width: 1300px; 
     margin: 0 auto; 
 }
 
-/* CARD BASE - Tamanho fixo para não quebrar o mosaico */
 .card-lider { 
     position: relative; 
-    height: 400px; 
+    aspect-ratio: 1 / 1; /* Garante que seja sempre quadrado */
     background: #111;
     overflow: hidden; 
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
 }
 
-/* DESTAQUE COORDENADOR (OCUPA 2 COLUNAS NO DESKTOP) */
+/* Destaque Coordenador (Ocupa 2 colunas se houver espaço) */
 @media (min-width: 900px) {
-    .card-coord { grid-column: span 2; }
+    .card-coord { 
+        grid-column: span 2; 
+        aspect-ratio: 2 / 1; /* Retangular para destaque, mas mantendo a altura do grid */
+    }
 }
 
-/* IMAGEM DE FUNDO */
 .img-bg { 
     width: 100%; height: 100%; 
-    background-size: cover; background-position: center; 
-    filter: grayscale(100%) brightness(0.6); 
+    background-size: cover; 
+    background-position: center top; /* Foca na parte superior/centro para o rosto */
+    filter: grayscale(100%) brightness(0.7); 
     transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.card-lider:hover .img-bg { filter: grayscale(0%) brightness(0.4); transform: scale(1.1); }
 
-/* TEXTO FIXO (CIDADE E NOME) */
+.card-lider:hover .img-bg { filter: grayscale(0%) brightness(0.5); transform: scale(1.05); }
+
 .card-static-info {
-    position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px;
-    background: linear-gradient(transparent, rgba(0,0,0,1));
-    z-index: 2; transition: 0.5s;
+    position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.9));
+    z-index: 2; transition: 0.4s;
 }
-.card-lider:hover .card-static-info { opacity: 0; transform: translateY(20px); }
 
-.info-city { color: #f1b434; font-size: 10px; text-transform: uppercase; letter-spacing: 3px; font-weight: 800; }
-.info-name { color: #fff; font-size: 20px; font-weight: 900; text-transform: uppercase; margin-top: 5px; }
+.card-lider:hover .card-static-info { opacity: 0; }
 
-/* CONTEÚDO NO HOVER (BIO E INSTA) */
+.info-city { color: #f1b434; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; }
+.info-name { color: #fff; font-size: 18px; font-weight: 900; text-transform: uppercase; margin-top: 4px; }
+
 .card-hover-overlay {
     position: absolute; inset: 0;
-    display: flex; flex-direction: column; justify-content: center;
-    padding: 40px; text-align: center;
-    background: rgba(241, 180, 52, 0.9); /* Dourado UNEGRO */
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 25px; text-align: center;
+    background: rgba(241, 180, 52, 0.95); 
     color: #000;
     transform: translateY(100%); 
-    transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 3;
 }
+
 .card-lider:hover .card-hover-overlay { transform: translateY(0); }
 
-.hover-bio { font-size: 14px; line-height: 1.6; font-weight: 700; margin-bottom: 25px; }
+.hover-bio { font-size: 13px; line-height: 1.5; font-weight: 700; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+
 .btn-insta-mosaico {
-    background: #000; color: #fff; padding: 12px 25px;
-    border-radius: 30px; text-decoration: none; font-size: 11px;
-    font-weight: 900; text-transform: uppercase; display: inline-block;
-    transition: 0.3s;
+    background: #000; color: #fff; padding: 10px 20px;
+    border-radius: 30px; text-decoration: none; font-size: 10px;
+    font-weight: 900; text-transform: uppercase;
 }
-.btn-insta-mosaico:hover { background: #333; transform: scale(1.05); }
-
-
         
     </style>
 </head>
