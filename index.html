@@ -156,43 +156,62 @@
 
 
 /* Navbar e Dropdown UNEGRO */
+ /* Menu Ultra Minimalista */
 .nav-unegro {
-    background: #1a1a1a;
-    border-bottom: 2px solid #f1b434;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    height: 60px;
+    justify-content: flex-end; 
+    padding: 25px 50px;
+    background: transparent; /* Fundo invisível */
 }
 
-.nav-links { display: flex; gap: 20px; align-items: center; }
-.nav-links a { color: white; text-decoration: none; font-size: 13px; font-weight: 700; text-transform: uppercase; }
-.nav-links a:hover { color: #f1b434; }
+.nav-links { display: flex; gap: 40px; align-items: center; }
 
-/* Dropdown */
-.dropdown { position: relative; display: inline-block; }
-.dropbtn {
-    background: none; border: none; color: white;
-    font-size: 13px; font-weight: 700; text-transform: uppercase;
-    cursor: pointer; display: flex; align-items: center; gap: 5px;
+.nav-links a, .dropbtn {
+    color: rgba(255, 255, 255, 0.4); /* Branco bem fraquinho, quase some */
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.4s ease;
 }
+
+.nav-links a:hover, .dropdown:hover .dropbtn {
+    color: #f1b434; /* Só aqui o dourado aparece de leve */
+}
+
+/* Dropdown que não "brota" do nada */
+.dropdown { position: relative; }
 .dropdown-content {
-    display: none; position: absolute; background: #1a1a1a;
-    min-width: 200px; box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-    border: 1px solid #f1b434; z-index: 1000; top: 100%;
+    display: none;
+    position: absolute;
+    background: rgba(10, 10, 10, 0.95); /* Quase preto sólido */
+    min-width: 160px;
+    right: 0;
+    z-index: 1000;
+    padding: 10px 0;
+    margin-top: 5px;
+    /* Sem borda dourada, apenas um contorno cinza escuro quase imperceptível */
+    border: 1px solid rgba(255, 255, 255, 0.05); 
 }
+
 .dropdown-content a {
-    color: white; padding: 12px 16px; text-decoration: none;
-    display: block; font-size: 12px; border-bottom: 1px solid #333;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 10px 20px;
+    display: block;
+    font-size: 10px;
+    letter-spacing: 1px;
 }
-.dropdown-content a:hover { background: #252525; color: #f1b434; }
+
+.dropdown-content a:hover {
+    background: rgba(241, 180, 52, 0.05);
+    color: #f1b434;
+}
+
 .dropdown:hover .dropdown-content { display: block; }
-
-/* Botão Live */
-.btn-live { background: #8b0000; padding: 8px 12px; border-radius: 4px; color: white !important; }
-
-        
     </style>
 </head>
 <body>
@@ -204,12 +223,12 @@
         <div class="dropdown">
             <button class="dropbtn">Filiados ▾</button>
             <div class="dropdown-content">
-                <a href="filiados.html">Todos</a>
+                <a href="filiados.html">Geral</a>
                 <a href="filiados-cruzeiro.html">Cruzeiro</a>
                 <a href="filiados-jacarei.html">Jacareí</a>
                 <a href="filiados-sjc.html">S.J. Campos</a>
                 <a href="filiados-taubate.html">Taubaté</a>
-                <a href="adm.html" style="color: #444;">Admin</a>
+                <a href="adm.html">Adm</a>
             </div>
         </div>
 
