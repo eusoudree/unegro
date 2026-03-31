@@ -52,7 +52,7 @@
     </div>
 
     <div id="main-content">
-        <div class="video-section" id="video-wrapper">Aguardando sinal...</div>
+        <div class="video-section" id="video-wrapper">Carregando sinal...</div>
         <div class="chat-section">
             <div class="chat-header">AO VIVO</div>
             <div id="chat-display"></div>
@@ -64,7 +64,6 @@
     </div>
 
 <script>
-    // CHAVES FORNECIDAS
     const CONFIG = {
         URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
         KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
@@ -80,25 +79,26 @@
 
         if(!nomeIn || !emailIn) return alert("Preencha nome e e-mail.");
 
-        btn.innerText = "CONECTANDO AO BANCO...";
+        btn.innerText = "VERIFICANDO...";
         btn.disabled = true;
 
         try {
+            // REMOVIDO o .maybeSingle() para evitar o erro PGRST116
+            // Agora ele busca uma lista e pegamos o primeiro item dela
             const { data, error } = await _supabase
                 .from('unegro_filiados')
                 .select('nome')
                 .ilike('nome', nomeIn)
                 .ilike('email', emailIn)
-                .maybeSingle();
+                .limit(1); // Garante que traga apenas 1 registro
 
             if (error) {
-                // Se der erro de conexão real, vai pular para o catch ou mostrar aqui
-                alert("ERRO TÉCNICO SUPABASE:\n" + error.message + "\nCódigo: " + error.code);
+                alert("ERRO SUPABASE: " + error.message);
                 return;
             }
 
-            if (data) {
-                usuarioAtivo = data.nome;
+            if (data && data.length > 0) {
+                usuarioAtivo = data[0].nome;
                 document.getElementById('lock-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'grid';
                 iniciar();
@@ -106,8 +106,7 @@
                 document.getElementById('error-msg').style.display = 'block';
             }
         } catch (err) {
-            alert("ERRO DE REDE: O navegador não conseguiu falar com o Supabase. Verifique se as chaves URL/KEY estão corretas nas configurações.");
-            console.error(err);
+            alert("Erro de conexão.");
         } finally {
             btn.innerText = "ENTRAR NA RODA";
             btn.disabled = false;
@@ -115,33 +114,31 @@
     }
 
     async function iniciar() {
-        // 1. Carrega Live
-        try {
-            const { data: config } = await _supabase.from('configuracoes').select('valor').eq('chave', 'url_live_atual').single();
-            if (config) document.getElementById('video-wrapper').innerHTML = `<iframe src="${config.valor}" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
-        } catch(e) { console.log("Erro ao carregar link da live"); }
+        // Carrega link da live
+        const { data: config } = await _supabase.from('configuracoes').select('valor').eq('chave', 'url_live_atual').maybeSingle();
+        if (config) document.getElementById('video-wrapper').innerHTML = `<iframe src="${config.valor}" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
 
-        // 2. Carrega Chat
+        // Carrega mensagens antigas
         const { data: msgs } = await _supabase.from('live_chat').select('*').order('created_at', { ascending: false }).limit(30);
         if (msgs) msgs.reverse().forEach(renderizar);
 
-        // 3. Escuta Realtime
-        _supabase.channel('unegro_live_chat').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'live_chat' }, p => renderizar(p.new)).subscribe();
+        // Ativa Realtime
+        _supabase.channel('chat_realtime').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'live_chat' }, p => renderizar(p.new)).subscribe();
     }
 
     function renderizar(m) {
         const d = document.createElement('div');
         d.className = 'msg-box';
         d.innerHTML = `<span class="msg-user">${m.user_name}</span><span class="msg-text">${m.content}</span>`;
-        const display = document.getElementById('chat-display');
-        display.appendChild(d);
-        display.scrollTop = display.scrollHeight;
+        const container = document.getElementById('chat-display');
+        container.appendChild(d);
+        container.scrollTop = container.scrollHeight;
     }
 
     async function enviarMensagem() {
         const inp = document.getElementById('chat-input');
         const txt = inp.value.trim();
-        if (!txt) return;
+        if (!txt || !usuarioAtivo) return;
         inp.value = '';
         await _supabase.from('live_chat').insert([{ user_name: usuarioAtivo, content: txt }]);
     }
