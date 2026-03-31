@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADM Lideranças | UNEGRO Vale do Paraíba</title>
+    <title>Painel de Lideranças | UNEGRO Vale</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --gold: #f1b434; --red: #8b0000; --black: #0a0a0a; --gray: #151515; }
+        :root { --gold: #f1b434; --red: #8b0000; --black: #0a0a0a; --gray: #151515; --blue: #1e3a5f; }
         body { background: var(--black); color: #eee; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; }
         
         .container { max-width: 1000px; margin: 0 auto; }
@@ -16,19 +16,20 @@
         .card { background: var(--gray); border: 1px solid #333; border-radius: 12px; padding: 25px; margin-bottom: 30px; }
         .label { font-size: 10px; color: #666; text-transform: uppercase; font-weight: 800; margin-bottom: 8px; display: block; }
         
-        /* Sistema de Busca */
+        /* Busca e Inputs */
         .search-row { display: flex; gap: 10px; margin-bottom: 15px; }
         input, textarea, select { 
             width: 100%; background: #000; border: 1px solid #333; color: #fff; 
             padding: 12px; border-radius: 8px; outline: none; font-size: 14px; box-sizing: border-box;
         }
         input:focus, textarea:focus { border-color: var(--gold); }
+        input[readonly] { background: #111; color: #666; cursor: not-allowed; }
 
-        .results-box { background: #050505; border-radius: 8px; max-height: 200px; overflow-y: auto; margin-bottom: 20px; border: 1px solid #222; }
+        .results-box { background: #050505; border-radius: 8px; max-height: 150px; overflow-y: auto; border: 1px solid #222; margin-bottom: 15px; }
         .res-item { padding: 12px; border-bottom: 1px solid #111; cursor: pointer; font-size: 13px; display: flex; justify-content: space-between; }
         .res-item:hover { background: #1a1a1a; color: var(--gold); }
 
-        /* Grid do Formulário de Promoção */
+        /* Grid do Form */
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px; display: none; padding-top: 20px; border-top: 1px solid #333; }
         .full { grid-column: span 2; }
 
@@ -38,73 +39,66 @@
             transition: 0.3s; width: 100%;
         }
         .btn:hover { background: #fff; transform: translateY(-2px); }
-        .btn-red { background: var(--red); color: #fff; padding: 6px 12px; font-size: 10px; }
+        .btn-edit { background: var(--blue); color: #fff; padding: 6px 12px; font-size: 10px; margin-right: 5px; border-radius: 4px; border: none; cursor: pointer; }
+        .btn-red { background: var(--red); color: #fff; padding: 6px 12px; font-size: 10px; border-radius: 4px; border: none; cursor: pointer; }
 
-        /* Tabela de Gestão */
-        .table-area { overflow-x: auto; }
+        /* Tabela */
         table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
         th { text-align: left; color: #444; text-transform: uppercase; padding: 12px; border-bottom: 2px solid #333; font-size: 10px; }
-        td { padding: 15px 12px; border-bottom: 1px solid #222; vertical-align: middle; }
+        td { padding: 15px 12px; border-bottom: 1px solid #222; }
         .img-preview { width: 45px; height: 45px; border-radius: 6px; background-size: cover; background-position: center; border: 1px solid #333; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 9px; font-weight: 800; text-transform: uppercase; }
-        .badge-coord { background: rgba(241, 180, 52, 0.1); color: var(--gold); border: 1px solid var(--gold); }
-        .badge-vale { background: #111; color: #888; border: 1px solid #333; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <div>
-            <h2>Gestão de Lideranças</h2>
-            <p style="color:#555; margin:5px 0 0; font-size:11px;">Promover filiados e organizar o mosaico do Vale.</p>
-        </div>
-        <a href="adm.html" style="color:var(--gold); text-decoration:none; font-size:12px; font-weight:bold;">← VOLTAR AO PAINEL</a>
+        <h2>Gestão de Lideranças</h2>
+        <a href="adm.html" style="color:var(--gold); text-decoration:none; font-size:12px; font-weight:bold;">← VOLTAR</a>
     </div>
 
     <div class="card">
-        <span class="label">Passo 1: Localizar Filiado no Banco</span>
-        <div class="search-row">
-            <input type="text" id="input-busca" placeholder="Digite nome ou e-mail para buscar...">
+        <span class="label" id="form-title">Cadastrar Nova Liderança</span>
+        
+        <div id="search-area" class="search-row">
+            <input type="text" id="input-busca" placeholder="Busque um filiado pelo nome...">
             <button class="btn" style="width: auto;" onclick="buscarFiliados()">BUSCAR</button>
         </div>
         <div id="lista-busca" class="results-box"></div>
 
-        <div id="form-lider" class="form-grid">
-            <div class="full"><span class="label">Militante Selecionado</span><input type="text" id="f-nome" readonly style="border-color:#444; color:#888;"></div>
-            <div><span class="label">Cidade</span><input type="text" id="f-cidade" readonly style="border-color:#444; color:#888;"></div>
+        <form id="form-lider" class="form-grid">
+            <input type="hidden" id="f-id"> <div class="full"><span class="label">Militante</span><input type="text" id="f-nome" readonly></div>
+            <div><span class="label">Cidade Origem</span><input type="text" id="f-cidade" readonly></div>
             <div>
-                <span class="label">Hierarquia no Site</span>
+                <span class="label">Hierarquia</span>
                 <select id="f-tipo">
-                    <option value="VALE">Liderança de Cidade (Mosaico)</option>
-                    <option value="COORDENACAO">Coordenação Geral (Destaque)</option>
+                    <option value="VALE">Liderança de Cidade</option>
+                    <option value="COORDENACAO">Coordenação Geral</option>
                 </select>
             </div>
-            <div class="full"><span class="label">Cargo / Função</span><input type="text" id="f-cargo" placeholder="Ex: Coordenador de Juventude"></div>
-            <div class="full"><span class="label">URL da Foto (Link Direto)</span><input type="text" id="f-foto" placeholder="https://site.com/foto-lider.jpg"></div>
-            <div class="full"><span class="label">Biografia (Pertencimento)</span><textarea id="f-bio" rows="4" placeholder="Escreva a trajetória e história desta liderança..."></textarea></div>
-            <div class="full"><span class="label">Link Instagram</span><input type="text" id="f-insta" placeholder="https://instagram.com/perfil"></div>
-            <button class="btn full" onclick="salvarLider()">Oficializar no Mosaico do Vale</button>
-        </div>
+            <div class="full"><span class="label">Cargo / Função</span><input type="text" id="f-cargo" placeholder="Ex: Articulação Política"></div>
+            <div class="full"><span class="label">URL da Foto</span><input type="text" id="f-foto" placeholder="Link da imagem hospedada"></div>
+            <div class="full"><span class="label">Biografia de Pertencimento</span><textarea id="f-bio" rows="4" placeholder="Conte a história dessa liderança..."></textarea></div>
+            <div class="full"><span class="label">Instagram Link</span><input type="text" id="f-insta" placeholder="https://instagram.com/perfil"></div>
+            
+            <button type="button" class="btn" id="btn-salvar" onclick="salvarLider()">Salvar Alterações</button>
+            <button type="button" class="btn" id="btn-cancelar" onclick="resetarForm()" style="display:none; background:#333; margin-top:10px;">Cancelar Edição</button>
+        </form>
     </div>
 
     <div class="card">
-        <span class="label">Lideranças Ativas no Site</span>
-        <div class="table-area">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Foto</th>
-                        <th>Nome / Cargo</th>
-                        <th>Cidade</th>
-                        <th>Status</th>
-                        <th style="text-align:right;">Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabela-liderancas">
-                    </tbody>
-            </table>
-        </div>
+        <span class="label">Lideranças no Mosaico do Vale</span>
+        <table>
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>Nome / Cargo</th>
+                    <th>Cidade</th>
+                    <th style="text-align:right;">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-liderancas"></tbody>
+        </table>
     </div>
 </div>
 
@@ -113,41 +107,31 @@
         URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
         KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
     };
-
     const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
-    // BUSCAR FILIADOS ATIVOS
+    // BUSCA FILIADOS
     async function buscarFiliados() {
         const termo = document.getElementById('input-busca').value;
-        if(termo.length < 3) return alert("Digite ao menos 3 letras para a busca.");
-
-        const { data, error } = await _supabase
-            .from('unegro_filiados')
-            .select('nome, cidade, email')
-            .or(`nome.ilike.%${termo}%,email.ilike.%${termo}%`)
-            .limit(5);
-
-        if(error) return alert("Erro na busca.");
-
-        const box = document.getElementById('lista-busca');
-        box.innerHTML = data.map(f => `
+        const { data, error } = await _supabase.from('unegro_filiados').select('nome, cidade').ilike('nome', `%${termo}%`).limit(5);
+        if(error) return;
+        document.getElementById('lista-busca').innerHTML = data.map(f => `
             <div class="res-item" onclick='selecionarFiliado(${JSON.stringify(f)})'>
-                <span><strong>${f.nome}</strong></span>
-                <span style="color:#555; font-size:11px;">${f.cidade} | ${f.email}</span>
+                ${f.nome} <span style="color:#555;">| ${f.cidade}</span>
             </div>
         `).join('');
     }
 
     function selecionarFiliado(f) {
+        resetarForm();
         document.getElementById('f-nome').value = f.nome;
         document.getElementById('f-cidade').value = f.cidade;
         document.getElementById('form-lider').style.display = 'grid';
         document.getElementById('lista-busca').innerHTML = '';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // SALVAR NA TABELA DE LIDERANÇAS
+    // SALVAR (INSERIR OU ATUALIZAR)
     async function salvarLider() {
+        const id = document.getElementById('f-id').value;
         const payload = {
             nome: document.getElementById('f-nome').value,
             cidade: document.getElementById('f-cidade').value,
@@ -159,52 +143,65 @@
             ordem: document.getElementById('f-tipo').value === 'COORDENACAO' ? 1 : 100
         };
 
-        if(!payload.foto_url || !payload.cargo) return alert("A foto e o cargo são obrigatórios para o mosaico.");
-
-        const { error } = await _supabase.from('liderancas_unegro').insert([payload]);
-        
-        if(error) {
-            alert("Erro ao salvar: " + error.message);
+        let result;
+        if (id) {
+            result = await _supabase.from('liderancas_unegro').update(payload).eq('id', id);
         } else {
-            alert("Liderança oficializada com sucesso!");
-            location.reload();
+            result = await _supabase.from('liderancas_unegro').insert([payload]);
         }
+
+        if (result.error) alert("Erro ao salvar.");
+        else location.reload();
     }
 
-    // CARREGAR LISTAGEM PARA GESTÃO
+    // LISTAR NA TABELA
     async function carregarTabela() {
-        const { data, error } = await _supabase
-            .from('liderancas_unegro')
-            .select('*')
-            .order('ordem', { ascending: true });
-
-        if(error) return;
-
+        const { data } = await _supabase.from('liderancas_unegro').select('*').order('ordem', { ascending: true });
         const tbody = document.getElementById('tabela-liderancas');
         tbody.innerHTML = data.map(l => `
             <tr>
                 <td><div class="img-preview" style="background-image:url('${l.foto_url}')"></div></td>
-                <td>
-                    <div style="font-weight:900; color:#fff;">${l.nome}</div>
-                    <div style="font-size:11px; color:#555;">${l.cargo}</div>
-                </td>
-                <td style="color:#888;">${l.cidade}</td>
-                <td>
-                    <span class="badge ${l.tipo === 'COORDENACAO' ? 'badge-coord' : 'badge-vale'}">
-                        ${l.tipo}
-                    </span>
-                </td>
+                <td><strong>${l.nome}</strong><br><span style="color:#555; font-size:11px;">${l.cargo}</span></td>
+                <td>${l.cidade}</td>
                 <td style="text-align:right;">
-                    <button class="btn btn-red" onclick="excluirLider(${l.id})">Remover</button>
+                    <button class="btn-edit" onclick='prepararEdicao(${JSON.stringify(l)})'>Editar</button>
+                    <button class="btn-red" onclick="excluirLider(${l.id})">Remover</button>
                 </td>
             </tr>
         `).join('');
     }
 
+    // PREPARAR FORM PARA EDIÇÃO
+    window.prepararEdicao = (lider) => {
+        document.getElementById('form-title').innerText = "Editando Dados de " + lider.nome;
+        document.getElementById('search-area').style.display = 'none';
+        document.getElementById('btn-cancelar').style.display = 'block';
+        document.getElementById('form-lider').style.display = 'grid';
+        
+        document.getElementById('f-id').value = lider.id;
+        document.getElementById('f-nome').value = lider.nome;
+        document.getElementById('f-cidade').value = lider.cidade;
+        document.getElementById('f-tipo').value = lider.tipo;
+        document.getElementById('f-cargo').value = lider.cargo;
+        document.getElementById('f-foto').value = lider.foto_url;
+        document.getElementById('f-bio').value = lider.biografia || lider.mini_descricao;
+        document.getElementById('f-insta').value = lider.instagram_url;
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    function resetarForm() {
+        document.getElementById('form-lider').reset();
+        document.getElementById('f-id').value = "";
+        document.getElementById('form-title').innerText = "Cadastrar Nova Liderança";
+        document.getElementById('search-area').style.display = 'flex';
+        document.getElementById('btn-cancelar').style.display = 'none';
+    }
+
     async function excluirLider(id) {
-        if(!confirm("Isso removerá a pessoa do mosaico público. Confirmar?")) return;
-        const { error } = await _supabase.from('liderancas_unegro').delete().eq('id', id);
-        if(!error) carregarTabela();
+        if(!confirm("Remover liderança do site?")) return;
+        await _supabase.from('liderancas_unegro').delete().eq('id', id);
+        carregarTabela();
     }
 
     window.onload = carregarTabela;
