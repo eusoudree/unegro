@@ -527,10 +527,7 @@
 
     <footer style="text-align: center; padding: 40px; color: #444; font-size: 0.8rem;">UNEGRO VALE • 2026 </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
     <script>
@@ -548,54 +545,64 @@
         });
         ScrollReveal().reveal('section', { delay: 200, distance: '50px', origin: 'bottom', opacity: 0 });
 
-       window.carregarLiderancas = async function() {
-    try {
-        const { data, error } = await _supabase
-            .from('liderancas_unegro')
-            .select('*')
-            .order('ordem', { ascending: true });
+        // 3. FUNÇÕES DO MOSAICO DE LIDERANÇAS
+        window.carregarLiderancas = async function() {
+            try {
+                const { data, error } = await _supabase
+                    .from('liderancas_unegro')
+                    .select('*')
+                    .order('ordem', { ascending: true });
 
-        if (error) throw error;
+                if (error) throw error;
 
-        const container = document.getElementById('mosaico-completo');
-        container.innerHTML = data.map(lider => {
-            const isCoord = lider.tipo === 'COORDENACAO';
-            
-            return `
-                <div class="card-lider ${isCoord ? 'card-coord' : ''}">
-                    <div class="img-bg" style="background-image: url('${lider.foto_url}')"></div>
-                    
-                    <div class="card-static-info">
-                        <span class="info-city">${lider.cidade}</span>
-                        <h3 class="info-name">${lider.nome}</h3>
-                    </div>
+                const coord = data.filter(i => i.tipo === 'COORDENACAO')[0];
+                const vale = data.filter(i => i.tipo === 'VALE');
+                let htmlFinal = "";
 
-                    <div class="card-hover-overlay">
-                        <h4 style="text-transform:uppercase; font-size:11px; letter-spacing:2px; margin-bottom:15px; border-bottom:1px solid rgba(0,0,0,0.2); padding-bottom:10px;">
-                            ${lider.cargo || 'Liderança Vale'}
-                        </h4>
-                        <p class="hover-bio">${lider.mini_descricao || lider.biografia.substring(0, 120) + '...'}</p>
-                        <div style="display:flex; flex-direction:column; gap:10px;">
-                            <a href="${lider.instagram_url}" target="_blank" class="btn-insta-mosaico">@Instagram</a>
-                            <button onclick='abrirModal(${JSON.stringify(lider)})' 
-                                    style="background:none; border:2px solid #000; padding:10px; border-radius:30px; font-size:10px; cursor:pointer; font-weight:900; text-transform:uppercase;">
-                                Ver Trajetória Completa
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    } catch (err) {
-        console.error("Erro na montagem do mosaico:", err.message);
-    }
-};
+                // Card Destaque (Coordenação Geral)
+                if (coord) {
+                    htmlFinal += `
+                        <div class="card-lider card-coord" onclick='abrirModal(${JSON.stringify(coord)})'>
+                            <div class="img-bg" style="background-image: url('${coord.foto_url}')"></div>
+                            <div class="card-static-info">
+                                <span class="info-city">${coord.cidade}</span>
+                                <h3 class="info-name">${coord.nome}</h3>
+                            </div>
+                            <div class="card-hover-overlay">
+                                <h4 style="text-transform:uppercase; font-size:11px; letter-spacing:2px; margin-bottom:15px; border-bottom:1px solid rgba(0,0,0,0.2); padding-bottom:10px;">
+                                    COORDENADOR GERAL
+                                </h4>
+                                <p class="hover-bio">${coord.mini_descricao || coord.biografia.substring(0, 150) + '...'}</p>
+                                <div style="display:flex; flex-direction:column; gap:10px;">
+                                    <a href="${coord.instagram_url}" target="_blank" class="btn-insta-mosaico">@Instagram</a>
+                                    <button onclick='abrirModal(${JSON.stringify(coord)})' style="background:none; border:2px solid #000; padding:10px; border-radius:30px; font-size:10px; cursor:pointer; font-weight:900; text-transform:uppercase;">
+                                        Ver Trajetória Completa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                }
+
                 // Cards Mosaico (Cidades)
                 htmlFinal += vale.map(v => `
-                    <div class="card-vale" onclick='abrirModal(${JSON.stringify(v)})'>
-                        <div class="img-vale" style="background-image: url("${v.foto_url}")"></div>
-                        <div style="font-size:13px; font-weight:800; color:#eee; text-transform:uppercase;">${v.nome}</div>
-                        <div style="font-size:9px; color:#444; text-transform:uppercase; margin-top:5px;">${v.cidade}</div>
+                    <div class="card-lider" onclick='abrirModal(${JSON.stringify(v)})'>
+                        <div class="img-bg" style="background-image: url('${v.foto_url}')"></div>
+                        <div class="card-static-info">
+                            <span class="info-city">${v.cidade}</span>
+                            <h3 class="info-name">${v.nome}</h3>
+                        </div>
+                        <div class="card-hover-overlay">
+                            <h4 style="text-transform:uppercase; font-size:11px; letter-spacing:2px; margin-bottom:15px; border-bottom:1px solid rgba(0,0,0,0.2); padding-bottom:10px;">
+                                ${v.cargo || 'Liderança Vale'}
+                            </h4>
+                            <p class="hover-bio">${v.mini_descricao || (v.biografia ? v.biografia.substring(0, 120) + '...' : 'Construindo o legado da UNEGRO no Vale.')}</p>
+                            <div style="display:flex; flex-direction:column; gap:10px;">
+                                <a href="${v.instagram_url}" target="_blank" class="btn-insta-mosaico">@Instagram</a>
+                                <button onclick='abrirModal(${JSON.stringify(v)})' style="background:none; border:2px solid #000; padding:10px; border-radius:30px; font-size:10px; cursor:pointer; font-weight:900; text-transform:uppercase;">
+                                    Ver Trajetória Completa
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 `).join('');
 
