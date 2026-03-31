@@ -579,7 +579,20 @@
         </div>
     </section>
 
+
+    <div id="modal-lider" class="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center;" onclick="this.style.display='none'">
+    <div style="background:#111; padding:40px; border-radius:20px; max-width:600px; border:1px solid #333;" onclick="event.stopPropagation()">
+        <h2 id="modal-nome" style="color:#f1b434;"></h2>
+        <p id="modal-cidade" style="font-size:12px; text-transform:uppercase; color:#888;"></p>
+        <div id="modal-bio" style="margin:20px 0; line-height:1.6;"></div>
+        <a id="modal-insta" href="#" target="_blank" class="btn-insta-mosaico">Instagram</a>
+        <button onclick="document.getElementById('modal-lider').style.display='none'" style="margin-top:20px; background:none; border:1px solid #444; color:#fff; cursor:pointer; padding:5px 10px;">Fechar</button>
+    </div>
+</div>
+
     <footer style="text-align: center; padding: 40px; color: #444; font-size: 0.8rem;">UNEGRO VALE • 2026 </footer>
+
+    
 
    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -607,11 +620,9 @@ window.carregarLiderancas = async function() {
                 // FUNÇÃO BLINDADA: Ela busca qualquer coluna que tenha 'mini' no nome
                 const getBio = (item) => {
                     // Tenta achar a chave que contém 'mini' (resolve o problema do ã)
-                    const chaveMini = Object.keys(item).find(key => key.includes('mini'));
-                    const valorMini = chaveMini ? item[chaveMini] : null;
-                    
-                    return valorMini || item.biografia?.substring(0, 150) || "Liderança UNEGRO Vale.";
-                };
+                   console.log("Dados do item:", item); // Isso vai mostrar no F12 exatamente o que o banco enviou
+    return item['mini_descricão'] || item['mini_descricao'] || item.mini_descricao || item.biografia || "Liderança UNEGRO Vale.";
+};
 
                 const gerarCardHTML = (lider, extraLabel = "") => {
                     const label = extraLabel || lider.cargo || 'Liderança Vale';
