@@ -470,17 +470,87 @@
 
     <footer style="text-align: center; padding: 40px; color: #444; font-size: 0.8rem;">UNEGRO VALE • 2026 </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
     <script>
-        const swiper = new Swiper('.swiper', { slidesPerView: 1, spaceBetween: 20, pagination: { el: '.swiper-pagination', clickable: true }, breakpoints: { 768: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } } });
+        // 1. CONFIGURAÇÃO UNIFICADA DO SUPABASE
+        const SUPABASE_URL = 'https://huxemmuzhlntwimgiukt.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // 2. INICIALIZAÇÃO DE PLUGINS VIZUAIS
+        const swiper = new Swiper('.swiper', { 
+            slidesPerView: 1, 
+            spaceBetween: 20, 
+            pagination: { el: '.swiper-pagination', clickable: true }, 
+            breakpoints: { 768: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } } 
+        });
         ScrollReveal().reveal('section', { delay: 200, distance: '50px', origin: 'bottom', opacity: 0 });
 
+        // 3. FUNÇÕES DO MOSAICO DE LIDERANÇAS
+        window.carregarLiderancas = async function() {
+            try {
+                const { data, error } = await _supabase
+                    .from('liderancas_unegro')
+                    .select('*')
+                    .order('ordem', { ascending: true });
+
+                if (error) throw error;
+
+                const coord = data.filter(i => i.tipo === 'COORDENACAO')[0];
+                const vale = data.filter(i => i.tipo === 'VALE');
+                let htmlFinal = "";
+
+                // Card Destaque (Dree)
+                if (coord) {
+                    htmlFinal += `
+                        <div class="card-coord" onclick='abrirModal(${JSON.stringify(coord)})'>
+                            <div class="img-coord" style="background-image: url("${coord.foto_url}")"></div>
+                            <div class="info-coord">
+                                <span style="color:#f1b434; font-size:10px; text-transform:uppercase; font-weight:800;">${coord.cidade}</span>
+                                <h3 style="margin:8px 0; font-size:22px; color:#fff; font-weight:900;">${coord.nome}</h3>
+                                <span style="font-size:11px; color:#555; text-transform:uppercase; font-weight:bold;">${coord.cargo}</span>
+                            </div>
+                        </div>`;
+                }
+
+                // Cards Mosaico (Cidades)
+                htmlFinal += vale.map(v => `
+                    <div class="card-vale" onclick='abrirModal(${JSON.stringify(v)})'>
+                        <div class="img-vale" style="background-image: url("${v.foto_url}")"></div>
+                        <div style="font-size:13px; font-weight:800; color:#eee; text-transform:uppercase;">${v.nome}</div>
+                        <div style="font-size:9px; color:#444; text-transform:uppercase; margin-top:5px;">${v.cidade}</div>
+                    </div>
+                `).join('');
+
+                document.getElementById('mosaico-completo').innerHTML = htmlFinal;
+            } catch (err) {
+                console.error("Erro ao carregar mosaico:", err.message);
+            }
+        };
+
+        window.abrirModal = (lider) => {
+            document.getElementById('modal-foto').style.backgroundImage = `url("${lider.foto_url}")`;
+            document.getElementById('modal-nome').innerText = lider.nome;
+            document.getElementById('modal-cidade').innerText = lider.cidade;
+            document.getElementById('modal-bio').innerText = lider.biografia || lider.mini_descricao;
+            document.getElementById('modal-insta').href = lider.instagram_url;
+            document.getElementById('modal-lider').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.fecharModal = () => {
+            document.getElementById('modal-lider').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        };
+
+        // 4. SISTEMA DE FILIAÇÃO E PDF
         async function processarCadastro() {
             const quiz = document.getElementById('quiz').value;
             const aceite = document.getElementById('aceite').checked;
-
-            // Validação básica de campos obrigatórios antes de prosseguir
             const campos = ['nome', 'nascimento', 'rg', 'cpf', 'endereco', 'numero', 'bairro', 'cep', 'cidade', 'whatsapp', 'email'];
+            
             for(let campo of campos) {
                 if(!document.getElementById(campo).value) {
                     alert("Por favor, preencha todos os campos obrigatórios.");
@@ -510,32 +580,20 @@
                 movimento_social: document.getElementById('movimento').value || ""
             };
 
-            // Credencial Anon Public (Correta para inserção via REST Client-side)
-            const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs";
-
-            // 1. SALVAR NO BANCO
             try {
-                const response = await fetch('https://huxemmuzhlntwimgiukt.supabase.co/rest/v1/unegro_filiados', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': KEY,
-                        'Authorization': `Bearer ${KEY}`,
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    console.log("Militância salva com sucesso.");
+                const { error } = await _supabase.from('unegro_filiados').insert([payload]);
+                if (!error) {
+                    alert("Filiação realizada com sucesso!");
+                    gerarPDF(payload);
                 } else {
-                    console.error("Erro na resposta do banco.");
+                    throw error;
                 }
             } catch (e) {
-                console.error("Erro na conexão com o banco.");
+                alert("Erro ao salvar no banco. Tente novamente.");
             }
+        }
 
-            // 2. GERAR PDF PROFISSIONAL COMPLETO
+        function gerarPDF(payload) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             let y = 20;
@@ -555,98 +613,19 @@
             };
 
             drawRow("Nome Completo", payload.nome.toUpperCase());
-            drawRow("Data de Nascimento", payload.nascimento);
-            drawRow("Sexo", payload.sexo);
-            drawRow("RG / CPF", `${payload.rg} / ${payload.cpf}`);
-            drawRow("Endereço", `${payload.endereco}, ${payload.numero}`);
-            drawRow("Bairro / CEP", `${payload.bairro} / ${payload.cep}`);
+            drawRow("Nascimento", payload.nascimento);
             drawRow("Cidade", payload.cidade);
-            drawRow("WhatsApp / E-mail", `${payload.whatsapp} / ${payload.email}`);
-            drawRow("Profissão", payload.profissao);
-            drawRow("Escolaridade", payload.escolaridade);
-            drawRow("Movimento Social", payload.movimento_social);
-
-            y += 10;
-            doc.setFont("helvetica", "bold");
-            doc.text(`Local e data: ${payload.cidade}, ${new Date().toLocaleDateString('pt-BR')}`, 20, y);
-
-            y += 25;
-            doc.line(20, y, 100, y); doc.line(110, y, 190, y);
-            y += 5;
-            doc.text("Assinatura do Filiado", 40, y);
-            doc.text("Responsável UNEGRO", 130, y);
+            drawRow("WhatsApp", payload.whatsapp);
+            drawRow("E-mail", payload.email);
 
             y += 20;
-            doc.setTextColor(200, 0, 0);
-            doc.setFontSize(9);
-            doc.text("FAVOR IMPRIMIR, ASSINAR E ENVIAR PARA: filia@unegrovale.com.br", 105, y, { align: "center" });
-
+            doc.text(`Local e data: ${payload.cidade}, ${new Date().toLocaleDateString('pt-BR')}`, 20, y);
             window.open(doc.output('bloburl'), '_blank');
         }
 
-
-
-///
-
-     window.carregarLiderancas = async function() {
-    // Busca as lideranças do Supabase
-    const { data, error } = await _supabase
-        .from('liderancas_unegro')
-        .select('*')
-        .order('ordem', { ascending: true });
-
-    if (error) return console.error("Erro ao carregar mosaico:", error);
-
-    // Filtra Coordenação e o restante (ignorando tipo REFERENCIA se houver)
-    const coord = data.filter(i => i.tipo === 'COORDENACAO')[0];
-    const vale = data.filter(i => i.tipo === 'VALE');
-
-    let htmlFinal = "";
-
-    // Adiciona Dree (Você) primeiro
-    if (coord) {
-        htmlFinal += `
-            <div class="card-coord" onclick='abrirModal(${JSON.stringify(coord)})'>
-                <div class="img-coord" style="background-image: url("${coord.foto_url}")"></div>
-                <div class="info-coord">
-                    <span style="color:#f1b434; font-size:10px; text-transform:uppercase; font-weight:800;">${coord.cidade}</span>
-                    <h3 style="margin:8px 0; font-size:22px; color:#fff; font-weight:900;">${coord.nome}</h3>
-                    <span style="font-size:11px; color:#555; text-transform:uppercase; font-weight:bold;">${coord.cargo}</span>
-                </div>
-            </div>`;
-    }
-
-    // Adiciona o restante das cidades no mesmo grid
-    htmlFinal += vale.map(v => `
-        <div class="card-vale" onclick='abrirModal(${JSON.stringify(v)})'>
-            <div class="img-vale" style="background-image: url("${v.foto_url}")"></div>
-            <div style="font-size:13px; font-weight:800; color:#eee; text-transform:uppercase;">${v.nome}</div>
-            <div style="font-size:9px; color:#444; text-transform:uppercase; margin-top:5px;">${v.cidade}</div>
-        </div>
-    `).join('');
-
-    document.getElementById('mosaico-completo').innerHTML = htmlFinal;
-};
-
-// Funções do Modal
-window.abrirModal = (lider) => {
-    document.getElementById('modal-foto').style.backgroundImage = `url("${lider.foto_url}")`;
-    document.getElementById('modal-nome').innerText = lider.nome;
-    document.getElementById('modal-cidade').innerText = lider.cidade;
-    document.getElementById('modal-bio').innerText = lider.biografia || lider.mini_descricao;
-    document.getElementById('modal-insta').href = lider.instagram_url;
-    document.getElementById('modal-lider').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-};
-
-window.fecharModal = () => {
-    document.getElementById('modal-lider').style.display = 'none';
-    document.body.style.overflow = 'auto';
-};
-
-// Dispara o carregamento
-carregarLiderancas();
-        
+        // 5. CARREGAMENTO INICIAL
+        window.onload = () => {
+            carregarLiderancas();
+        };
     </script>
-</body>
 </html>
