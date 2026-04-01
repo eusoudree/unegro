@@ -392,9 +392,51 @@
         flex: 0 0 350px; 
     }
 }
+
+
+
+
+/* Módulo de Atmosfera Ancestral */
+#ancestral-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    z-index: -2; /* Fica atrás de tudo, inclusive do gradiente do body */
+    overflow: hidden;
+}
+
+.spirit-face {
+    position: absolute;
+    width: 70vh;
+    height: 70vh;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    filter: grayscale(100%) contrast(110%) brightness(40%);
+    transition: opacity 4s ease-in-out, transform 10s linear;
+    pointer-events: none;
+    
+    /* Máscara radial para o rosto 'brotar' da escuridão */
+    -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 65%);
+    mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 65%);
+}
+
+/* Garante que o conteúdo do site tenha um fundo que permita ver as fotos nos vãos */
+body {
+    background-color: transparent !important;
+}
+.hero {
+    background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%);
+}
+
+        
     </style>
 </head>
 <body>
+    <div id="ancestral-overlay"></div>
 
   <nav class="nav-unegro">
     <div class="nav-links">
@@ -762,5 +804,78 @@ window.carregarLiderancas = async function() {
         window.onload = () => {
             carregarLiderancas();
         };
+
+
+
+
+
+// --- MÓDULO: ATMOSFERA ANCESTRAL ---
+async function iniciarAtmosferaAncestral() {
+    const overlay = document.getElementById('ancestral-overlay');
+    if (!overlay) return;
+
+    // Busca as fotos diretamente da sua tabela de lideranças
+    const { data: liderancas } = await _supabase
+        .from('liderancas_unegro')
+        .select('foto_url');
+
+    // Referências fixas (Leci e Orlando) caso o banco esteja vazio ou para intercalar
+    const referencias = [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQd-iTVw7Wna6Hk1Y7dVTIsXTO6dhvdUAVD5w&s', // Leci
+        'https://jornalempoderado.com.br/wp-content/uploads/2025/09/Imagem-do-WhatsApp-de-2025-09-06-as-10.35.50_0e8c4375.jpg' // Orlando
+    ];
+
+    const listaFotos = liderancas && liderancas.length > 0 
+        ? [...referencias, ...liderancas.map(l => l.foto_url)]
+        : referencias;
+
+    let index = 0;
+
+    function manifestarFace() {
+        // Remove faces antigas para não pesar a memória
+        const antigas = document.querySelectorAll('.spirit-face');
+        antigas.forEach(a => {
+            if (parseFloat(a.style.opacity) > 0) {
+                a.style.opacity = '0';
+                setTimeout(() => a.remove(), 4000);
+            }
+        });
+
+        const face = document.createElement('div');
+        face.className = 'spirit-face';
+        face.style.backgroundImage = `url('${listaFotos[index]}')`;
+
+        // Posicionamento aleatório mas equilibrado
+        const lado = Math.random() > 0.5 ? 'left' : 'right';
+        face.style[lado] = Math.random() * 20 + '%';
+        face.style.top = Math.random() * 30 + 10 + '%';
+        
+        // Efeito de movimento bem lento (zoom in)
+        face.style.transform = 'scale(1)';
+        
+        overlay.appendChild(face);
+
+        // Fade In
+        setTimeout(() => { 
+            face.style.opacity = '0.35'; 
+            face.style.transform = 'scale(1.15)'; // Lentamente cresce enquanto aparece
+        }, 100);
+
+        index = (index + 1) % listaFotos.length;
+    }
+
+    // Ciclo: manifesta uma face a cada 9 segundos
+    manifestarFace();
+    setInterval(manifestarFace, 9000);
+}
+
+// Integrando ao seu onload existente
+const originalOnload = window.onload;
+window.onload = () => {
+    if (originalOnload) originalOnload();
+    iniciarAtmosferaAncestral();
+};
+
+       
     </script>
 </html>
