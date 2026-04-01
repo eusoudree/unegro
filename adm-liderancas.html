@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --gold: #f1b434; --red: #8b0000; --black: #0a0a0a; --gray: #151515; --blue: #1e3a5f; }
-        body { background: var(--black); color: #eee; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; }
+        body { background: var(--black); color: #eee; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; display: none; }
         
         .container { max-width: 1000px; margin: 0 auto; }
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
@@ -23,7 +23,7 @@
             padding: 12px; border-radius: 8px; outline: none; font-size: 14px; box-sizing: border-box;
         }
         input:focus, textarea:focus { border-color: var(--gold); }
-        input[readonly] { background: #111; color: #666; cursor: not-allowed; }
+        input[readonly] { background: #111; color: #888; cursor: not-allowed; }
 
         .results-box { background: #050505; border-radius: 8px; max-height: 150px; overflow-y: auto; border: 1px solid #222; margin-bottom: 15px; }
         .res-item { padding: 12px; border-bottom: 1px solid #111; cursor: pointer; font-size: 13px; display: flex; justify-content: space-between; }
@@ -41,6 +41,7 @@
         .btn:hover { background: #fff; transform: translateY(-2px); }
         .btn-edit { background: var(--blue); color: #fff; padding: 6px 12px; font-size: 10px; margin-right: 5px; border-radius: 4px; border: none; cursor: pointer; }
         .btn-red { background: var(--red); color: #fff; padding: 6px 12px; font-size: 10px; border-radius: 4px; border: none; cursor: pointer; }
+        .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
 
         /* Tabela */
         table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
@@ -54,21 +55,38 @@
 <div class="container">
     <div class="header">
         <h2>Gestão de Lideranças</h2>
-        <a href="adm.html" style="color:var(--gold); text-decoration:none; font-size:12px; font-weight:bold;">← VOLTAR</a>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <button onclick="logout()" style="background:none; border:none; color:#666; cursor:pointer; font-size:10px; font-weight:bold;">SAIR</button>
+            <a href="adm.html" style="color:var(--gold); text-decoration:none; font-size:12px; font-weight:bold;">← VOLTAR</a>
+        </div>
     </div>
 
     <div class="card">
         <span class="label" id="form-title">Cadastrar Nova Liderança</span>
         
-        <div id="search-area" class="search-row">
-            <input type="text" id="input-busca" placeholder="Busque um filiado pelo nome...">
-            <button class="btn" style="width: auto;" onclick="buscarFiliados()">BUSCAR</button>
+        <div id="search-area">
+            <div class="search-row">
+                <input type="text" id="input-busca" placeholder="Busque um filiado pelo nome...">
+                <button class="btn" style="width: auto;" onclick="buscarFiliados()">BUSCAR</button>
+            </div>
+            <div id="lista-busca" class="results-box"></div>
+            
+            <div style="text-align: center; margin-top: 10px;">
+                <span style="font-size: 11px; color: #555;">OU</span><br>
+                <button class="btn btn-outline" style="width: auto; margin-top: 10px; padding: 8px 15px; font-size: 11px;" onclick="abrirCadastroManual()">+ Cadastrar Liderança Manualmente</button>
+            </div>
         </div>
-        <div id="lista-busca" class="results-box"></div>
 
         <form id="form-lider" class="form-grid">
-            <input type="hidden" id="f-id"> <div class="full"><span class="label">Militante</span><input type="text" id="f-nome" readonly></div>
-            <div><span class="label">Cidade Origem</span><input type="text" id="f-cidade" readonly></div>
+            <input type="hidden" id="f-id"> 
+            <div class="full">
+                <span class="label">Nome da Liderança</span>
+                <input type="text" id="f-nome" required>
+            </div>
+            <div>
+                <span class="label">Cidade Origem</span>
+                <input type="text" id="f-cidade" required>
+            </div>
             <div>
                 <span class="label">Hierarquia</span>
                 <select id="f-tipo">
@@ -81,8 +99,8 @@
             <div class="full"><span class="label">Biografia de Pertencimento</span><textarea id="f-bio" rows="4" placeholder="Conte a história dessa liderança..."></textarea></div>
             <div class="full"><span class="label">Instagram Link</span><input type="text" id="f-insta" placeholder="https://instagram.com/perfil"></div>
             
-            <button type="button" class="btn" id="btn-salvar" onclick="salvarLider()">Salvar Alterações</button>
-            <button type="button" class="btn" id="btn-cancelar" onclick="resetarForm()" style="display:none; background:#333; margin-top:10px;">Cancelar Edição</button>
+            <button type="button" class="btn" id="btn-salvar" onclick="salvarLider()">Salvar Liderança</button>
+            <button type="button" class="btn" id="btn-cancelar" onclick="resetarForm()" style="display:none; background:#333; margin-top:10px;">Cancelar</button>
         </form>
     </div>
 
@@ -103,6 +121,27 @@
 </div>
 
 <script>
+    // --- SEGURANÇA ---
+    const PASS_KEY = "unegro_auth_lider";
+    if (sessionStorage.getItem(PASS_KEY) !== "true") {
+        const user = prompt("Usuário:");
+        const pass = prompt("Senha:");
+        if (user === "unegro" && pass === "Unegrovale2026!") {
+            sessionStorage.setItem(PASS_KEY, "true");
+            document.body.style.display = "block";
+        } else {
+            alert("Acesso negado.");
+            window.location.href = "index.html";
+        }
+    } else {
+        document.body.style.display = "block";
+    }
+
+    function logout() {
+        sessionStorage.removeItem(PASS_KEY);
+        location.reload();
+    }
+
     const CONFIG = {
         URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
         KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
@@ -112,6 +151,7 @@
     // BUSCA FILIADOS
     async function buscarFiliados() {
         const termo = document.getElementById('input-busca').value;
+        if(!termo) return;
         const { data, error } = await _supabase.from('unegro_filiados').select('nome, cidade').ilike('nome', `%${termo}%`).limit(5);
         if(error) return;
         document.getElementById('lista-busca').innerHTML = data.map(f => `
@@ -124,9 +164,21 @@
     function selecionarFiliado(f) {
         resetarForm();
         document.getElementById('f-nome').value = f.nome;
+        document.getElementById('f-nome').readOnly = true;
         document.getElementById('f-cidade').value = f.cidade;
+        document.getElementById('f-cidade').readOnly = true;
         document.getElementById('form-lider').style.display = 'grid';
         document.getElementById('lista-busca').innerHTML = '';
+        document.getElementById('btn-cancelar').style.display = 'block';
+    }
+
+    function abrirCadastroManual() {
+        resetarForm();
+        document.getElementById('f-nome').readOnly = false;
+        document.getElementById('f-cidade').readOnly = false;
+        document.getElementById('form-lider').style.display = 'grid';
+        document.getElementById('btn-cancelar').style.display = 'block';
+        window.scrollTo({ top: 200, behavior: 'smooth' });
     }
 
     // SALVAR (INSERIR OU ATUALIZAR)
@@ -143,6 +195,11 @@
             ordem: document.getElementById('f-tipo').value === 'COORDENACAO' ? 1 : 100
         };
 
+        if(!payload.nome || !payload.cidade) {
+            alert("Nome e Cidade são obrigatórios.");
+            return;
+        }
+
         let result;
         if (id) {
             result = await _supabase.from('liderancas_unegro').update(payload).eq('id', id);
@@ -150,7 +207,7 @@
             result = await _supabase.from('liderancas_unegro').insert([payload]);
         }
 
-        if (result.error) alert("Erro ao salvar.");
+        if (result.error) alert("Erro ao salvar: " + result.error.message);
         else location.reload();
     }
 
@@ -158,10 +215,11 @@
     async function carregarTabela() {
         const { data } = await _supabase.from('liderancas_unegro').select('*').order('ordem', { ascending: true });
         const tbody = document.getElementById('tabela-liderancas');
+        if(!data) return;
         tbody.innerHTML = data.map(l => `
             <tr>
-                <td><div class="img-preview" style="background-image:url('${l.foto_url}')"></div></td>
-                <td><strong>${l.nome}</strong><br><span style="color:#555; font-size:11px;">${l.cargo}</span></td>
+                <td><div class="img-preview" style="background-image:url('${l.foto_url || 'https://via.placeholder.com/150'}')"></div></td>
+                <td><strong>${l.nome}</strong><br><span style="color:#555; font-size:11px;">${l.cargo || 'Membro'}</span></td>
                 <td>${l.cidade}</td>
                 <td style="text-align:right;">
                     <button class="btn-edit" onclick='prepararEdicao(${JSON.stringify(l)})'>Editar</button>
@@ -173,18 +231,20 @@
 
     // PREPARAR FORM PARA EDIÇÃO
     window.prepararEdicao = (lider) => {
-        document.getElementById('form-title').innerText = "Editando Dados de " + lider.nome;
+        document.getElementById('form-title').innerText = "Editando: " + lider.nome;
         document.getElementById('search-area').style.display = 'none';
         document.getElementById('btn-cancelar').style.display = 'block';
         document.getElementById('form-lider').style.display = 'grid';
         
         document.getElementById('f-id').value = lider.id;
         document.getElementById('f-nome').value = lider.nome;
+        document.getElementById('f-nome').readOnly = false;
         document.getElementById('f-cidade').value = lider.cidade;
+        document.getElementById('f-cidade').readOnly = false;
         document.getElementById('f-tipo').value = lider.tipo;
         document.getElementById('f-cargo').value = lider.cargo;
         document.getElementById('f-foto').value = lider.foto_url;
-        document.getElementById('f-bio').value = lider.biografia || lider.mini_descricao;
+        document.getElementById('f-bio').value = lider.biografia || lider.mini_descricao || "";
         document.getElementById('f-insta').value = lider.instagram_url;
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -193,13 +253,16 @@
     function resetarForm() {
         document.getElementById('form-lider').reset();
         document.getElementById('f-id').value = "";
+        document.getElementById('f-nome').readOnly = false;
+        document.getElementById('f-cidade').readOnly = false;
         document.getElementById('form-title').innerText = "Cadastrar Nova Liderança";
-        document.getElementById('search-area').style.display = 'flex';
+        document.getElementById('search-area').style.display = 'block';
+        document.getElementById('form-lider').style.display = 'none';
         document.getElementById('btn-cancelar').style.display = 'none';
     }
 
     async function excluirLider(id) {
-        if(!confirm("Remover liderança do site?")) return;
+        if(!confirm("Remover liderança do mosaico?")) return;
         await _supabase.from('liderancas_unegro').delete().eq('id', id);
         carregarTabela();
     }
