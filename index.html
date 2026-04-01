@@ -160,7 +160,7 @@
  /* Menu Ultra Minimalista */
 .nav-unegro {
     display: flex;
-    justify-content: flex-end; 
+    justify-content: flex-end;
     padding: 25px 50px;
     background: transparent; /* Fundo invisível */
 }
@@ -196,7 +196,7 @@
     padding: 10px 0;
     margin-top: 5px;
     /* Sem borda dourada, apenas um contorno cinza escuro quase imperceptível */
-    border: 1px solid rgba(255, 255, 255, 0.05); 
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .dropdown-content a {
@@ -218,37 +218,37 @@
    /* MÓDULO LIDERANÇAS DO VALE */
 .secao-liderancas { padding: 80px 20px; background: #0a0a0a; }
 
-.grid-mosaico-vale { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
-    gap: 20px; 
-    max-width: 1200px; 
-    margin: 0 auto; 
+.grid-mosaico-vale {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 /* SEU CARD (COORDENAÇÃO) - DESTAQUE */
-.card-coord { 
-    grid-column: span 2; 
-    background: #111; 
-    padding: 30px; 
-    border-radius: 15px; 
-    border: 1px solid #f1b434; 
-    display: flex; 
-    align-items: center; 
+.card-coord {
+    grid-column: span 2;
+    background: #111;
+    padding: 30px;
+    border-radius: 15px;
+    border: 1px solid #f1b434;
+    display: flex;
+    align-items: center;
     gap: 25px;
-    cursor: pointer; 
+    cursor: pointer;
     transition: 0.4s;
 }
 .card-coord:hover { background: #151515; transform: translateY(-5px); box-shadow: 0 10px 40px rgba(241, 180, 52, 0.1); }
 .img-coord { width: 120px; height: 120px; border-radius: 10px; background-size: cover; background-position: center; border: 1px solid #222; }
 
 /* DEMAIS CARDS DO MOSAICO */
-.card-vale { 
-    background: #0d0d0d; 
-    padding: 15px; 
-    border-radius: 10px; 
-    border: 1px solid #1a1a1a; 
-    cursor: pointer; 
+.card-vale {
+    background: #0d0d0d;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #1a1a1a;
+    cursor: pointer;
     transition: 0.3s;
     text-align: center;
 }
@@ -271,62 +271,62 @@
 
 
 /* CONTAINER EM FLEX PARA O EFEITO DE DESLISE */
-.secao-liderancas { 
-    padding: 60px 20px; 
-    background: #000; 
+.secao-liderancas {
+    padding: 60px 20px;
+    background: #000;
     overflow-x: hidden; /* Evita scroll se expandir muito */
 }
 
-.grid-mosaico-vale { 
-    display: flex; 
+.grid-mosaico-vale {
+    display: flex;
     flex-wrap: nowrap; /* Mantém na mesma linha para o efeito lateral */
-    gap: 10px; 
-    max-width: 1400px; 
-    margin: 0 auto; 
+    gap: 10px;
+    max-width: 1400px;
+    margin: 0 auto;
     height: 450px; /* Altura fixa para todos os cards */
 }
 
-.card-lider { 
-    position: relative; 
+.card-lider {
+    position: relative;
     flex: 0 0 200px; /* Largura inicial estreita */
     height: 100%;
     background: #111;
-    overflow: hidden; 
+    overflow: hidden;
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); /* Transição suave do deslise */
 }
 
 /* EFEITO DE EXPANSÃO NO HOVER */
-.card-lider:hover { 
+.card-lider:hover {
     flex: 0 0 500px; /* Alarga o card no hover */
 }
 
-.img-bg { 
+.img-bg {
     position: absolute;
     inset: 0;
-    width: 100%; 
-    height: 100%; 
-    background-size: cover; 
-    background-position: center; 
-    filter: grayscale(100%) brightness(0.6); 
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: grayscale(100%) brightness(0.6);
     transition: 0.8s;
 }
 
-.card-lider:hover .img-bg { 
-    filter: grayscale(0%) brightness(0.3); 
-    transform: scale(1.05); 
+.card-lider:hover .img-bg {
+    filter: grayscale(0%) brightness(0.3);
+    transform: scale(1.05);
 }
 
 /* INFO ESTÁTICA (NOME E CIDADE) - SOME NO HOVER */
 .card-static-info {
-    position: absolute; 
-    bottom: 0; 
-    left: 0; 
-    width: 100%; 
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     padding: 25px;
     background: linear-gradient(transparent, rgba(0,0,0,0.9));
-    z-index: 2; 
+    z-index: 2;
     transition: opacity 0.3s;
 }
 
@@ -334,15 +334,15 @@
 
 /* CONTEÚDO QUE DESLIZA AO LADO */
 .card-hover-overlay {
-    position: absolute; 
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    padding: 40px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px;
     background: rgba(241, 180, 52, 0.9); /* Dourado UNEGRO */
     color: #000;
     opacity: 0;
@@ -351,45 +351,45 @@
     z-index: 3;
 }
 
-.card-lider:hover .card-hover-overlay { 
-    opacity: 1; 
-    transform: translateX(0); 
+.card-lider:hover .card-hover-overlay {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 .info-city { color: #f1b434; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; }
 .info-name { color: #fff; font-size: 22px; font-weight: 900; text-transform: uppercase; }
 
-.hover-bio { 
-    font-size: 15px; 
-    line-height: 1.6; 
-    font-weight: 700; 
-    margin: 20px 0; 
+.hover-bio {
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 700;
+    margin: 20px 0;
 }
 
 .btn-insta-mosaico {
     align-self: flex-start;
-    background: #000; 
-    color: #fff; 
+    background: #000;
+    color: #fff;
     padding: 12px 25px;
-    border-radius: 30px; 
-    text-decoration: none; 
+    border-radius: 30px;
+    text-decoration: none;
     font-size: 11px;
-    font-weight: 900; 
+    font-weight: 900;
     text-transform: uppercase;
 }
 
 /* RESPONSIVIDADE: No mobile vira grid normal para não quebrar */
 @media (max-width: 900px) {
-    .grid-mosaico-vale { 
-        flex-direction: column; 
+    .grid-mosaico-vale {
+        flex-direction: column;
         height: auto;
     }
-    .card-lider { 
-        flex: 0 0 350px; 
+    .card-lider {
+        flex: 0 0 350px;
         width: 100%;
     }
-    .card-lider:hover { 
-        flex: 0 0 350px; 
+    .card-lider:hover {
+        flex: 0 0 350px;
     }
 }
 
@@ -418,7 +418,7 @@
     filter: grayscale(100%) contrast(110%) brightness(40%);
     transition: opacity 4s ease-in-out, transform 10s linear;
     pointer-events: none;
-    
+
     /* Máscara radial para o rosto 'brotar' da escuridão */
     -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 65%);
     mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 65%);
@@ -427,12 +427,26 @@
 /* Garante que o conteúdo do site tenha um fundo que permita ver as fotos nos vãos */
 body {
     background-color: transparent !important;
-}
-.hero {
-    background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%);
+    /* Reduzi de 0.92 para 0.65 para as faces aparecerem com clareza nos espaços pretos */
+    background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 100 100"><g fill="%23222" fill-opacity="0.3"><path d="M50 20 L40 35 H60 L50 20 M50 80 L60 65 H40 L50 80 M20 50 L35 40 V60 L20 50 M80 50 L65 60 V40 L80 50"/></g></svg>');
 }
 
-        
+.spirit-face {
+    position: absolute;
+    width: 80vh; /* Aumentei um pouco o tamanho */
+    height: 80vh;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    /* Aumentei o brilho de 40% para 65% */
+    filter: grayscale(100%) contrast(110%) brightness(65%);
+    transition: opacity 4s ease-in-out, transform 10s linear;
+    pointer-events: none;
+
+    -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%);
+    mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%);
+}
+
     </style>
 </head>
 <body>
@@ -634,7 +648,7 @@ body {
 
     <footer style="text-align: center; padding: 40px; color: #444; font-size: 0.8rem;">UNEGRO VALE • 2026 </footer>
 
-    
+
 
    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -696,7 +710,7 @@ window.carregarLiderancas = async function() {
             }
         };
 
-       
+
         window.abrirModal = (lider) => {
             // IDs do Modal precisam existir no seu HTML (ID="modal-lider", etc)
             const modalFoto = document.getElementById('modal-foto');
@@ -727,7 +741,7 @@ window.carregarLiderancas = async function() {
             const quiz = document.getElementById('quiz').value;
             const aceite = document.getElementById('aceite').checked;
             const campos = ['nome', 'nascimento', 'rg', 'cpf', 'endereco', 'numero', 'bairro', 'cep', 'cidade', 'whatsapp', 'email'];
-            
+
             for(let campo of campos) {
                 if(!document.getElementById(campo).value) {
                     alert("Por favor, preencha todos os campos obrigatórios.");
@@ -825,7 +839,7 @@ async function iniciarAtmosferaAncestral() {
         'https://jornalempoderado.com.br/wp-content/uploads/2025/09/Imagem-do-WhatsApp-de-2025-09-06-as-10.35.50_0e8c4375.jpg' // Orlando
     ];
 
-    const listaFotos = liderancas && liderancas.length > 0 
+    const listaFotos = liderancas && liderancas.length > 0
         ? [...referencias, ...liderancas.map(l => l.foto_url)]
         : referencias;
 
@@ -849,17 +863,17 @@ async function iniciarAtmosferaAncestral() {
         const lado = Math.random() > 0.5 ? 'left' : 'right';
         face.style[lado] = Math.random() * 20 + '%';
         face.style.top = Math.random() * 30 + 10 + '%';
-        
+
         // Efeito de movimento bem lento (zoom in)
         face.style.transform = 'scale(1)';
-        
+
         overlay.appendChild(face);
 
         // Fade In
-        setTimeout(() => { 
-            face.style.opacity = '0.35'; 
-            face.style.transform = 'scale(1.15)'; // Lentamente cresce enquanto aparece
-        }, 100);
+        setTimeout(() => {
+            face.style.opacity = '0.6'; // Subi de 0.35 para 0.6
+            face.style.transform = 'scale(1.15)';
+        }, 100)
 
         index = (index + 1) % listaFotos.length;
     }
@@ -876,6 +890,6 @@ window.onload = () => {
     iniciarAtmosferaAncestral();
 };
 
-       
+
     </script>
 </html>
