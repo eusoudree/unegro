@@ -3,13 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNEGRO | SÃO PAULO - Ancestralidade e Luta</title>
+    <title>UNEGRO | Estado de São Paulo - Ancestralidade e Luta</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://unpkg.com/scrollreveal"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+
+    /* RESET SELECT */
+    select.input-style {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+
+        background-color: #000;
+        color: #fff;
+
+        border: 1px solid #222;
+        border-radius: 10px;
+
+        padding: 14px 40px 14px 14px;
+
+        font-size: 0.95rem;
+        cursor: pointer;
+
+        /* seta custom */
+        background-image: url("data:image/svg+xml;utf8,<svg fill='%23ff8c00' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 18px;
+    }
+
+    /* REMOVE seta padrão IE */
+    select::-ms-expand {
+        display: none;
+    }
+
+    /* HOVER / FOCUS */
+    select.input-style:focus {
+        outline: none;
+        border-color: #ff8c00;
+        box-shadow: 0 0 0 1px rgba(255,140,0,0.3);
+    }
+
+
         :root {
             --preto: #000000;
             --laranja-fogo: linear-gradient(135deg, #ff8c00 0%, #ff4500 100%);
@@ -17,170 +55,997 @@
             --cinza-card: #0d0d0d;
             --texto: #ffffff;
             --laranja-solid: #ff8c00;
-            --gold: #f1b434;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
-        body { background-color: transparent !important; font-family: 'Inter', sans-serif; background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 100 100"><g fill="%23222" fill-opacity="0.3"><path d="M50 20 L40 35 H60 L50 20 M50 80 L60 65 H40 L50 80 M20 50 L35 40 V60 L20 50 M80 50 L65 60 V40 L80 50"/></g></svg>'); }
+        body {
+            background-color: var(--preto); color: var(--texto); font-family: 'Inter', sans-serif;
+            background-image: linear-gradient(rgba(0,0,0,0.92), rgba(0,0,0,0.95)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 100 100"><g fill="%23222" fill-opacity="0.3"><path d="M50 20 L40 35 H60 L50 20 M50 80 L60 65 H40 L50 80 M20 50 L35 40 V60 L20 50 M80 50 L65 60 V40 L80 50"/></g></svg>');
+        }
 
-        nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,140,0,0.2); padding: 15px 0; }
-        .nav-links { display: flex; gap: 30px; justify-content: flex-end; padding-right: 50px; }
-        .nav-links a { color: rgba(255, 255, 255, 0.5); text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; transition: 0.3s; }
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,140,0,0.2);
+            padding: 15px 0;
+        }
+        .nav-container { max-width: 1200px; margin: auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a { color: #fff; text-decoration: none; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; font-weight: bold; }
         .nav-links a:hover { color: var(--laranja-solid); }
 
-        section { padding: 100px 20px; max-width: 1200px; margin: auto; }
+        section { padding: 120px 20px; max-width: 1100px; margin: auto; }
         .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        .secao-titulo { color: var(--laranja-solid); text-transform: uppercase; letter-spacing: 5px; margin-bottom: 50px; font-size: 2rem; font-weight: 900; text-align: center; }
+        .titulo-ancestral { font-size: clamp(3.5rem, 10vw, 6.5rem); font-weight: 900; background: var(--laranja-fogo); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 12px; filter: drop-shadow(0 0 20px rgba(255, 140, 0, 0.4)); }
 
-        /* LIDERANÇAS ESTADUAIS */
-        .grid-mosaico-sp { display: flex; flex-wrap: nowrap; gap: 10px; height: 450px; overflow-x: hidden; }
-        .card-lider { position: relative; flex: 0 0 200px; height: 100%; background: #111; overflow: hidden; border-radius: 12px; cursor: pointer; transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
-        .card-lider:hover { flex: 0 0 500px; }
-        .img-bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: grayscale(1) brightness(0.5); transition: 0.8s; }
-        .card-lider:hover .img-bg { filter: grayscale(0) brightness(0.3); transform: scale(1.05); }
+        .secao-titulo { color: var(--laranja-solid); text-transform: uppercase; letter-spacing: 5px; margin-bottom: 50px; font-size: 2.2rem; font-weight: 900; text-align: center; }
+        .texto-longo { font-size: 1.15rem; line-height: 2; color: #ccc; text-align: justify; margin-bottom: 30px; }
 
-        .card-static-info { position: absolute; bottom: 0; padding: 25px; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.9)); transition: 0.3s; }
-        .card-lider:hover .card-static-info { opacity: 0; }
-        .info-city { color: var(--gold); font-size: 10px; text-transform: uppercase; font-weight: 800; }
-        .info-name { color: #fff; font-size: 18px; font-weight: 900; text-transform: uppercase; }
+        .perso-container { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+        .perso-card { background: var(--cinza-card); border: 1px solid #222; border-radius: 25px; width: 320px; overflow: hidden; transition: 0.5s; text-align: center; }
+        .perso-img { width: 100%; height: 320px; background-size: cover; background-position: top center; filter: grayscale(1); transition: 0.6s; border-bottom: 3px solid var(--laranja-solid); }
+        .perso-card:hover { border-color: var(--laranja-solid); transform: translateY(-10px); }
+        .perso-card:hover .perso-img { filter: grayscale(0); }
+        .insta-btn { display: inline-block; margin: 20px 0; color: var(--laranja-solid); border: 1px solid var(--laranja-solid); padding: 8px 25px; border-radius: 30px; text-decoration: none; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; }
+        .insta-btn:hover { background: var(--laranja-solid); color: #000; }
 
-        .card-hover-overlay { position: absolute; inset: 0; background: rgba(241, 180, 52, 0.9); color: #000; padding: 40px; display: flex; flex-direction: column; justify-content: center; opacity: 0; transform: translateX(-20px); transition: 0.5s ease 0.2s; }
-        .card-lider:hover .card-hover-overlay { opacity: 1; transform: translateX(0); }
+        .swiper { width: 100%; padding: 50px 0; }
+        .midia-card { background: #111; border: 1px solid #222; border-radius: 20px; padding: 30px; height: 200px; text-align: left; display: flex; flex-direction: column; justify-content: center; }
 
-        /* AGENDA SP */
-        .agenda-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .card-agenda { background: rgba(13, 13, 13, 0.6); border-left: 3px solid var(--laranja-solid); padding: 25px; border-radius: 12px; transition: 0.4s; }
-        .card-agenda:hover { background: rgba(20, 20, 20, 0.9); transform: translateY(-5px); }
+        .filiacao-box { max-width: 1000px; margin: 50px auto; background: var(--cinza-card); padding: 50px; border-radius: 40px; border: 1px solid rgba(255,140,0,0.1); }
 
-        /* FILIAÇÃO */
-        .filiacao-box { background: var(--cinza-card); padding: 50px; border-radius: 40px; border: 1px solid rgba(255,140,0,0.1); }
-        .input-style { width: 100%; padding: 14px; background: #000; border: 1px solid #222; color: #fff; border-radius: 10px; margin-bottom: 15px; }
-        .btn-enviar { width: 100%; padding: 20px; background: var(--laranja-fogo); border: none; border-radius: 15px; font-weight: 900; text-transform: uppercase; cursor: pointer; color: #000; }
+        /* Correção da responsividade do Grid */
+        .grid-form {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .span-2 { grid-column: span 2; }
+        .span-3 { grid-column: span 3; }
 
-        /* ANCESTRALIDADE */
-        #ancestral-overlay { position: fixed; inset: 0; z-index: -2; background: #000; overflow: hidden; }
-        .spirit-face { position: absolute; width: 80vh; height: 80vh; background-size: cover; opacity: 0; filter: grayscale(1) brightness(0.6); transition: opacity 4s, transform 10s; pointer-events: none; -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 75%); }
+        .input-group label { display: block; color: #888; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; text-align: left; }
+        .input-style { width: 100%; padding: 14px; background: #000; border: 1px solid #222; color: #fff; border-radius: 10px; font-size: 0.95rem; }
 
-        @media (max-width: 900px) { .grid-mosaico-sp { flex-direction: column; height: auto; } .card-lider { flex: 0 0 350px; width: 100%; } }
+        .desafio-box { grid-column: span 3; background: rgba(255,140,0,0.03); padding: 25px; border: 1px dashed rgba(255,140,0,0.2); border-radius: 20px; margin-top: 20px; }
+        .btn-enviar { width: 100%; padding: 22px; background: var(--laranja-fogo); border: none; border-radius: 15px; font-weight: 900; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; color: #000; transition: 0.4s; letter-spacing: 2px; }
+
+        /* Media Queries Ajustadas */
+        @media (max-width: 900px) {
+            .grid-form { grid-template-columns: 1fr 1fr; }
+            .span-3, .span-2 { grid-column: span 2; }
+        }
+
+        @media (max-width: 600px) {
+      section { padding: 80px 15px; }
+
+      .grid-form {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 15px;
+      }
+
+      .grid-form > * {
+          width: 100% !important;
+      }
+
+      .span-3, .span-2 {
+          grid-column: unset !important;
+      }
+
+      .input-group {
+          width: 100%;
+      }
+
+      .desafio-box {
+          width: 100% !important;
+      }
+
+      .filiacao-box {
+          padding: 25px 15px;
+          border-radius: 25px;
+      }
+
+      .titulo-ancestral {
+          font-size: 3rem;
+          letter-spacing: 5px;
+      }
+
+      .secao-titulo {
+          font-size: 1.8rem;
+      }
+  }
+
+
+/* Navbar e Dropdown UNEGRO */
+ /* Menu Ultra Minimalista */
+.nav-unegro {
+    display: flex;
+    justify-content: flex-end;
+    padding: 25px 50px;
+    background: transparent; /* Fundo invisível */
+}
+
+.nav-links { display: flex; gap: 40px; align-items: center; }
+
+.nav-links a, .dropbtn {
+    color: rgba(255, 255, 255, 0.4); /* Branco bem fraquinho, quase some */
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.4s ease;
+}
+
+.nav-links a:hover, .dropdown:hover .dropbtn {
+    color: #f1b434; /* Só aqui o dourado aparece de leve */
+}
+
+/* Dropdown que não "brota" do nada */
+.dropdown { position: relative; }
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background: rgba(10, 10, 10, 0.95); /* Quase preto sólido */
+    min-width: 160px;
+    right: 0;
+    z-index: 1000;
+    padding: 10px 0;
+    margin-top: 5px;
+    /* Sem borda dourada, apenas um contorno cinza escuro quase imperceptível */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dropdown-content a {
+    color: rgba(255, 255, 255, 0.5);
+    padding: 10px 20px;
+    display: block;
+    font-size: 10px;
+    letter-spacing: 1px;
+}
+
+.dropdown-content a:hover {
+    background: rgba(241, 180, 52, 0.05);
+    color: #f1b434;
+}
+
+.dropdown:hover .dropdown-content { display: block; }
+
+
+   /* MÓDULO LIDERANÇAS DO VALE */
+.secao-liderancas { padding: 80px 20px; background: #0a0a0a; }
+
+.grid-mosaico-vale {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* SEU CARD (COORDENAÇÃO) - DESTAQUE */
+.card-coord {
+    grid-column: span 2;
+    background: #111;
+    padding: 30px;
+    border-radius: 15px;
+    border: 1px solid #f1b434;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    cursor: pointer;
+    transition: 0.4s;
+}
+.card-coord:hover { background: #151515; transform: translateY(-5px); box-shadow: 0 10px 40px rgba(241, 180, 52, 0.1); }
+.img-coord { width: 120px; height: 120px; border-radius: 10px; background-size: cover; background-position: center; border: 1px solid #222; }
+
+/* DEMAIS CARDS DO MOSAICO */
+.card-vale {
+    background: #0d0d0d;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #1a1a1a;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+}
+.card-vale:hover { border-color: #333; background: #151515; transform: translateY(-3px); }
+.img-vale { width: 100%; aspect-ratio: 1/1; background-size: cover; background-position: center; border-radius: 6px; filter: grayscale(1); margin-bottom: 12px; transition: 0.5s; }
+.card-vale:hover .img-vale { filter: grayscale(0); }
+
+/* MODAL DE BIOGRAFIA */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+.modal-content { background: #151515; width: 90%; max-width: 800px; border-radius: 20px; border: 1px solid #333; position: relative; overflow: hidden; display: flex; flex-wrap: wrap; }
+.modal-img { flex: 1; min-width: 300px; height: 450px; background-size: cover; background-position: center; }
+.modal-text { flex: 1.2; padding: 45px; min-width: 300px; text-align: left; }
+.close-btn { position: absolute; top: 15px; right: 25px; background: none; border: none; color: #fff; font-size: 35px; cursor: pointer; z-index: 10; }
+
+@media (max-width: 768px) {
+    .card-coord { grid-column: span 1; flex-direction: column; text-align: center; padding: 20px; }
+    .grid-mosaico-vale { grid-template-columns: repeat(2, 1fr); }
+}
+
+
+
+/* CONTAINER EM FLEX PARA O EFEITO DE DESLISE */
+.secao-liderancas {
+    padding: 60px 20px;
+    background: #000;
+    overflow-x: hidden; /* Evita scroll se expandir muito */
+}
+
+.grid-mosaico-vale {
+    display: flex;
+    flex-wrap: nowrap; /* Mantém na mesma linha para o efeito lateral */
+    gap: 10px;
+    max-width: 1400px;
+    margin: 0 auto;
+    height: 450px; /* Altura fixa para todos os cards */
+}
+
+.card-lider {
+    position: relative;
+    flex: 0 0 200px; /* Largura inicial estreita */
+    height: 100%;
+    background: #111;
+    overflow: hidden;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); /* Transição suave do deslise */
+}
+
+/* EFEITO DE EXPANSÃO NO HOVER */
+.card-lider:hover {
+    flex: 0 0 500px; /* Alarga o card no hover */
+}
+
+.img-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: grayscale(100%) brightness(0.6);
+    transition: 0.8s;
+}
+
+.card-lider:hover .img-bg {
+    filter: grayscale(0%) brightness(0.3);
+    transform: scale(1.05);
+}
+
+/* INFO ESTÁTICA (NOME E CIDADE) - SOME NO HOVER */
+.card-static-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 25px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.9));
+    z-index: 2;
+    transition: opacity 0.3s;
+}
+
+.card-lider:hover .card-static-info { opacity: 0; }
+
+/* CONTEÚDO QUE DESLIZA AO LADO */
+.card-hover-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px;
+    background: rgba(241, 180, 52, 0.9); /* Dourado UNEGRO */
+    color: #000;
+    opacity: 0;
+    transform: translateX(-20px); /* Começa um pouco recuado */
+    transition: all 0.5s ease 0.2s; /* Delayzinho para esperar o card abrir */
+    z-index: 3;
+}
+
+.card-lider:hover .card-hover-overlay {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.info-city { color: #f1b434; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; }
+.info-name { color: #fff; font-size: 22px; font-weight: 900; text-transform: uppercase; }
+
+.hover-bio {
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 700;
+    margin: 20px 0;
+}
+
+.btn-insta-mosaico {
+    align-self: flex-start;
+    background: #000;
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+/* RESPONSIVIDADE: No mobile vira grid normal para não quebrar */
+@media (max-width: 900px) {
+    .grid-mosaico-vale {
+        flex-direction: column;
+        height: auto;
+    }
+    .card-lider {
+        flex: 0 0 350px;
+        width: 100%;
+    }
+    .card-lider:hover {
+        flex: 0 0 350px;
+    }
+}
+
+
+
+
+/* Módulo de Atmosfera Ancestral */
+#ancestral-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    z-index: -2; /* Fica atrás de tudo, inclusive do gradiente do body */
+    overflow: hidden;
+}
+
+.spirit-face {
+    position: absolute;
+    width: 70vh;
+    height: 70vh;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    filter: grayscale(100%) contrast(110%) brightness(40%);
+    transition: opacity 4s ease-in-out, transform 10s linear;
+    pointer-events: none;
+
+    /* Máscara radial para o rosto 'brotar' da escuridão */
+    -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 65%);
+    mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 65%);
+}
+
+/* Garante que o conteúdo do site tenha um fundo que permita ver as fotos nos vãos */
+body {
+    background-color: transparent !important;
+    /* Reduzi de 0.92 para 0.65 para as faces aparecerem com clareza nos espaços pretos */
+    background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 100 100"><g fill="%23222" fill-opacity="0.3"><path d="M50 20 L40 35 H60 L50 20 M50 80 L60 65 H40 L50 80 M20 50 L35 40 V60 L20 50 M80 50 L65 60 V40 L80 50"/></g></svg>');
+}
+
+.spirit-face {
+    position: absolute;
+    width: 80vh; /* Aumentei um pouco o tamanho */
+    height: 80vh;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    /* Aumentei o brilho de 40% para 65% */
+    filter: grayscale(100%) contrast(110%) brightness(65%);
+    transition: opacity 4s ease-in-out, transform 10s linear;
+    pointer-events: none;
+
+    -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%);
+    mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%);
+}
+
+
+
+
+
+/* MÓDULO AGENDA INDEX - DREE.ONE */
+.secao-agenda { padding: 60px 20px; background: #000; border-top: 1px solid rgba(255,140,0,0.05); }
+.agenda-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 20px; 
+    max-width: 1200px; 
+    margin: 0 auto; 
+}
+
+.card-agenda {
+    background: rgba(13, 13, 13, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-left: 3px solid var(--laranja-solid);
+    padding: 25px;
+    border-radius: 12px;
+    transition: 0.4s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-agenda:hover {
+    background: rgba(20, 20, 20, 0.9);
+    border-color: var(--laranja-solid);
+    transform: translateY(-5px);
+}
+
+.ag-data { 
+    font-size: 10px; 
+    font-weight: 900; 
+    color: var(--laranja-solid); 
+    text-transform: uppercase; 
+    letter-spacing: 2px; 
+    margin-bottom: 10px;
+}
+
+.ag-titulo { 
+    font-size: 18px; 
+    font-weight: 850; 
+    color: #fff; 
+    margin-bottom: 8px; 
+    text-transform: uppercase;
+}
+
+.ag-local { 
+    font-size: 12px; 
+    color: #666; 
+    font-weight: 500; 
+}
+
+.ag-vazio {
+    grid-column: span 3;
+    text-align: center;
+    color: #333;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 40px;
+}
+        
+
     </style>
 </head>
 <body>
     <div id="ancestral-overlay"></div>
 
-    <nav>
-        <div class="nav-links">
-            <a href="index.html">Vale do Paraíba</a>
-            <a href="portal.html">Portal do Filiado</a>
+  <nav class="nav-unegro">
+    <div class="nav-links">
+        <a href="index.html">Início</a>
+
+        <div class="dropdown">
+            <button class="dropbtn">Cidades</button>
+            <div class="dropdown-content">
+                <a href="filiados.html">Geral</a>
+                <a href="filiados-cruzeiro.html">Cruzeiro</a>
+                <a href="filiados-jacarei.html">Jacareí</a>
+                <a href="filiados-sjc.html">S.J. Campos</a>
+                <a href="filiados-taubate.html">Taubaté</a>
+            </div>
         </div>
-    </nav>
 
+        <a href="portal.html">Área do Filiado</a>
+    </div>
+</nav>
     <section class="hero">
-        <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="max-width:350px;">
-        <p style="letter-spacing: 8px; color: #888; text-transform: uppercase; font-weight: 800; margin-top: 20px;">Estado de São Paulo</p>
+          <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="max-width:400px;" alt="Logo UNEGRO">
+        <p style="letter-spacing: 8px; color: #888; text-transform: uppercase; font-weight: bold; margin-top: 15px;">Estado de São Paulo • SP</p>
     </section>
 
-    <section>
-        <h2 class="secao-titulo">História e Luta Estadual</h2>
-        <p style="font-size: 1.2rem; line-height: 1.8; color: #ccc; text-align: justify;">
-            A UNEGRO no Estado de São Paulo articula a resistência negra da capital ao interior. Das pautas do ABC Paulista à força universitária de São Carlos, nossa missão é combater o racismo estrutural e organizar a classe trabalhadora negra para a transformação social definitiva.
-        </p>
+    <section id="unegro">
+        <h2 class="secao-titulo">História e Luta</h2>
+        <div class="texto-longo">
+            <p>A União de Negros pela Igualdade (UNEGRO) é uma entidade nacional suprapartidária fundada em 14 de julho de 1988, em Salvador, na Bahia. Com a integridade de uma entidade fundada por comunistas, a UNEGRO construiu um programa de cunho classista e abertamente marxista, lutando para transformar um povo escravizado em construtores de uma nova nação.</p>
+        </div>
     </section>
 
-    <section>
-        <h2 class="secao-titulo">Lideranças SP</h2>
-        <div id="mosaico-sp" class="grid-mosaico-sp"></div>
+    <section id="liderancas" style="background: #050505; border-radius: 50px;">
+        <h2 class="secao-titulo">Nossas Referências</h2>
+        <div class="perso-container">
+            <div class="perso-card">
+                <div class="perso-img" style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQd-iTVw7Wna6Hk1Y7dVTIsXTO6dhvdUAVD5w&s');"></div>
+                <div class="perso-info">
+                    <h4 style="margin-top: 15px;">Leci Brandão</h4>
+                    <a href="https://www.instagram.com/lecibrandao/" target="_blank" class="insta-btn">Instagram</a>
+                </div>
+            </div>
+            <div class="perso-card">
+                <div class="perso-img" style="background-image: url('https://jornalempoderado.com.br/wp-content/uploads/2025/09/Imagem-do-WhatsApp-de-2025-09-06-as-10.35.50_0e8c4375.jpg');"></div>
+                <div class="perso-info">
+                    <h4 style="margin-top: 15px;">Orlando Silva</h4>
+                    <a href="https://www.instagram.com/orlandosilvasp/" target="_blank" class="insta-btn">Instagram</a>
+                </div>
+            </div>
+        </div>
     </section>
 
-    <section>
-        <h2 class="secao-titulo">Agenda da Luta SP</h2>
-        <div id="agenda-sp" class="agenda-grid"></div>
-    </section>
+
+
+
+    <section id="midia" style="background: #050505; border-radius: 50px;">
+    <h2 class="secao-titulo">Na Mídia</h2>
+
+    <div class="perso-container">
+
+        <!-- CARD 1 (corrigido no mesmo padrão) -->
+        <div class="perso-card">
+            <div class="perso-img" style="background-image: url('https://images.unsplash.com/photo-1559027615-cd4628902d4a?q=80&w=1200');"></div>
+            <div class="perso-info">
+                <h6 style="color:#888; margin-top:15px;">Vermelho</h6>
+                <h4 style="margin-top:10px;">UNEGRO: 30 anos de resistência e luta.</h4>
+                <a href="#" target="_blank" class="insta-btn">Ler matéria</a>
+            </div>
+        </div>
+
+        <!-- CARD 2 (o seu que já funciona) -->
+        <div class="perso-card">
+            <div class="perso-img" style="background-image: url('https://images.unsplash.com/photo-1509099836639-18ba1795216d?q=80&w=1200');"></div>
+            <div class="perso-info">
+                <h6 style="color:#888; margin-top:15px;">Geledés</h6>
+                <h4 style="margin-top:10px;">O combate ao racismo religioso no Brasil.</h4>
+                <a href="#" target="_blank" class="insta-btn">Ler matéria</a>
+            </div>
+        </div>
+
+        <!-- CARD 3 (o seu que já funciona) -->
+        <div class="perso-card">
+            <div class="perso-img" style="background-image: url('https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?q=80&w=1200');"></div>
+            <div class="perso-info">
+                <h6 style="color:#888; margin-top:15px;">Brasil de Fato</h6>
+                <h4 style="margin-top:10px;">A juventude negra contra o genocídio.</h4>
+                <a href="#" target="_blank" class="insta-btn">Ler matéria</a>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+
+
+<section class="secao-agenda">
+    <h2 class="secao-titulo" style="font-size: 1.5rem; margin-bottom: 40px;">Agenda da Luta</h2>
+    <div id="agenda-dinamica" class="agenda-grid">
+        </div>
+</section>
+
+    
 
     <section id="filiacao">
         <div class="filiacao-box">
-            <h2 class="secao-titulo">Filiação Estadual</h2>
-            <form id="formSP">
-                <input type="text" id="nome" placeholder="Nome Completo" class="input-style" required>
-                <select id="cidade" class="input-style" required>
-                    <option value="" disabled selected>Selecione sua cidade em SP</option>
-                    <option value="São Paulo">São Paulo (Capital)</option>
-                    <option value="Santo André">Santo André (ABC)</option>
-                    <option value="São Bernardo do Campo">São Bernardo do Campo (ABC)</option>
-                    <option value="São Caetano do Sul">São Caetano do Sul (ABC)</option>
-                    <option value="Diadema">Diadema (ABC)</option>
-                    <option value="Mauá">Mauá (ABC)</option>
-                    <option value="São Carlos">São Carlos</option>
-                    <option value="Campinas">Campinas</option>
-                    <option value="Santos">Santos</option>
-                    <option value="Outra">Outra cidade de SP</option>
-                </select>
-                <input type="tel" id="whatsapp" placeholder="WhatsApp" class="input-style" required>
-                <input type="email" id="email" placeholder="E-mail" class="input-style" required>
-                <button type="button" class="btn-enviar">Solicitar Filiação Estadual</button>
+            <h2 class="secao-titulo">Ficha Nacional de Filiação</h2>
+            <form id="formFiliacao">
+                <div class="grid-form">
+                    <div class="input-group span-3"><label>Nome Completo</label><input type="text" id="nome" class="input-style" required></div>
+                    <div class="input-group span-2"><label>Endereço</label><input type="text" id="endereco" class="input-style" required></div>
+                    <div class="input-group"><label>Número</label><input type="text" id="numero" class="input-style" required></div>
+                    <div class="input-group"><label>Complemento</label><input type="text" id="complemento" class="input-style"></div>
+                    <div class="input-group"><label>Bairro</label><input type="text" id="bairro" class="input-style" required></div>
+                    <div class="input-group"><label>CEP</label><input type="text" id="cep" class="input-style" required></div>
+                    <div class="input-group">
+                        <label>Cidades</label>
+                        <select id="cidade" class="input-style" required>
+      <option value="" disabled selected>Selecione sua cidade</option>
+
+      <!-- REGIÃO METROPOLITANA -->
+      <optgroup label="Região Metropolitana de São Paulo">
+          <option>São Paulo</option>
+          <option>Guarulhos</option>
+          <option>Osasco</option>
+          <option>Santo André</option>
+          <option>São Bernardo do Campo</option>
+          <option>São Caetano do Sul</option>
+          <option>Diadema</option>
+          <option>Mauá</option>
+          <option>Carapicuíba</option>
+          <option>Itaquaquecetuba</option>
+          <option>Suzano</option>
+          <option>Mogi das Cruzes</option>
+          <option>Barueri</option>
+          <option>Santana de Parnaíba</option>
+          <option>Cotia</option>
+          <option>Embu das Artes</option>
+          <option>Taboão da Serra</option>
+      </optgroup>
+
+      <!-- INTERIOR -->
+      <optgroup label="Interior do Estado">
+          <option>Campinas</option>
+          <option>Ribeirão Preto</option>
+          <option>Sorocaba</option>
+          <option>Jundiaí</option>
+          <option>Piracicaba</option>
+          <option>Bauru</option>
+          <option>São José do Rio Preto</option>
+          <option>Franca</option>
+          <option>Araraquara</option>
+          <option>São Carlos</option>
+          <option>Marília</option>
+          <option>Presidente Prudente</option>
+          <option>Araçatuba</option>
+          <option>Limeira</option>
+          <option>Americana</option>
+          <option>Sumaré</option>
+          <option>Hortolândia</option>
+          <option>Indaiatuba</option>
+          <option>Atibaia</option>
+          <option>Bragança Paulista</option>
+          <option>Itu</option>
+          <option>Salto</option>
+          <option>Botucatu</option>
+          <option>Assis</option>
+          <option>Ourinhos</option>
+          <option>Jaú</option>
+          <option>Avaré</option>
+      </optgroup>
+
+      <!-- LITORAL (FORA DO VALE) -->
+      <optgroup label="Litoral Paulista">
+          <option>Santos</option>
+          <option>São Vicente</option>
+          <option>Praia Grande</option>
+          <option>Guarujá</option>
+          <option>Cubatão</option>
+          <option>Itanhaém</option>
+          <option>Peruíbe</option>
+      </optgroup>
+
+  </select>
+                    </div>
+                    <div class="input-group"><label>Nascimento</label><input type="date" id="nascimento" class="input-style" required></div>
+                    <div class="input-group"><label>Sexo</label>
+                        <select id="sexo" class="input-style">
+                            <option value="Masculino">Masculino</option>
+                            <option value="Feminino">Feminino</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label>RG</label><input type="text" id="rg" class="input-style" required></div>
+                    <div class="input-group"><label>CPF</label><input type="text" id="cpf" class="input-style" required></div>
+                    <div class="input-group"><label>WhatsApp</label><input type="tel" id="whatsapp" class="input-style" required></div>
+                    <div class="input-group span-3"><label>E-mail</label><input type="email" id="email" class="input-style" required></div>
+                    <div class="input-group span-2"><label>Profissão</label><input type="text" id="profissao" class="input-style"></div>
+                    <div class="input-group"><label>Escolaridade</label>
+                        <select id="escolaridade" class="input-style">
+                            <option value="Ensino Médio">Ensino Médio</option>
+                            <option value="Superior">Superior</option>
+                        </select>
+                    </div>
+                    <div class="input-group span-3"><label>Movimento Social</label><input type="text" id="movimento" class="input-style"></div>
+
+                    <div class="desafio-box">
+                        <p>Quanto é 5 + 5? <input type="number" id="quiz" style="width: 60px; background: #000; color: #fff; border: 1px solid #333; text-align: center;"></p>
+                        <label style="display: flex; gap: 10px; margin-top: 15px; cursor: pointer; font-size: 0.85rem; align-items: flex-start;">
+                            <input type="checkbox" id="aceite" required style="margin-top: 4px;">
+                            Declaro, para os devidos fins, que as informações prestadas são verdadeiras e que, ao submeter este formulário, formalizo minha filiação à UNEGRO, estando de acordo com sua Carta de Princípios e diretrizes organizativas.
+                        </label>
+                    </div>
+                </div>
+                <button type="button" onclick="processarCadastro()" class="btn-enviar" style="margin-top: 20px;">Filiar-se e Gerar PDF</button>
             </form>
         </div>
     </section>
 
-    <footer style="text-align: center; padding: 40px; background: #000; border-top: 1px solid #111;">
-        <a href="https://www.dree.one/" target="_blank" style="color: #444; text-decoration: none; font-size: 12px; font-weight: bold; letter-spacing: 1px;">
-            Tecnologia <span style="color: var(--gold);">Dree.One</span>
-        </a>
-    </footer>
 
-    <script>
-        const CONFIG = {
-            URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
-            KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
+    <div id="modal-lider" class="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center;" onclick="this.style.display='none'">
+    <div style="background:#111; padding:40px; border-radius:20px; max-width:600px; border:1px solid #333;" onclick="event.stopPropagation()">
+        <h2 id="modal-nome" style="color:#f1b434;"></h2>
+        <p id="modal-cidade" style="font-size:12px; text-transform:uppercase; color:#888;"></p>
+        <div id="modal-bio" style="margin:20px 0; line-height:1.6;"></div>
+        <a id="modal-insta" href="#" target="_blank" class="btn-insta-mosaico">Instagram</a>
+        <button onclick="document.getElementById('modal-lider').style.display='none'" style="margin-top:20px; background:none; border:1px solid #444; color:#fff; cursor:pointer; padding:5px 10px;">Fechar</button>
+    </div>
+</div>
+
+  <footer style="text-align: center; padding: 40px; background: #000; border-top: 1px solid #111;">
+    <a href="https://www.dree.one/" target="_blank" style="color: #444; text-decoration: none; font-size: 12px; font-weight: bold; letter-spacing: 1px; transition: 0.3s;">
+        Tecnologia <span style="color: #f1b434;">Dree.One</span>
+    </a>
+</footer>
+
+
+
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+   <script>
+        // 1. CONFIGURAÇÃO UNIFICADA DO SUPABASE
+        const SUPABASE_URL = 'https://huxemmuzhlntwimgiukt.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+window.carregarLiderancas = async function() {
+            try {
+                const { data, error } = await _supabase
+                    .from('liderancas_unegro')
+                    .select('*')
+                    .order('ordem', { ascending: true });
+
+                if (error) throw error;
+
+                const coord = data.filter(i => i.tipo === 'COORDENACAO')[0];
+                const vale = data.filter(i => i.tipo === 'VALE');
+                let htmlFinal = "";
+
+                // FUNÇÃO BLINDADA: Ela busca qualquer coluna que tenha 'mini' no nome
+                const getBio = (item) => {
+                    // Tenta achar a chave que contém 'mini' (resolve o problema do ã)
+                   console.log("Dados do item:", item); // Isso vai mostrar no F12 exatamente o que o banco enviou
+    return item['mini_descricão'] || item['mini_descricao'] || item.mini_descricao || item.biografia || "Liderança UNEGRO Vale.";
+};
+
+                const gerarCardHTML = (lider, extraLabel = "") => {
+                    const label = extraLabel || lider.cargo || 'Liderança Vale';
+                    return `
+                        <div class="card-lider" onclick='abrirModal(${JSON.stringify(lider)})'>
+                            <div class="img-bg" style="background-image: url('${lider.foto_url}')"></div>
+                            <div class="card-static-info">
+                                <span class="info-city">${lider.cidade}</span>
+                                <h3 class="info-name">${lider.nome}</h3>
+                            </div>
+                            <div class="card-hover-overlay">
+                                <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">${label}</span>
+                                <h2 style="font-weight: 900; text-transform: uppercase; margin-bottom: 5px;">${lider.nome}</h2>
+                                <p class="hover-bio">${getBio(lider)}</p>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <a href="${lider.instagram_url}" target="_blank" onclick="event.stopPropagation();" class="btn-insta-mosaico">@Instagram</a>
+                                    <span style="font-size: 10px; font-weight: 900;">VER BIO ➔</span>
+                                </div>
+                            </div>
+                        </div>`;
+                };
+
+                if (coord) htmlFinal += gerarCardHTML(coord, "COORDENAÇÃO GERAL");
+                htmlFinal += vale.map(v => gerarCardHTML(v)).join('');
+
+                document.getElementById('mosaico-completo').innerHTML = htmlFinal;
+            } catch (err) {
+                console.error("Erro ao carregar mosaico:", err.message);
+            }
         };
-        const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
-        async function init() {
-            // Carregar Lideranças
-            const { data: lid } = await _supabase.from('liderancas_unegro').select('*').order('ordem');
-            if(lid) {
-                document.getElementById('mosaico-sp').innerHTML = lid.map(l => `
-                    <div class="card-lider">
-                        <div class="img-bg" style="background-image: url('${l.foto_url}')"></div>
-                        <div class="card-static-info">
-                            <span class="info-city">${l.cidade}</span>
-                            <h3 class="info-name">${l.nome}</h3>
-                        </div>
-                        <div class="card-hover-overlay">
-                            <h2 style="font-weight:900;">${l.nome}</h2>
-                            <p style="font-size:14px; font-weight:700; margin:15px 0;">${l.mini_descricao || 'UNEGRO SP'}</p>
-                            <a href="${l.instagram_url}" target="_blank" style="color:#000; font-weight:900; font-size:10px;">@INSTAGRAM</a>
-                        </div>
-                    </div>`).join('');
+
+        window.abrirModal = (lider) => {
+            // IDs do Modal precisam existir no seu HTML (ID="modal-lider", etc)
+            const modalFoto = document.getElementById('modal-foto');
+            const modalNome = document.getElementById('modal-nome');
+            const modalBio = document.getElementById('modal-bio');
+            const modalInsta = document.getElementById('modal-insta');
+
+            if(modalFoto) modalFoto.style.backgroundImage = `url("${lider.foto_url}")`;
+            if(modalNome) modalNome.innerText = lider.nome;
+            if(modalBio) modalBio.innerText = lider.biografia || lider['mini_descricão'];
+            if(modalInsta) modalInsta.href = lider.instagram_url;
+
+            const modalElement = document.getElementById('modal-lider');
+            if(modalElement) {
+                modalElement.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        };
+
+        window.fecharModal = () => {
+            const modalElement = document.getElementById('modal-lider');
+            if(modalElement) modalElement.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        };
+
+        // 4. SISTEMA DE FILIAÇÃO E PDF
+        async function processarCadastro() {
+            const quiz = document.getElementById('quiz').value;
+            const aceite = document.getElementById('aceite').checked;
+            const campos = ['nome', 'nascimento', 'rg', 'cpf', 'endereco', 'numero', 'bairro', 'cep', 'cidade', 'whatsapp', 'email'];
+
+            for(let campo of campos) {
+                if(!document.getElementById(campo).value) {
+                    alert("Por favor, preencha todos os campos obrigatórios.");
+                    document.getElementById(campo).focus();
+                    return;
+                }
             }
 
-            // Carregar Agenda
-            const { data: ag } = await _supabase.from('agenda_unegro').select('*').order('data').limit(3);
-            if(ag) {
-                document.getElementById('agenda-sp').innerHTML = ag.map(ev => {
-                    const d = new Date(ev.data + 'T00:00:00');
-                    return `<div class="card-agenda">
-                        <div style="color:var(--laranja-solid); font-size:10px; font-weight:900;">${d.getDate()} ${d.toLocaleString('pt-BR', {month:'short'})}</div>
-                        <h3 style="color:#fff; font-size:18px; margin:10px 0;">${ev.titulo}</h3>
-                        <div style="color:#666; font-size:12px;">📍 ${ev.local || 'SP'}</div>
-                    </div>`;
-                }).join('');
+            if(quiz !== "10" || !aceite) { alert("Valide o desafio matemático e aceite os termos."); return; }
+
+            const payload = {
+                nome: document.getElementById('nome').value,
+                nascimento: document.getElementById('nascimento').value,
+                sexo: document.getElementById('sexo').value,
+                rg: document.getElementById('rg').value,
+                cpf: document.getElementById('cpf').value,
+                endereco: document.getElementById('endereco').value,
+                numero: document.getElementById('numero').value,
+                complemento: document.getElementById('complemento').value || "",
+                bairro: document.getElementById('bairro').value,
+                cep: document.getElementById('cep').value,
+                cidade: document.getElementById('cidade').value,
+                whatsapp: document.getElementById('whatsapp').value,
+                email: document.getElementById('email').value,
+                profissao: document.getElementById('profissao').value || "",
+                escolaridade: document.getElementById('escolaridade').value,
+                movimento_social: document.getElementById('movimento').value || ""
+            };
+
+            try {
+                const { error } = await _supabase.from('unegro_filiados').insert([payload]);
+                if (!error) {
+                    alert("Filiação realizada com sucesso!");
+                    gerarPDF(payload);
+                } else {
+                    throw error;
+                }
+            } catch (e) {
+                alert("Erro ao salvar no banco. Tente novamente.");
             }
         }
 
-        // Atmosfera Ancestral
-        setInterval(() => {
-            const overlay = document.getElementById('ancestral-overlay');
-            const face = document.createElement('div');
-            face.className = 'spirit-face';
-            face.style.backgroundImage = `url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQd-iTVw7Wna6Hk1Y7dVTIsXTO6dhvdUAVD5w&s')`;
-            face.style.left = Math.random() * 80 + '%';
-            face.style.top = Math.random() * 50 + '%';
-            overlay.appendChild(face);
-            setTimeout(() => face.style.opacity = '0.5', 100);
-            setTimeout(() => { face.style.opacity = '0'; setTimeout(() => face.remove(), 4000); }, 8000);
-        }, 10000);
+        function gerarPDF(payload) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let y = 20;
 
-        window.onload = init;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.text("FICHA DE FILIAÇÃO NACIONAL - UNEGRO", 105, y, { align: "center" });
+            y += 15;
+            doc.line(20, y, 190, y);
+            y += 10;
+
+            doc.setFontSize(10);
+            const drawRow = (label, value) => {
+                doc.setFont("helvetica", "bold"); doc.text(`${label}:`, 20, y);
+                doc.setFont("helvetica", "normal"); doc.text(`${value}`, 60, y);
+                y += 8;
+            };
+
+            drawRow("Nome Completo", payload.nome.toUpperCase());
+            drawRow("Nascimento", payload.nascimento);
+            drawRow("Cidade", payload.cidade);
+            drawRow("WhatsApp", payload.whatsapp);
+            drawRow("E-mail", payload.email);
+
+            y += 20;
+            doc.text(`Local e data: ${payload.cidade}, ${new Date().toLocaleDateString('pt-BR')}`, 20, y);
+            window.open(doc.output('bloburl'), '_blank');
+        }
+
+        // 5. CARREGAMENTO INICIAL
+        window.onload = () => {
+            carregarLiderancas();
+        };
+
+
+
+
+
+// --- MÓDULO: ATMOSFERA ANCESTRAL ---
+async function iniciarAtmosferaAncestral() {
+    const overlay = document.getElementById('ancestral-overlay');
+    if (!overlay) return;
+
+    // Busca as fotos diretamente da sua tabela de lideranças
+    const { data: liderancas } = await _supabase
+        .from('liderancas_unegro')
+        .select('foto_url');
+
+    // Referências fixas (Leci e Orlando) caso o banco esteja vazio ou para intercalar
+    const referencias = [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQd-iTVw7Wna6Hk1Y7dVTIsXTO6dhvdUAVD5w&s', // Leci
+        'https://jornalempoderado.com.br/wp-content/uploads/2025/09/Imagem-do-WhatsApp-de-2025-09-06-as-10.35.50_0e8c4375.jpg' // Orlando
+    ];
+
+    const listaFotos = liderancas && liderancas.length > 0
+        ? [...referencias, ...liderancas.map(l => l.foto_url)]
+        : referencias;
+
+    let index = 0;
+
+    function manifestarFace() {
+        // Remove faces antigas para não pesar a memória
+        const antigas = document.querySelectorAll('.spirit-face');
+        antigas.forEach(a => {
+            if (parseFloat(a.style.opacity) > 0) {
+                a.style.opacity = '0';
+                setTimeout(() => a.remove(), 4000);
+            }
+        });
+
+        const face = document.createElement('div');
+        face.className = 'spirit-face';
+        face.style.backgroundImage = `url('${listaFotos[index]}')`;
+
+        // Posicionamento aleatório mas equilibrado
+        const lado = Math.random() > 0.5 ? 'left' : 'right';
+        face.style[lado] = Math.random() * 20 + '%';
+        face.style.top = Math.random() * 30 + 10 + '%';
+
+        // Efeito de movimento bem lento (zoom in)
+        face.style.transform = 'scale(1)';
+
+        overlay.appendChild(face);
+
+        // Fade In
+        setTimeout(() => {
+            face.style.opacity = '0.6'; // Subi de 0.35 para 0.6
+            face.style.transform = 'scale(1.15)';
+        }, 100)
+
+        index = (index + 1) % listaFotos.length;
+    }
+
+    // Ciclo: manifesta uma face a cada 9 segundos
+    manifestarFace();
+    setInterval(manifestarFace, 9000);
+}
+
+// Integrando ao seu onload existente
+const originalOnload = window.onload;
+window.onload = () => {
+    if (originalOnload) originalOnload();
+    iniciarAtmosferaAncestral();
+};
+
+
+
+async function carregarAgendaIndex() {
+    try {
+        // Busca os 3 próximos eventos do banco
+        const { data: eventos, error } = await _supabase
+            .from('agenda_unegro')
+            .select('*')
+            .order('data', { ascending: true })
+            .limit(3);
+
+        if (error) throw error;
+
+        const container = document.getElementById('agenda-dinamica');
+        
+        if (!eventos || eventos.length === 0) {
+            container.innerHTML = '<div class="ag-vazio">Nenhum evento agendado no momento.</div>';
+            return;
+        }
+
+        container.innerHTML = eventos.map(ev => {
+            // Formata a data de YYYY-MM-DD para DD/MM
+            const dataObj = new Date(ev.data + 'T00:00:00');
+            const dia = dataObj.getDate().toString().padStart(2, '0');
+            const mes = dataObj.toLocaleString('pt-BR', { month: 'short' }).replace('.', '');
+
+            return `
+                <div class="card-agenda">
+                    <div>
+                        <div class="ag-data">${dia} ${mes}</div>
+                        <h3 class="ag-titulo">${ev.titulo}</h3>
+                        <div class="ag-local">📍 ${ev.local || 'Local a definir'}</div>
+                    </div>
+                    <div style="margin-top: 20px; font-size: 11px; color: #444; font-weight: bold;">
+                        UNEGRO VALE ➔
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (err) {
+        console.error("Erro ao carregar agenda:", err);
+    }
+}
+
+// Chame a função no seu window.onload
+const originalOnloadIndex = window.onload;
+window.onload = () => {
+    if (originalOnloadIndex) originalOnloadIndex();
+    carregarAgendaIndex(); // Chama a agenda
+    // ... suas outras funções (lideranças, etc)
+};
+       
+
     </script>
-</body>
 </html>
