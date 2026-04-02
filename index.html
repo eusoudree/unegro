@@ -760,7 +760,7 @@ body {
    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-  <script>
+ <script>
     // 1. CONFIGURAÇÃO UNIFICADA DO SUPABASE
     const SUPABASE_URL = 'https://huxemmuzhlntwimgiukt.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs';
@@ -829,13 +829,7 @@ body {
         }
     };
 
-    window.fecharModal = () => {
-        const modalElement = document.getElementById('modal-lider');
-        if(modalElement) modalElement.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    };
-
-    // SISTEMA DE FILIAÇÃO E PDF (VALE DO PARAÍBA)
+    // 2. SISTEMA DE FILIAÇÃO E PDF (PADRÃO ADMINISTRATIVO COMPLETO)
     async function processarCadastro() {
         const quiz = document.getElementById('quiz').value;
         const aceite = document.getElementById('aceite').checked;
@@ -875,46 +869,50 @@ body {
             const { error } = await _supabase.from('unegro_filiados').insert([payload]);
             if (!error) {
                 alert("Filiação realizada com sucesso!");
-                gerarPDF(payload);
+                generateSinglePDF(payload);
             } else { throw error; }
         } catch (e) {
             alert("Erro ao salvar. Verifique a coluna 'raca' no Supabase.");
         }
     }
 
-    function gerarPDF(payload) {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+    function drawPage(doc, payload) {
         let y = 20;
-
         doc.setFont("helvetica", "bold"); doc.setFontSize(14);
         doc.text("FICHA DE FILIAÇÃO NACIONAL - UNEGRO", 105, y, { align: "center" });
         y += 15; doc.setDrawColor(139, 0, 0); doc.line(20, y, 190, y); y += 10;
         doc.setFontSize(10);
         
-        const row = (label, value) => {
-            doc.setFont("helvetica", "bold"); doc.text(`${label}:`, 20, y);
-            doc.setFont("helvetica", "normal"); doc.text(`${value || '---'}`, 60, y);
+        const row = (l, v) => {
+            doc.setFont("helvetica", "bold"); doc.text(`${l}:`, 20, y);
+            doc.setFont("helvetica", "normal"); doc.text(`${v || '---'}`, 65, y);
             y += 8;
         };
 
-        row("Nome Completo", payload.nome.toUpperCase());
-        row("Nascimento", payload.nascimento);
-        row("Étnico-Racial", payload.raca); 
-        row("Cidade", payload.cidade);
-        row("WhatsApp", payload.whatsapp);
-        row("E-mail", payload.email);
+        row("NOME COMPLETO", (payload.nome || "").toUpperCase());
+        row("NASCIMENTO", payload.nascimento);
+        row("AUTO DECLARAÇÃO", payload.raca);
+        row("RG / CPF", `${payload.rg || ''} / ${payload.cpf || ''}`);
+        row("ENDEREÇO", `${payload.endereco || ''}, ${payload.numero || ''}`);
+        row("CIDADE / BAIRRO", `${payload.cidade || ''} - ${payload.bairro || ''}`);
+        row("CONTATO", `${payload.whatsapp || ''} / ${payload.email || ''}`);
+        row("PROFISSÃO", payload.profissao);
 
-        y += 20;
+        y += 15;
         doc.setFont("helvetica", "bold");
-        doc.text(`Local e data: ${payload.cidade}, ${new Date().toLocaleDateString('pt-BR')}`, 20, y);
+        doc.text(`Local e data: ${payload.cidade || 'SP'}, ${new Date().toLocaleDateString('pt-BR')}`, 20, y);
         y += 25; doc.setDrawColor(0); doc.line(20, y, 90, y); doc.line(110, y, 180, y);
         y += 5; doc.text("Assinatura do Filiado", 35, y); doc.text("Responsável UNEGRO", 125, y);
-        
+    }
+
+    function generateSinglePDF(item) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        drawPage(doc, item);
         window.open(doc.output('bloburl'), '_blank');
     }
 
-    // MÓDULO ANCESTRAL COMPLETO (BASE + REFERÊNCIAS)
+    // 3. MÓDULO ANCESTRAL COMPLETO
     async function iniciarAtmosferaAncestral() {
         const overlay = document.getElementById('ancestral-overlay');
         if (!overlay) return;
