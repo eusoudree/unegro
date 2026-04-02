@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #f1b434; --red: #8b0000; --black: #050505; --gray: #121212; --border: rgba(255,255,255,0.1); }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--black); color: #fff; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--black); color: #fff; overflow-x: hidden; }
 
         /* HEADER CENTRALIZADO */
         header { background: #000; border-bottom: 1px solid var(--border); padding: 10px 0; }
@@ -23,10 +23,11 @@
 
         /* BLOG / NOTÍCIAS */
         .news-card { background: var(--gray); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
-        .news-img { width: 100%; height: 250px; background: #222; object-fit: cover; }
+        .news-img { width: 100%; height: 350px; background: #222; object-fit: cover; }
         .news-body { padding: 25px; }
         .news-tag { color: var(--gold); font-size: 10px; font-weight: 900; text-transform: uppercase; }
-        .news-body h3 { margin: 10px 0; font-size: 1.5rem; line-height: 1.2; }
+        .news-body h3 { margin: 10px 0; font-size: 1.8rem; line-height: 1.2; color: #fff; }
+        .news-body p { color: #aaa; line-height: 1.6; }
 
         /* CALENDÁRIO INTERATIVO */
         .cal-container { background: var(--gray); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 30px; }
@@ -39,33 +40,58 @@
         .cal-day.has-event::after { content: ''; width: 4px; height: 4px; background: var(--gold); position: absolute; bottom: 4px; border-radius: 50%; }
         .cal-day.active { background: var(--gold); color: #000; }
 
-        /* BOX DETALHE DA AÇÃO */
+        /* DETALHE DA AÇÃO */
         #event-detail { margin-top: 15px; padding: 15px; background: #000; border-radius: 8px; border: 1px solid #333; display: none; font-size: 13px; }
-        #event-detail b { color: var(--gold); display: block; margin-bottom: 5px; }
+        #event-detail b { color: var(--gold); display: block; margin-bottom: 5px; text-transform: uppercase; }
 
         /* BIBLIOTECA */
         .lib-box { background: var(--gray); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
-        .search-input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; }
-        .lib-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid #222; text-decoration: none; color: #aaa; font-size: 13px; }
+        .search-input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; outline: none; }
+        .search-input:focus { border-color: var(--gold); }
+        .lib-item { display: flex; align-items: center; gap: 10px; padding: 12px; border-bottom: 1px solid #222; color: #aaa; font-size: 13px; cursor: pointer; transition: 0.2s; }
         .lib-item:hover { color: var(--gold); background: rgba(255,255,255,0.02); }
 
-        /* LOGIN PADRÃO CENTRALIZADO */
-        #lock-screen { position: fixed; inset: 0; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 5000; }
-        .login-card { background: var(--gray); padding: 40px; border-radius: 16px; border: 1px solid var(--gold); text-align: center; width: 340px; }
-        .login-card input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; }
+        /* MODAL DE LEITURA */
+        #pdf-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); display: none; z-index: 9999; padding: 20px; backdrop-filter: blur(8px); }
+        .modal-content { max-width: 1100px; height: 92vh; margin: 0 auto; background: #1a1a1a; border-radius: 12px; border: 1px solid var(--gold); display: flex; flex-direction: column; overflow: hidden; }
+        .modal-header { padding: 15px 25px; background: #000; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        .modal-header h3 { margin: 0; font-size: 12px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+        .btn-close { background: var(--red); color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: 900; font-size: 10px; transition: 0.2s; }
+        .btn-close:hover { opacity: 0.8; }
+        #pdf-viewer { width: 100%; height: 100%; border: none; }
 
-        @media (max-width: 900px) { .main-wrapper { grid-template-columns: 1fr; } }
+        /* LOGIN */
+        #lock-screen { position: fixed; inset: 0; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 5000; }
+        .login-card { background: var(--gray); padding: 50px; border-radius: 16px; border: 1px solid var(--gold); text-align: center; width: 340px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .login-card input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 6px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; outline: none; }
+        .login-card button { width: 100%; padding: 14px; background: var(--gold); border: none; font-weight: 900; border-radius: 6px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+
+        @media (max-width: 900px) { 
+            .main-wrapper { grid-template-columns: 1fr; } 
+            .modal-content { height: 80vh; }
+        }
     </style>
 </head>
 <body>
 
     <div id="lock-screen">
         <div class="login-card">
-            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="height: 60px; margin-bottom: 20px;">
-            <h2 style="font-family: 'Oswald';">ACESSO FILIADO</h2>
-            <input type="text" id="user-name" placeholder="Nome">
-            <input type="email" id="user-email" placeholder="E-mail">
-            <button onclick="validarAcesso()" style="width: 100%; padding: 14px; background: var(--gold); border: none; font-weight: 900; border-radius: 6px; cursor: pointer;">ENTRAR</button>
+            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="height: 60px; margin-bottom: 30px;">
+            <h2 style="font-family: 'Oswald'; margin-bottom: 20px; letter-spacing: 2px;">ACESSO FILIADO</h2>
+            <input type="text" id="user-name" placeholder="Nome Completo">
+            <input type="email" id="user-email" placeholder="E-mail de Cadastro">
+            <button onclick="validarAcesso()">ENTRAR NO PORTAL</button>
+            <p id="error-msg" style="color: #ff4d4d; font-size: 11px; margin-top: 15px; display: none; font-weight: bold;">Cadastro não localizado.</p>
+        </div>
+    </div>
+
+    <div id="pdf-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Visualizador de Documentos</h3>
+                <button class="btn-close" onclick="fecharModal()">FECHAR ACERVO</button>
+            </div>
+            <iframe id="pdf-viewer" src=""></iframe>
         </div>
     </div>
 
@@ -81,11 +107,11 @@
         <div class="left-col">
             <h2>Destaques da Luta</h2>
             <div class="news-card">
-                <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" class="news-img" style="object-fit: contain; padding: 40px;">
+                <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" class="news-img" style="object-fit: contain; padding: 60px; background: #000;">
                 <div class="news-body">
-                    <span class="news-tag">Mobilização Nacional</span>
-                    <h3>Plenária Regional UNEGRO: Estratégias para 2026</h3>
-                    <p>Lideranças se reúnem para alinhar o calendário de ações contra o racismo estrutural no Vale do Paraíba.</p>
+                    <span class="news-tag">Mobilização 2026</span>
+                    <h3>Plenária Regional UNEGRO: Estratégias e Formação</h3>
+                    <p>Construindo a resistência através do conhecimento. Confira o calendário de debates e as resoluções do último congresso nacional disponíveis na biblioteca.</p>
                 </div>
             </div>
         </div>
@@ -95,19 +121,17 @@
             <h2>Agenda Interativa</h2>
             <div class="cal-container">
                 <div class="cal-header" id="month-name">ABRIL 2026</div>
-                <div class="cal-grid" id="calendar-days">
-                    </div>
+                <div class="cal-grid" id="calendar-days"></div>
                 <div id="event-detail"></div>
             </div>
 
             <h2>Biblioteca Digital</h2>
             <div class="lib-box">
-                <input type="text" class="search-input" id="lib-search" placeholder="Pesquisar material..." onkeyup="filtrarLib()">
+                <input type="text" class="search-input" id="lib-search" placeholder="Pesquisar no acervo..." onkeyup="filtrarLib()">
                 <div id="lib-list"></div>
             </div>
 
         </div>
-
     </div>
 
 <script>
@@ -120,21 +144,25 @@
     let dadosMateriais = [];
 
     async function validarAcesso() {
-        const n = document.getElementById('user-name').value;
-        const e = document.getElementById('user-email').value;
-        const { data } = await _supabase.from('unegro_filiados').select('*').ilike('nome', n).ilike('email', e).limit(1);
+        const n = document.getElementById('user-name').value.trim();
+        const e = document.getElementById('user-email').value.trim();
+        if(!n || !e) return;
+
+        const { data, error } = await _supabase.from('unegro_filiados').select('*').ilike('nome', n).ilike('email', e).limit(1);
 
         if (data && data.length > 0) {
-            document.getElementById('user-info').innerText = `${data[0].nome.split(' ')[0]} | ${data[0].cidade}`;
+            document.getElementById('user-info').innerText = `${data[0].nome.toUpperCase()} | ${data[0].cidade.toUpperCase()}`;
             document.getElementById('lock-screen').style.display = 'none';
             document.getElementById('main-content').style.display = 'grid';
             carregarDados();
+        } else {
+            document.getElementById('error-msg').style.display = 'block';
         }
     }
 
     async function carregarDados() {
         const { data: ag } = await _supabase.from('agenda_unegro').select('*');
-        const { data: mt } = await _supabase.from('materiais_unegro').select('*');
+        const { data: mt } = await _supabase.from('materiais_unegro').select('*').order('titulo');
         
         dadosAgenda = ag || [];
         dadosMateriais = mt || [];
@@ -148,21 +176,24 @@
         const nomesDias = ['D','S','T','Q','Q','S','S'];
         let html = nomesDias.map(d => `<div class="cal-day-name">${d}</div>`).join('');
         
-        // Gerando 30 dias para Abril
+        // Gerando 30 dias para Abril/2026
         for(let i=1; i<=30; i++) {
             const dataStr = `2026-04-${i.toString().padStart(2, '0')}`;
             const temEvento = dadosAgenda.find(a => a.data === dataStr);
-            html += `<div class="cal-day ${temEvento ? 'has-event' : ''}" onclick="verEvento('${dataStr}')">${i}</div>`;
+            html += `<div class="cal-day ${temEvento ? 'has-event' : ''}" onclick="verEvento('${dataStr}', this)">${i}</div>`;
         }
         grid.innerHTML = html;
     }
 
-    function verEvento(data) {
+    function verEvento(data, el) {
+        document.querySelectorAll('.cal-day').forEach(d => d.classList.remove('active'));
+        el.classList.add('active');
+
         const ev = dadosAgenda.find(a => a.data === data);
         const detail = document.getElementById('event-detail');
         if(ev) {
             detail.style.display = 'block';
-            detail.innerHTML = `<b>${ev.titulo}</b>${ev.descricao || 'Sem descrição.'}`;
+            detail.innerHTML = `<b>${ev.titulo}</b>${ev.descricao || 'Detalhes em breve.'}`;
         } else {
             detail.style.display = 'none';
         }
@@ -170,13 +201,33 @@
 
     function renderLib(lista) {
         document.getElementById('lib-list').innerHTML = lista.map(i => `
-            <a href="${i.link}" target="_blank" class="lib-item">📄 ${i.titulo}</a>
+            <div class="lib-item" onclick="abrirModal('${i.link}', '${i.titulo}')">
+                <span style="font-size: 16px;">📄</span> ${i.titulo}
+            </div>
         `).join('');
     }
 
     function filtrarLib() {
         const t = document.getElementById('lib-search').value.toLowerCase();
         renderLib(dadosMateriais.filter(m => m.titulo.toLowerCase().includes(t)));
+    }
+
+    function abrirModal(url, titulo) {
+        const modal = document.getElementById('pdf-modal');
+        const viewer = document.getElementById('pdf-viewer');
+        const title = document.getElementById('modal-title');
+        
+        // Parâmetros para dificultar download nativo
+        viewer.src = `${url}#toolbar=0&navpanes=0`;
+        title.innerText = titulo;
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function fecharModal() {
+        document.getElementById('pdf-modal').style.display = 'none';
+        document.getElementById('pdf-viewer').src = '';
+        document.body.style.overflow = 'auto';
     }
 </script>
 </body>
