@@ -3,166 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal do Filiado | UNEGRO</title>
+    <title>Gestão Estratégica | UNEGRO</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;850&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #f1b434; --red: #8b0000; --black: #050505; --gray: #121212; --border: rgba(255,255,255,0.1); }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--black); color: #fff; overflow-x: hidden; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--black); color: #fff; }
 
-        /* HEADER CENTRALIZADO */
-        header { background: #000; border-bottom: 1px solid var(--border); padding: 10px 0; position: sticky; top: 0; z-index: 1000; }
-        .header-content { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-        .logo-area img { height: 40px; }
-        .user-tag { font-size: 10px; font-weight: bold; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+        /* TELA DE LOGIN ADM */
+        #login-adm { position: fixed; inset: 0; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-card { background: var(--gray); padding: 40px; border-radius: 12px; border: 1px solid var(--gold); text-align: center; width: 320px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        
+        /* LAYOUT PAINEL */
+        #painel-gestao { display: none; max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        header { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { font-weight: 850; text-transform: uppercase; letter-spacing: -1px; font-size: 1.5rem; margin: 0; }
 
-        /* CONTAINER PRINCIPAL 1280px */
-        .main-wrapper { max-width: 1280px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 380px; gap: 30px; }
+        .grid-forms { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .form-card { background: var(--gray); border: 1px solid var(--border); border-radius: 16px; padding: 30px; }
+        .form-card h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin: 0 0 25px 0; border-bottom: 1px solid #222; padding-bottom: 10px; }
 
-        h2 { font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 1.3rem; border-left: 4px solid var(--red); padding-left: 15px; margin-bottom: 20px; }
-
-        /* BLOG / NOTÍCIAS */
-        .news-card { background: var(--gray); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 30px; }
-        .news-img { width: 100%; height: 350px; background: #000; object-fit: contain; padding: 40px; box-sizing: border-box; }
-        .news-body { padding: 25px; border-top: 1px solid var(--border); }
-        .news-tag { color: var(--gold); font-size: 10px; font-weight: 900; text-transform: uppercase; }
-        .news-body h3 { margin: 10px 0; font-size: 1.8rem; line-height: 1.2; color: #fff; }
-        .news-body p { color: #aaa; line-height: 1.6; font-size: 14px; }
-
-        /* SEÇÃO DE VÍDEOS (AUDIOVISUAL) */
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-bottom: 40px; }
-        .video-item { 
-            background: #000; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); 
-            cursor: pointer; transition: 0.3s; position: relative; aspect-ratio: 16/9;
+        label { font-size: 11px; text-transform: uppercase; color: #666; font-weight: bold; margin-bottom: 5px; display: block; }
+        input, textarea, select { 
+            width: 100%; background: #000; border: 1px solid #333; color: #fff; 
+            padding: 12px; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; font-family: 'Inter';
         }
-        .video-item:hover { border-color: var(--gold); transform: translateY(-3px); }
-        .video-item img { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; transition: 0.3s; }
-        .video-item:hover img { opacity: 0.8; }
-        .video-item::after { 
-            content: '▶'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            color: var(--gold); font-size: 24px; pointer-events: none;
+        input:focus, textarea:focus { border-color: var(--gold); outline: none; }
+
+        .btn-post { 
+            width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; 
+            border-radius: 8px; font-weight: 850; text-transform: uppercase; cursor: pointer; transition: 0.2s;
         }
-        .video-label { 
-            position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.85); 
-            padding: 8px; font-size: 10px; text-align: center; font-weight: bold; color: var(--gold); letter-spacing: 1px;
-        }
+        .btn-post:hover { background: #fff; transform: translateY(-2px); }
 
-        /* CALENDÁRIO INTERATIVO */
-        .cal-container { background: var(--gray); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 30px; }
-        .cal-header { text-align: center; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; color: var(--gold); font-size: 14px; letter-spacing: 1px; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
-        .cal-day-name { font-size: 10px; color: #555; font-weight: bold; padding-bottom: 10px; }
-        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; border-radius: 50%; cursor: pointer; transition: 0.2s; }
-        .cal-day:hover { background: rgba(255,255,255,0.1); }
-        .cal-day.has-event { border: 1px solid var(--gold); color: var(--gold); font-weight: bold; position: relative; }
-        .cal-day.has-event::after { content: ''; width: 4px; height: 4px; background: var(--gold); position: absolute; bottom: 4px; border-radius: 50%; }
-        .cal-day.active { background: var(--gold); color: #000; font-weight: 900; }
+        .status-msg { font-size: 12px; text-align: center; margin-top: 10px; display: none; }
 
-        /* DETALHE DA AÇÃO */
-        #event-detail { margin-top: 15px; padding: 15px; background: #000; border-radius: 8px; border: 1px solid #333; display: none; font-size: 13px; }
-        #event-detail b { color: var(--gold); display: block; margin-bottom: 5px; text-transform: uppercase; }
-
-        /* BIBLIOTECA */
-        .lib-box { background: var(--gray); padding: 20px; border-radius: 12px; border: 1px solid var(--border); max-height: 600px; display: flex; flex-direction: column; }
-        .search-input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; outline: none; }
-        .search-input:focus { border-color: var(--gold); }
-        #lib-list { overflow-y: auto; flex: 1; }
-        .lib-item { display: flex; align-items: center; gap: 10px; padding: 12px; border-bottom: 1px solid #222; color: #aaa; font-size: 13px; cursor: pointer; transition: 0.2s; }
-        .lib-item:hover { color: var(--gold); background: rgba(255,255,255,0.02); }
-
-        /* MODAL DE LEITURA E VÍDEO */
-        #pdf-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); display: none; z-index: 9999; padding: 20px; backdrop-filter: blur(8px); }
-        .modal-content { max-width: 1100px; height: 92vh; margin: 0 auto; background: #1a1a1a; border-radius: 12px; border: 1px solid var(--gold); display: flex; flex-direction: column; overflow: hidden; }
-        .modal-header { padding: 15px 25px; background: #000; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
-        .modal-header h3 { margin: 0; font-size: 12px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
-        .btn-close { background: var(--red); color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: 900; font-size: 10px; transition: 0.2s; }
-        #pdf-viewer { width: 100%; height: 100%; border: none; }
-
-        /* LOGIN */
-        #lock-screen { position: fixed; inset: 0; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 5000; }
-        .login-card { background: var(--gray); padding: 50px; border-radius: 16px; border: 1px solid var(--gold); text-align: center; width: 340px; }
-        .login-card input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 6px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; outline: none; }
-        .login-card button { width: 100%; padding: 14px; background: var(--gold); border: none; font-weight: 900; border-radius: 6px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-
-        @media (max-width: 1000px) { 
-            .main-wrapper { grid-template-columns: 1fr; } 
-            .modal-content { height: 80vh; width: 95%; }
-        }
+        @media (max-width: 800px) { .grid-forms { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <div id="lock-screen">
+    <div id="login-adm">
         <div class="login-card">
-            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="height: 60px; margin-bottom: 30px;">
-            <h2 style="font-family: 'Oswald'; margin-bottom: 20px; letter-spacing: 2px;">ACESSO FILIADO</h2>
-            <input type="text" id="user-name" placeholder="Nome Completo">
-            <input type="email" id="user-email" placeholder="E-mail de Cadastro">
-            <button onclick="validarAcesso()">ENTRAR NO PORTAL</button>
-            <p id="error-msg" style="color: #ff4d4d; font-size: 11px; margin-top: 15px; display: none; font-weight: bold;">Militante não localizado.</p>
+            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="height: 50px; margin-bottom: 20px;">
+            <h2 style="font-size: 14px; margin-bottom: 20px;">GESTÃO ESTRATÉGICA</h2>
+            <input type="text" id="adm-user" placeholder="Usuário">
+            <input type="password" id="adm-pass" placeholder="Senha">
+            <button class="btn-post" onclick="checkAdm()">ACESSAR PAINEL</button>
+            <p id="error-adm" style="color: red; font-size: 11px; margin-top: 15px; display: none;">Acesso Negado.</p>
         </div>
     </div>
 
-    <div id="pdf-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modal-title">Visualizador de Documentos</h3>
-                <button class="btn-close" onclick="fecharModal()">FECHAR ACERVO</button>
-            </div>
-            <iframe id="pdf-viewer" src=""></iframe>
-        </div>
-    </div>
+    <div id="painel-gestao">
+        <header>
+            <h1>Governança do Portal</h1>
+            <button onclick="location.reload()" style="background: transparent; color: #666; border: none; cursor: pointer; font-size: 11px; font-weight: bold;">SAIR DO SISTEMA</button>
+        </header>
 
-    <header>
-        <div class="header-content">
-            <div class="logo-area"><img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png"></div>
-            <div class="user-tag" id="user-info"></div>
-        </div>
-    </header>
-
-    <div class="main-wrapper" id="main-content" style="display: none;">
-        
-        <div class="left-col">
-            <h2>Destaques da Luta</h2>
-            <div class="news-card">
-                <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" class="news-img">
-                <div class="news-body">
-                    <span class="news-tag">Mobilização Nacional</span>
-                    <h3>Plenária Regional UNEGRO: Estratégias e Formação 2026</h3>
-                    <p>Construindo a resistência através do conhecimento coletivo. Confira as resoluções do último congresso nacional e os subsídios de formação disponíveis em nossa biblioteca digital.</p>
-                </div>
-            </div>
-
-            <h2>Formação e Memória (Audiovisual)</h2>
-            <div class="video-grid">
-                <div class="video-item" onclick="abrirModal('https://www.youtube.com/embed/dQw4w9WgXcQ', 'Liderança: Adriano S. - Depoimento', true)">
-                    <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg">
-                    <div class="video-label">LIDERANÇA: ADRIANO S.</div>
-                </div>
-                <div class="video-item" onclick="abrirModal('https://www.youtube.com/embed/dQw4w9WgXcQ', 'História da UNEGRO', true)">
-                    <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/1.jpg">
-                    <div class="video-label">MEMÓRIA UNEGRO</div>
-                </div>
-                <div class="video-item" onclick="abrirModal('https://www.youtube.com/embed/dQw4w9WgXcQ', 'Formação: Raça e Classe', true)">
-                    <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/2.jpg">
-                    <div class="video-label">FORMAÇÃO POLÍTICA</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="right-col">
+        <div class="grid-forms">
             
-            <h2>Agenda Interativa</h2>
-            <div class="cal-container">
-                <div class="cal-header" id="month-name">ABRIL 2026</div>
-                <div class="cal-grid" id="calendar-days"></div>
-                <div id="event-detail"></div>
+            <div class="form-card">
+                <h2>📢 Destaque Principal (Notícia)</h2>
+                
+                <label>Título do Destaque</label>
+                <input type="text" id="news-titulo" placeholder="Ex: Plenária Regional 2026">
+                
+                <label>Descrição Curta</label>
+                <textarea id="news-desc" rows="3" placeholder="Resumo da notícia para o portal..."></textarea>
+                
+                <label>URL da Imagem (Storage)</label>
+                <input type="text" id="news-img" placeholder="https://...">
+
+                <label>Link de Destino (Opcional)</label>
+                <input type="text" id="news-link" placeholder="Link para ler mais...">
+
+                <button class="btn-post" onclick="salvarDestaque()">Publicar no Portal</button>
+                <div id="status-news" class="status-msg"></div>
             </div>
 
-            <h2>Biblioteca Digital</h2>
-            <div class="lib-box">
-                <input type="text" class="search-input" id="lib-search" placeholder="Pesquisar material no acervo..." onkeyup="filtrarLib()">
-                <div id="lib-list"></div>
+            <div class="form-card">
+                <h2>🎥 Conteúdo Audiovisual</h2>
+                
+                <label>Título do Vídeo / Nome do Líder</label>
+                <input type="text" id="vid-titulo" placeholder="Ex: Adriano S. - Depoimento">
+                
+                <label>ID do Vídeo no YouTube</label>
+                <input type="text" id="vid-id" placeholder="Ex: dQw4w9WgXcQ">
+                
+                <label>Seção do Portal</label>
+                <select id="vid-secao">
+                    <option value="liderancas">Nossas Lideranças</option>
+                    <option value="nacional">UNEGRO Nacional</option>
+                </select>
+
+                <button class="btn-post" onclick="salvarVideo()" style="background: #fff; color: #000;">Cadastrar Vídeo</button>
+                <div id="status-vid" class="status-msg"></div>
             </div>
 
         </div>
@@ -174,90 +109,75 @@
         KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
     };
     const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
-    let dadosAgenda = [];
-    let dadosMateriais = [];
 
-    async function validarAcesso() {
-        const n = document.getElementById('user-name').value.trim();
-        const e = document.getElementById('user-email').value.trim();
-        if(!n || !e) return;
-
-        const { data } = await _supabase.from('unegro_filiados').select('*').ilike('nome', n).ilike('email', e).limit(1);
-
-        if (data && data.length > 0) {
-            document.getElementById('user-info').innerText = `${data[0].nome.toUpperCase()} | ${data[0].cidade.toUpperCase()}`;
-            document.getElementById('lock-screen').style.display = 'none';
-            document.getElementById('main-content').style.display = 'grid';
-            carregarDados();
+    // LOGIN DO ADM
+    function checkAdm() {
+        const u = document.getElementById('adm-user').value;
+        const p = document.getElementById('adm-pass').value;
+        
+        if(u === 'unegro' && p === 'admunegro2026!') {
+            document.getElementById('login-adm').style.display = 'none';
+            document.getElementById('painel-gestao').style.display = 'block';
         } else {
-            document.getElementById('error-msg').style.display = 'block';
+            document.getElementById('error-adm').style.display = 'block';
         }
     }
 
-    async function carregarDados() {
-        const { data: ag } = await _supabase.from('agenda_unegro').select('*');
-        const { data: mt } = await _supabase.from('materiais_unegro').select('*').order('titulo');
-        
-        dadosAgenda = ag || [];
-        dadosMateriais = mt || [];
+    // SALVAR DESTAQUE
+    async function salvarDestaque() {
+        const msg = document.getElementById('status-news');
+        const payload = {
+            titulo: document.getElementById('news-titulo').value,
+            descricao: document.getElementById('news-desc').value,
+            imagem_url: document.getElementById('news-img').value,
+            link_externo: document.getElementById('news-link').value
+        };
 
-        renderCalendario();
-        renderLib(dadosMateriais);
-    }
-
-    function renderCalendario() {
-        const grid = document.getElementById('calendar-days');
-        const nomesDias = ['D','S','T','Q','Q','S','S'];
-        let html = nomesDias.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+        const { error } = await _supabase.from('unegro_noticias').insert([payload]);
         
-        for(let i=1; i<=30; i++) {
-            const dataStr = `2026-04-${i.toString().padStart(2, '0')}`;
-            const temEvento = dadosAgenda.find(a => a.data === dataStr);
-            html += `<div class="cal-day ${temEvento ? 'has-event' : ''}" onclick="verEvento('${dataStr}', this)">${i}</div>`;
+        msg.style.display = 'block';
+        if(error) {
+            msg.innerText = "ERRO: " + error.message;
+            msg.style.color = "red";
+        } else {
+            msg.innerText = "SUCESSO: DESTAQUE PUBLICADO!";
+            msg.style.color = "var(--gold)";
+            limparCampos('news');
         }
-        grid.innerHTML = html;
     }
 
-    function verEvento(data, el) {
-        document.querySelectorAll('.cal-day').forEach(d => d.classList.remove('active'));
-        el.classList.add('active');
-        const ev = dadosAgenda.find(a => a.data === data);
-        const detail = document.getElementById('event-detail');
-        if(ev) {
-            detail.style.display = 'block';
-            detail.innerHTML = `<b>${ev.titulo}</b>${ev.descricao || 'Detalhes em breve.'}`;
-        } else { detail.style.display = 'none'; }
-    }
+    // SALVAR VÍDEO
+    async function salvarVideo() {
+        const msg = document.getElementById('status-vid');
+        const payload = {
+            titulo: document.getElementById('vid-titulo').value,
+            youtube_id: document.getElementById('vid-id').value,
+            secao: document.getElementById('vid-secao').value
+        };
 
-    function renderLib(lista) {
-        document.getElementById('lib-list').innerHTML = lista.map(i => `
-            <div class="lib-item" onclick="abrirModal('${i.link}', '${i.titulo}', false)">
-                <span>📄</span> ${i.titulo}
-            </div>
-        `).join('');
-    }
-
-    function filtrarLib() {
-        const t = document.getElementById('lib-search').value.toLowerCase();
-        renderLib(dadosMateriais.filter(m => m.titulo.toLowerCase().includes(t)));
-    }
-
-    function abrirModal(url, titulo, isVideo) {
-        const modal = document.getElementById('pdf-modal');
-        const viewer = document.getElementById('pdf-viewer');
-        const title = document.getElementById('modal-title');
+        const { error } = await _supabase.from('unegro_videos').insert([payload]);
         
-        // Se for vídeo, adiciona autoplay. Se for PDF, desabilita toolbar.
-        viewer.src = isVideo ? `${url}?autoplay=1` : `${url}#toolbar=0&navpanes=0`;
-        title.innerText = titulo;
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
+        msg.style.display = 'block';
+        if(error) {
+            msg.innerText = "ERRO: " + error.message;
+            msg.style.color = "red";
+        } else {
+            msg.innerText = "SUCESSO: VÍDEO CADASTRADO!";
+            msg.style.color = "var(--gold)";
+            limparCampos('vid');
+        }
     }
 
-    function fecharModal() {
-        document.getElementById('pdf-modal').style.display = 'none';
-        document.getElementById('pdf-viewer').src = '';
-        document.body.style.overflow = 'auto';
+    function limparCampos(prefix) {
+        if(prefix === 'news') {
+            document.getElementById('news-titulo').value = '';
+            document.getElementById('news-desc').value = '';
+            document.getElementById('news-img').value = '';
+            document.getElementById('news-link').value = '';
+        } else {
+            document.getElementById('vid-titulo').value = '';
+            document.getElementById('vid-id').value = '';
+        }
     }
 </script>
 </body>
