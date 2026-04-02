@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADM | UNEGRO SP</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root { --gold: #f1b434; --red: #8b0000; --black: #0a0a0a; --gray: #1a1a1a; }
+        body { font-family: 'Inter', sans-serif; background: var(--black); color: white; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* Login Overlay */
+        #login-screen { position: fixed; inset: 0; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .login-box { background: var(--gray); padding: 40px; border-radius: 12px; border: 1px solid var(--gold); text-align: center; width: 300px; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; background: #000; color: #fff; }
+
+        /* Dashboard */
+        #admin-content { display: none; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
+        header { border-bottom: 2px solid var(--gold); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; flex-wrap: wrap; gap: 20px; }
+        h1 { color: var(--gold); margin: 0; text-transform: uppercase; font-size: 1.5rem; }
+
+        .stats-card { background: var(--gray); padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* Filtro */
+        .filter-group { display: flex; align-items: center; gap: 10px; background: #000; padding: 5px 15px; border-radius: 8px; border: 1px solid #333; }
+        .filter-group select { background: transparent; color: var(--gold); border: none; padding: 8px; font-weight: bold; outline: none; cursor: pointer; text-transform: uppercase; font-size: 11px; }
+
+        table { width: 100%; border-collapse: collapse; background: var(--gray); border-radius: 8px; overflow: hidden; }
+        th { background: #252525; color: var(--gold); padding: 15px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+        td { padding: 15px; border-bottom: 1px solid #333; font-size: 13px; }
+        tr:hover { background: #222; }
+
+        .btn { cursor: pointer; border: none; border-radius: 4px; padding: 8px 14px; font-weight: 700; transition: 0.2s; text-transform: uppercase; font-size: 10px; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-gold { background: var(--gold); color: var(--black); }
+        .btn-outline-red { background: transparent; color: #ff4444; border: 1px solid #441111; }
+        .btn-outline-red:hover { background: var(--red); color: white; }
+        .btn:hover { opacity: 0.8; transform: translateY(-1px); }
+
+        footer { text-align: center; padding: 40px; margin-top: auto; border-top: 1px solid #222; }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 style="color: var(--gold); margin-top: 0;">ACESSO RESTRITO</h2>
+            <input type="text" id="user" placeholder="Usuário">
+            <input type="password" id="pass" placeholder="Senha">
+            <button class="btn btn-gold" style="width: 100%; margin-top: 10px;" onclick="checkLogin()">Entrar</button>
+            <p id="error-msg" style="color: #ff4444; font-size: 11px; margin-top: 15px; display: none; font-weight: bold;">ACESSO NEGADO</p>
+        </div>
+    </div>
+
+    <div id="admin-content">
+        <header>
+            <div>
+                <h1>Gestão de Filiados</h1>
+                <small style="color: #666;">UNIÃO DE NEGROS PELA IGUALDADE - ESTADO DE SÃO PAULO</small>
+            </div>
+            
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div class="filter-group">
+                    <label style="font-size: 10px; color: #666; font-weight: bold;">CIDADE:</label>
+                    <select id="cityFilter" onchange="applyFilter()">
+                        <option value="TODAS">TODAS</option>
+                    </select>
+                </div>
+                <button class="btn btn-gold" onclick="generateAllPDFs()">Gerar PDF Consolidado</button>
+            </div>
+        </header>
+
+        <div class="stats-card">
+            <span id="counter">Carregando base de dados...</span>
+            <span style="font-size: 11px; color: var(--gold); font-weight: 800;">● DATABASE CONNECTED</span>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome Completo</th>
+                    <th>Cidade</th>
+                    <th>WhatsApp</th>
+                    <th>Raça/Cor</th>
+                    <th style="text-align: right;">Gerenciamento</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <footer>
+        <a href="https://www.dree.one/" target="_blank" style="color: #444; text-decoration: none; font-size: 12px; font-weight: bold;">
+            Tecnologia <span style="color: #f1b434;">Dree.One</span>
+        </a>
+    </footer>
+
+<script>
+    const CONFIG = {
+        URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
+        KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
+    };
+
+    const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
+    let fullDataList = []; 
+    let filteredDataList = [];
+
+    // LOGIN COM NOVAS CREDENCIAIS
+    function checkLogin() {
+        const u = document.getElementById('user').value.trim();
+        const p = document.getElementById('pass').value.trim();
+
+        if(u === 'unegrosp' && p === 'UnegroSP2026!') {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'block';
+            loadData();
+        } else {
+            const err = document.getElementById('error-msg');
+            err.style.display = 'block';
+            setTimeout(() => err.style.display = 'none', 3000);
+        }
+    }
+
+    async function loadData() {
+        const { data, error } = await _supabase
+            .from('unegro_filiados')
+            .select('*')
+            .order('nome', { ascending: true });
+
+        if (error) return console.error(error);
+
+        // Remove duplicados pelo nome para exibição
+        fullDataList = Array.from(new Map(data.map(item => [item.nome.toLowerCase(), item])).values());
+        
+        populateCityFilter(fullDataList);
+        applyFilter();
+    }
+
+    function populateCityFilter(list) {
+        const select = document.getElementById('cityFilter');
+        const cities = [...new Set(list.map(i => i.cidade))].sort();
+        select.innerHTML = '<option value="TODAS">TODAS AS CIDADES</option>';
+        cities.forEach(city => {
+            if(city) select.innerHTML += `<option value="${city}">${city.toUpperCase()}</option>`;
+        });
+    }
+
+    function applyFilter() {
+        const city = document.getElementById('cityFilter').value;
+        filteredDataList = city === "TODAS" ? fullDataList : fullDataList.filter(i => i.cidade === city);
+        render(filteredDataList);
+    }
+
+    function render(list) {
+        const tbody = document.getElementById('tableBody');
+        document.getElementById('counter').innerText = `${list.length} militantes listados.`;
+
+        tbody.innerHTML = list.map(item => `
+            <tr>
+                <td><b>${item.nome.toUpperCase()}</b></td>
+                <td><span style="color:#888">${item.cidade || '---'}</span></td>
+                <td>${item.whatsapp || '---'}</td>
+                <td><small style="background:#333; padding:2px 6px; border-radius:4px; font-size:10px; color:var(--gold)">${item.raca || '---'}</small></td>
+                <td style="text-align: right; display: flex; gap: 8px; justify-content: flex-end;">
+                    <button class="btn btn-gold" onclick='generateSinglePDF(${JSON.stringify(item)})'>PDF</button>
+                    <button class="btn btn-outline-red" onclick="deleteRecord('${item.id}', '${item.nome}')">Excluir</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function deleteRecord(id, nome) {
+        if(!confirm(`⚠️ ATENÇÃO: Deseja realmente excluir permanentemente o registro de ${nome.toUpperCase()}?`)) return;
+        const { error } = await _supabase.from('unegro_filiados').delete().eq('id', id);
+        if(!error) { alert("Registro removido."); loadData(); }
+    }
+
+    function drawPage(doc, payload) {
+        let y = 20;
+        doc.setFont("helvetica", "bold"); doc.setFontSize(14);
+        doc.text("FICHA DE FILIAÇÃO NACIONAL - UNEGRO", 105, y, { align: "center" });
+        y += 15; doc.setDrawColor(139, 0, 0); doc.line(20, y, 190, y); y += 10;
+        doc.setFontSize(10);
+        
+        const row = (l, v) => {
+            doc.setFont("helvetica", "bold"); doc.text(`${l}:`, 20, y);
+            doc.setFont("helvetica", "normal"); doc.text(`${v || '---'}`, 60, y);
+            y += 8;
+        };
+
+        row("Nome Completo", (payload.nome || "").toUpperCase());
+        row("Nascimento", payload.nascimento);
+        row("Auto Declaração", payload.raca);
+        row("RG / CPF", `${payload.rg || ''} / ${payload.cpf || ''}`);
+        row("Endereço", `${payload.endereco || ''}, ${payload.numero || ''}`);
+        row("Cidade", payload.cidade);
+        row("Contato", `${payload.whatsapp || ''} / ${payload.email || ''}`);
+        row("Profissão", payload.profissao);
+
+        y += 15;
+        doc.setFont("helvetica", "bold");
+        doc.text(`Local e data: ${payload.cidade || 'SP'}, ${new Date().toLocaleDateString('pt-BR')}`, 20, y);
+        y += 25; doc.setDrawColor(0); doc.line(20, y, 90, y); doc.line(110, y, 180, y);
+        y += 5; doc.text("Assinatura do Filiado", 35, y); doc.text("Responsável UNEGRO", 125, y);
+    }
+
+    function generateSinglePDF(item) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        drawPage(doc, item);
+        window.open(doc.output('bloburl'), '_blank');
+    }
+
+    function generateAllPDFs() {
+        const { jsPDF } = window.jspdf;
+        if (filteredDataList.length === 0) return;
+        const doc = new jsPDF();
+        filteredDataList.forEach((item, i) => {
+            drawPage(doc, item);
+            if (i < filteredDataList.length - 1) doc.addPage();
+        });
+        window.open(doc.output('bloburl'), '_blank');
+    }
+</script>
+</body>
+</html>
