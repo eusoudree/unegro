@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Administrativo | UNEGRO</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #050505; color: white; padding: 40px; }
+        .card { background: #121212; padding: 25px; border-radius: 12px; border: 1px solid #333; margin-bottom: 20px; }
+        h2 { color: #f1b434; text-transform: uppercase; font-size: 1rem; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: white; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #f1b434; border: none; font-weight: 900; cursor: pointer; border-radius: 6px; text-transform: uppercase; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    </style>
+</head>
+<body>
+
+    <h1>Gestão do Portal UNEGRO</h1>
+
+    <div class="grid">
+        <div class="card">
+            <h2>📢 Novo Destaque (Foto + Desc + Link)</h2>
+            <input type="text" id="news-titulo" placeholder="Título do Destaque">
+            <textarea id="news-desc" placeholder="Breve descrição"></textarea>
+            <input type="text" id="news-img" placeholder="URL da Foto (Storage)">
+            <input type="text" id="news-link" placeholder="Link (opcional)">
+            <button onclick="postarNoticia()">Publicar Destaque</button>
+        </div>
+
+        <div class="card">
+            <h2>🎥 Cadastrar Vídeo</h2>
+            <input type="text" id="vid-titulo" placeholder="Título do Vídeo">
+            <input type="text" id="vid-id" placeholder="ID do YouTube (ex: dQw4w9WgXcQ)">
+            <select id="vid-secao">
+                <option value="liderancas">Nossas Lideranças</option>
+                <option value="nacional">UNEGRO Nacional</option>
+            </select>
+            <button onclick="postarVideo()">Cadastrar Vídeo</button>
+        </div>
+    </div>
+
+<script>
+    const _supabase = supabase.createClient('https://huxemmuzhlntwimgiukt.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs');
+
+    async function postarNoticia() {
+        const { error } = await _supabase.from('unegro_noticias').insert([{
+            titulo: document.getElementById('news-titulo').value,
+            descricao: document.getElementById('news-desc').value,
+            imagem_url: document.getElementById('news-img').value,
+            link_externo: document.getElementById('news-link').value
+        }]);
+        if(!error) { alert("Destaque publicado!"); location.reload(); }
+    }
+
+    async function postarVideo() {
+        const { error } = await _supabase.from('unegro_videos').insert([{
+            titulo: document.getElementById('vid-titulo').value,
+            youtube_id: document.getElementById('vid-id').value,
+            secao: document.getElementById('vid-secao').value
+        }]);
+        if(!error) { alert("Vídeo cadastrado!"); location.reload(); }
+    }
+</script>
+</body>
+</html>
