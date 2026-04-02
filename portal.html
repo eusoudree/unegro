@@ -162,18 +162,41 @@
     let dadosMateriais = [];
     let eventosCarregados = [];
 
-    async function validarAcesso() {
+   async function validarAcesso() {
+        // Pega os valores e limpa espaços extras no início e fim
         const n = document.getElementById('user-name').value.trim();
         const e = document.getElementById('user-email').value.trim();
-        const { data } = await _supabase.from('unegro_filiados').select('*').ilike('nome', n).ilike('email', e).limit(1);
+
+        if (!n || !e) {
+            alert("Por favor, preencha nome e e-mail.");
+            return;
+        }
+
+        // Usamos .ilike com % para permitir que ele encontre o nome mesmo se 
+        // houver pequenas variações ou se o usuário não digitar o nome completo idêntico
+        const { data, error } = await _supabase
+            .from('unegro_filiados')
+            .select('*')
+            .ilike('nome', `%${n}%`) // Busca aproximada (contém o nome)
+            .ilike('email', e)       // E-mail continua exato por segurança
+            .limit(1);
+
+        if (error) {
+            console.error("Erro na busca:", error);
+            alert("Erro ao conectar com a base de dados.");
+            return;
+        }
+
         if (data?.length > 0) {
+            // Sucesso
             document.getElementById('user-info').innerText = `${data[0].nome.toUpperCase()} | ${data[0].cidade.toUpperCase()}`;
             document.getElementById('lock-screen').style.display = 'none';
             document.getElementById('main-content').style.display = 'grid';
             carregarDadosPortal();
-        } else { alert("Cadastro não localizado."); }
+        } else { 
+            alert("Cadastro não localizado. Verifique se o e-mail digitado é o mesmo da ficha de filiação."); 
+        }
     }
-
     async function carregarDadosPortal() {
         const { data: news } = await _supabase.from('unegro_noticias').select('*').order('created_at', { ascending: false }).limit(1);
         if(news?.length > 0) {
