@@ -3,150 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal da Militância | UNEGRO</title>
+    <title>Portal UNEGRO | Território de Luta</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --gold: #f1b434; --red: #d9534f; --black: #050505; 
-            --card-bg: rgba(255, 255, 255, 0.03); 
-            --border: rgba(255, 255, 255, 0.08);
-            --font-display: 'Anton', sans-serif;
-        }
-
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Inter', sans-serif; background: var(--black); color: #fff; overflow-x: hidden; }
-
-        /* --- Sidebar Estilizada --- */
-        #main-content { display: none; height: 100vh; grid-template-columns: 280px 1fr; }
-        nav { background: #000; border-right: 1px solid var(--border); padding: 40px 25px; display: flex; flex-direction: column; gap: 10px; }
-        .nav-logo { width: 110px; margin-bottom: 40px; filter: drop-shadow(0 0 10px rgba(241, 180, 52, 0.2)); }
-        .nav-btn { background: transparent; border: none; color: #666; padding: 15px; text-align: left; font-weight: 700; cursor: pointer; border-radius: 12px; transition: 0.3s; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-btn:hover, .nav-btn.active { background: var(--card-bg); color: var(--gold); box-shadow: inset 0 0 10px rgba(241, 180, 52, 0.05); }
-
-        /* --- Main Container --- */
-        main { padding: 40px 60px; overflow-y: auto; background: radial-gradient(circle at top right, #101010, #050505); }
+        :root { --gold: #f1b434; --red: #8b0000; --black: #0a0a0a; --dark: #121212; --border: rgba(255,255,255,0.1); }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--black); color: #fff; }
         
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px; }
-        .user-welcome h1 { font-family: var(--font-display); font-size: 2.5rem; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
-        .user-welcome span { color: var(--gold); font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
+        /* HEADER PORTAL */
+        header { background: #000; border-bottom: 2px solid var(--gold); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo-area img { height: 45px; }
+        .portal-title { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 1.2rem; }
 
-        /* --- Grid de Boxes Modernas --- */
-        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
-        
-        .section-title { font-family: var(--font-display); font-size: 1.2rem; text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .section-title::after { content: ''; height: 2px; flex: 1; background: linear-gradient(to right, var(--gold), transparent); }
+        /* GRID PRINCIPAL */
+        .portal-container { max-width: 1300px; margin: 30px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 350px; gap: 30px; }
 
-        /* --- Recado da Diretoria (Box de Destaque) --- */
-        .diretoria-box { 
-            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); 
-            padding: 30px; border-radius: 20px; border: 1px solid var(--gold);
-            position: relative; overflow: hidden; margin-bottom: 30px;
-        }
-        .diretoria-box::before { content: '"'; position: absolute; top: -20px; right: 20px; font-size: 150px; color: rgba(241, 180, 52, 0.05); font-family: serif; }
-        .diretoria-box h3 { color: var(--gold); margin-top: 0; font-size: 1.1rem; }
-        .diretoria-box p { font-style: italic; color: #ccc; line-height: 1.6; font-size: 0.95rem; }
+        /* SEÇÃO DE NOTÍCIAS (BLOG) */
+        .news-section h2, .side-section h2 { font-family: 'Oswald', sans-serif; text-transform: uppercase; border-left: 4px solid var(--red); padding-left: 15px; margin-bottom: 25px; }
+        .news-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .news-card { background: var(--dark); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); transition: 0.3s; }
+        .news-card:hover { transform: translateY(-5px); border-color: var(--gold); }
+        .news-img { width: 100%; height: 180px; background: #222; object-fit: cover; }
+        .news-content { padding: 20px; }
+        .news-tag { color: var(--gold); font-size: 10px; font-weight: 900; text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .news-content h3 { margin: 0 0 10px; font-size: 1.1rem; line-height: 1.3; }
+        .news-content p { font-size: 0.85rem; color: #aaa; margin-bottom: 15px; }
 
-        /* --- Lideranças Destaque --- */
-        .liderancas-row { display: flex; gap: 20px; margin-bottom: 40px; overflow-x: auto; padding-bottom: 10px; }
-        .lider-card { min-width: 120px; text-align: center; }
-        .lider-img { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--gold); padding: 3px; object-fit: cover; filter: grayscale(100%); transition: 0.3s; }
-        .lider-card:hover .lider-img { filter: grayscale(0%); transform: scale(1.1); }
-        .lider-card span { display: block; font-size: 11px; margin-top: 8px; font-weight: 700; color: #888; }
+        /* BIBLIOTECA DINÂMICA (BOX) */
+        .library-box { background: var(--dark); border-radius: 15px; padding: 25px; border: 1px solid var(--border); margin-bottom: 30px; }
+        .search-bar { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; }
+        .material-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #222; text-decoration: none; color: #ddd; transition: 0.2s; }
+        .material-item:hover { color: var(--gold); padding-left: 5px; }
+        .material-item span { font-size: 18px; }
 
-        /* --- Boxes de Conteúdo (Agenda e Materiais) --- */
-        .content-card { 
-            background: var(--card-bg); border: 1px solid var(--border); padding: 25px; border-radius: 20px; 
-            backdrop-filter: blur(10px); transition: 0.3s;
-        }
-        .content-card:hover { border-color: rgba(241, 180, 52, 0.3); background: rgba(255,255,255,0.05); }
-        .content-card h4 { margin: 0 0 10px 0; color: var(--gold); }
-        .content-card p { font-size: 0.85rem; color: #999; margin: 0; }
+        /* AGENDA LATERAL */
+        .event-card { background: #1a1a1a; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid var(--gold); }
+        .event-date { font-weight: 900; color: var(--gold); font-size: 0.8rem; }
+        .event-title { font-weight: 700; margin-top: 5px; display: block; }
 
-        /* --- Video Hero --- */
-        .hero-video { width: 100%; aspect-ratio: 16/9; border-radius: 24px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        
-        /* --- Login Estilizado --- */
-        #lock-screen { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 5000; }
-        .login-box { background: #0a0a0a; padding: 50px; border-radius: 30px; border: 1px solid var(--border); text-align: center; width: 100%; max-width: 380px; }
-        .login-box input { width: 100%; padding: 15px; margin-bottom: 15px; background: #111; border: 1px solid #222; color: #fff; border-radius: 12px; box-sizing: border-box; }
-        
-        .btn-gold { background: var(--gold); color: #000; padding: 15px 30px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.3s; }
-        .btn-gold:hover { transform: scale(1.02); box-shadow: 0 10px 20px rgba(241, 180, 52, 0.2); }
+        /* LOGIN PADRÃO (REMANESCIDO) */
+        #lock-screen { position: fixed; inset: 0; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 5000; }
+        .login-card { background: var(--dark); padding: 40px; border-radius: 16px; border: 1px solid var(--gold); text-align: center; width: 340px; }
+        .login-card input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; }
+        .btn-gold { width: 100%; padding: 14px; background: var(--gold); border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 6px; }
 
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
-
-        @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } #main-content { grid-template-columns: 80px 1fr; } nav span { display: none; } }
+        @media (max-width: 900px) { .portal-container { grid-template-columns: 1fr; } .news-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
     <div id="lock-screen">
-        <div class="login-box">
-            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="width: 80px; margin-bottom: 30px;">
-            <h2 style="font-family: var(--font-display); letter-spacing: 1px;">ÁREA DO FILIADO</h2>
-            <input type="text" id="user-name" placeholder="Nome completo">
-            <input type="email" id="user-email" placeholder="E-mail cadastrado">
-            <button class="btn-gold" onclick="validarAcesso()">ENTRAR NA LUTA</button>
-            <p id="error-msg" style="color: var(--red); font-size: 11px; display: none; margin-top: 15px;">Militante não localizado.</p>
+        <div class="login-card">
+            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="height: 60px; margin-bottom: 20px;">
+            <h2 class="portal-title">Acesso do Filiado</h2>
+            <input type="text" id="user-name" placeholder="Seu Nome">
+            <input type="email" id="user-email" placeholder="Seu E-mail">
+            <button class="btn-gold" onclick="validarAcesso()">Entrar no Portal</button>
         </div>
     </div>
 
-    <div id="main-content">
-        <nav>
-            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" class="nav-logo">
-            <button class="nav-btn active" onclick="switchTab('inicio')"><span>Dashboard</span></button>
-            <button class="nav-btn" onclick="switchTab('agenda')"><span>Agenda</span></button>
-            <button class="nav-btn" onclick="switchTab('materiais')"><span>Acervo</span></button>
-            <button class="nav-btn" onclick="switchTab('mural')"><span>Mural</span></button>
-        </nav>
+    <header>
+        <div class="logo-area">
+            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" alt="UNEGRO">
+            <span class="portal-title">Portal de Notícias UNEGRO</span>
+        </div>
+        <div id="user-info" style="font-size: 0.8rem; color: var(--gold);"></div>
+    </header>
 
-        <main>
-            <div class="header-top">
-                <div class="user-welcome">
-                    <span id="welcome-city">JACAREÍ - SP</span>
-                    <h1 id="welcome-text">OLÁ, MILITANTE!</h1>
+    <div class="portal-container" id="main-content" style="display: none;">
+        
+        <div class="news-section">
+            <h2>Últimas da Luta</h2>
+            <div class="news-grid" id="news-list">
+                <div class="news-card">
+                    <img src="https://via.placeholder.com/400x200/1a1a1a/gold?text=Acao+UNEGRO" class="news-img">
+                    <div class="news-content">
+                        <span class="news-tag">Mobilização</span>
+                        <h3>UNEGRO convoca plenária regional para discutir ancestralidade</h3>
+                        <p>Encontro acontecerá no próximo sábado com lideranças do Vale...</p>
+                        <a href="#" style="color: var(--gold); font-size: 12px; font-weight: bold; text-decoration: none;">LER MAIS →</a>
+                    </div>
                 </div>
-                <div style="background: var(--card-bg); padding: 10px 20px; border-radius: 50px; font-size: 11px; border: 1px solid var(--border);">
-                    FILIADO ATIVO 🟢
+                </div>
+        </div>
+
+        <div class="side-column">
+            
+            <div class="side-section">
+                <h2>Biblioteca Digital</h2>
+                <div class="library-box">
+                    <input type="text" class="search-bar" id="lib-search" placeholder="Buscar material (PDF, Livros...)" onkeyup="filtrarBiblioteca()">
+                    <div id="materiais-list">
+                        </div>
                 </div>
             </div>
 
-            <section id="inicio" class="tab-content">
-                <div class="section-title">Lideranças em Destaque</div>
-                <div class="liderancas-row">
-                    <div class="lider-card"><img src="https://i.pravatar.cc/150?u=1" class="lider-img"><span>ADRIANO S.</span></div>
-                    <div class="lider-card"><img src="https://i.pravatar.cc/150?u=2" class="lider-img"><span>MARIANNE B.</span></div>
-                    <div class="lider-card"><img src="https://i.pravatar.cc/150?u=3" class="lider-img"><span>DREE</span></div>
-                    <div class="lider-card"><img src="https://i.pravatar.cc/150?u=4" class="lider-img"><span>EDSON L.</span></div>
-                </div>
-
-                <div class="dashboard-grid">
-                    <div class="left-col">
-                        <div class="hero-video" id="video-wrapper">
-                            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen style="width: 100%; height: 100%;"></iframe>
-                        </div>
-                        
-                        <div class="section-title">Ações Prioritárias</div>
-                        <div id="agenda-list" class="card-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            </div>
+            <div class="side-section">
+                <h2>Próximas Ações</h2>
+                <div id="agenda-list">
                     </div>
+                <button class="btn-gold" style="font-size: 10px;" onclick="window.open('https://unegro.online/agenda', '_blank')">VER AGENDA COMPLETA</button>
+            </div>
 
-                    <div class="right-col">
-                        <div class="section-title">Recado da Diretoria</div>
-                        <div class="diretoria-box">
-                            <h3>"Nossa luta é ancestral"</h3>
-                            <p>A organização é a ferramenta mais poderosa do povo preto. Mantenha-se ativo nas bases e utilize os materiais de apoio para nossa formação política. Tamo junto!</p>
-                            <small style="color: var(--gold); font-weight: bold; margin-top: 10px; display: block;">— Coordenação Regional</small>
-                        </div>
+        </div>
 
-                        <div class="section-title">Biblioteca</div>
-                        <div id="materiais-list" style="display: flex; flex-direction: column; gap: 15px;">
-                            </div>
-                    </div>
-                </div>
-            </section>
-        </main>
     </div>
 
 <script>
@@ -155,7 +116,7 @@
         KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
     };
     const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
-    let dadosUser = {};
+    let todosMateriais = [];
 
     async function validarAcesso() {
         const n = document.getElementById('user-name').value;
@@ -163,39 +124,43 @@
         const { data } = await _supabase.from('unegro_filiados').select('*').ilike('nome', n).ilike('email', e).limit(1);
 
         if (data && data.length > 0) {
-            dadosUser = data[0];
-            document.getElementById('welcome-text').innerText = `OLÁ, ${dadosUser.nome.split(' ')[0].toUpperCase()}!`;
-            document.getElementById('welcome-city').innerText = `${dadosUser.cidade.toUpperCase()} - SP`;
+            document.getElementById('user-info').innerText = `${data[0].nome.toUpperCase()} | ${data[0].cidade.toUpperCase()}`;
             document.getElementById('lock-screen').style.display = 'none';
             document.getElementById('main-content').style.display = 'grid';
-            carregarDados();
-        } else {
-            document.getElementById('error-msg').style.display = 'block';
+            carregarPortal();
         }
     }
 
-    async function carregarDados() {
-        const { data: ag } = await _supabase.from('agenda_unegro').select('*').limit(4);
-        const { data: mt } = await _supabase.from('materiais_unegro').select('*').limit(4);
-
+    async function carregarPortal() {
+        // Carregar Agenda
+        const { data: ag } = await _supabase.from('agenda_unegro').select('*').order('data', { ascending: true });
         if(ag) document.getElementById('agenda-list').innerHTML = ag.map(i => `
-            <div class="content-card">
-                <h4>${i.titulo}</h4>
-                <p>${new Date(i.data).toLocaleDateString('pt-BR')}</p>
+            <div class="event-card">
+                <span class="event-date">${new Date(i.data).toLocaleDateString('pt-BR')}</span>
+                <span class="event-title">${i.titulo}</span>
             </div>
         `).join('');
 
-        if(mt) document.getElementById('materiais-list').innerHTML = mt.map(i => `
-            <div class="content-card" style="padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-                <h4 style="font-size: 13px; margin: 0;">${i.titulo}</h4>
-                <a href="${i.link}" target="_blank" style="color: var(--gold); font-size: 10px; font-weight: bold; text-decoration: none; border: 1px solid var(--gold); padding: 4px 8px; border-radius: 4px;">BAIXAR</a>
-            </div>
+        // Carregar Biblioteca
+        const { data: mt } = await _supabase.from('materiais_unegro').select('*').order('titulo');
+        if(mt) {
+            todosMateriais = mt;
+            renderBiblioteca(mt);
+        }
+    }
+
+    function renderBiblioteca(lista) {
+        document.getElementById('materiais-list').innerHTML = lista.map(i => `
+            <a href="${i.link}" target="_blank" class="material-item">
+                <span>📄</span> ${i.titulo}
+            </a>
         `).join('');
     }
 
-    function switchTab(id) {
-        // Lógica de troca de abas aqui
-        alert("Navegando para: " + id);
+    function filtrarBiblioteca() {
+        const termo = document.getElementById('lib-search').value.toLowerCase();
+        const filtrados = todosMateriais.filter(m => m.titulo.toLowerCase().includes(termo));
+        renderBiblioteca(filtrados);
     }
 </script>
 </body>
