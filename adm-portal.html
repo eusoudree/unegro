@@ -10,35 +10,31 @@
         :root { --gold: #f1b434; --red: #8b0000; --black: #050505; --gray: #121212; --border: rgba(255,255,255,0.1); }
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--black); color: #fff; }
 
-        /* TELA DE LOGIN ADM */
         #login-adm { position: fixed; inset: 0; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .login-card { background: var(--gray); padding: 40px; border-radius: 12px; border: 1px solid var(--gold); text-align: center; width: 320px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .login-card { background: var(--gray); padding: 40px; border-radius: 12px; border: 1px solid var(--gold); text-align: center; width: 320px; }
         
-        /* LAYOUT PAINEL */
         #painel-gestao { display: none; max-width: 1200px; margin: 40px auto; padding: 0 20px; }
         header { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; }
         header h1 { font-weight: 850; text-transform: uppercase; letter-spacing: -1px; font-size: 1.5rem; margin: 0; }
 
-        .grid-forms { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .grid-forms { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 50px; }
         .form-card { background: var(--gray); border: 1px solid var(--border); border-radius: 16px; padding: 30px; }
         .form-card h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin: 0 0 25px 0; border-bottom: 1px solid #222; padding-bottom: 10px; }
 
         label { font-size: 11px; text-transform: uppercase; color: #666; font-weight: bold; margin-bottom: 5px; display: block; }
-        input, textarea, select { 
-            width: 100%; background: #000; border: 1px solid #333; color: #fff; 
-            padding: 12px; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; font-family: 'Inter';
-        }
-        input:focus, textarea:focus { border-color: var(--gold); outline: none; }
-
-        .btn-post { 
-            width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; 
-            border-radius: 8px; font-weight: 850; text-transform: uppercase; cursor: pointer; transition: 0.2s;
-        }
+        input, textarea, select { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; }
+        
+        .btn-post { width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; border-radius: 8px; font-weight: 850; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
         .btn-post:hover { background: #fff; transform: translateY(-2px); }
 
+        /* TABELA DE GERENCIAMENTO */
+        .manage-section { background: var(--gray); border-radius: 16px; border: 1px solid var(--border); padding: 30px; margin-top: 40px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; font-size: 10px; text-transform: uppercase; color: var(--gold); padding: 10px; border-bottom: 2px solid #222; }
+        td { padding: 12px 10px; font-size: 13px; border-bottom: 1px solid #222; }
+        .btn-del { background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold; }
+        
         .status-msg { font-size: 12px; text-align: center; margin-top: 10px; display: none; }
-
-        @media (max-width: 800px) { .grid-forms { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -61,45 +57,54 @@
         </header>
 
         <div class="grid-forms">
-            
             <div class="form-card">
-                <h2>📢 Destaque Principal (Notícia)</h2>
-                
+                <h2>📢 Novo Destaque (Notícia)</h2>
                 <label>Título do Destaque</label>
-                <input type="text" id="news-titulo" placeholder="Ex: Plenária Regional 2026">
-                
+                <input type="text" id="news-titulo">
                 <label>Descrição Curta</label>
-                <textarea id="news-desc" rows="3" placeholder="Resumo da notícia para o portal..."></textarea>
-                
-                <label>URL da Imagem (Storage)</label>
-                <input type="text" id="news-img" placeholder="https://...">
-
-                <label>Link de Destino (Opcional)</label>
-                <input type="text" id="news-link" placeholder="Link para ler mais...">
-
+                <textarea id="news-desc" rows="3"></textarea>
+                <label>URL da Imagem</label>
+                <input type="text" id="news-img">
+                <label>Link (Opcional)</label>
+                <input type="text" id="news-link">
                 <button class="btn-post" onclick="salvarDestaque()">Publicar no Portal</button>
                 <div id="status-news" class="status-msg"></div>
             </div>
 
             <div class="form-card">
                 <h2>🎥 Conteúdo Audiovisual</h2>
-                
-                <label>Título do Vídeo / Nome do Líder</label>
-                <input type="text" id="vid-titulo" placeholder="Ex: Adriano S. - Depoimento">
-                
-                <label>ID do Vídeo no YouTube</label>
-                <input type="text" id="vid-id" placeholder="Ex: dQw4w9WgXcQ">
-                
-                <label>Seção do Portal</label>
+                <label>Título ou Nome do Líder</label>
+                <input type="text" id="vid-titulo">
+                <label>ID do YouTube</label>
+                <input type="text" id="vid-id">
+                <label>Seção</label>
                 <select id="vid-secao">
                     <option value="liderancas">Nossas Lideranças</option>
                     <option value="nacional">UNEGRO Nacional</option>
                 </select>
-
-                <button class="btn-post" onclick="salvarVideo()" style="background: #fff; color: #000;">Cadastrar Vídeo</button>
+                <button class="btn-post" onclick="salvarVideo()" style="background: #fff;">Cadastrar Vídeo</button>
                 <div id="status-vid" class="status-msg"></div>
             </div>
+        </div>
 
+        <div class="manage-section">
+            <h2 style="font-size: 1rem; color: var(--gold); font-family: 'Inter';">📁 GERENCIAR CONTEÚDO EXISTENTE</h2>
+            
+            <div style="margin-top: 30px;">
+                <h3 style="font-size: 12px; color: #666;">NOTÍCIAS / DESTAQUES</h3>
+                <table id="table-news">
+                    <thead><tr><th>Título</th><th>Ações</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 40px;">
+                <h3 style="font-size: 12px; color: #666;">VÍDEOS CADASTRADOS</h3>
+                <table id="table-vids">
+                    <thead><tr><th>Título</th><th>Seção</th><th>Ações</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -110,74 +115,68 @@
     };
     const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
-    // LOGIN DO ADM
     function checkAdm() {
         const u = document.getElementById('adm-user').value;
         const p = document.getElementById('adm-pass').value;
-        
         if(u === 'unegro' && p === 'admunegro2026!') {
             document.getElementById('login-adm').style.display = 'none';
             document.getElementById('painel-gestao').style.display = 'block';
+            carregarDadosGerenciamento();
         } else {
             document.getElementById('error-adm').style.display = 'block';
         }
     }
 
-    // SALVAR DESTAQUE
+    async function carregarDadosGerenciamento() {
+        const { data: news } = await _supabase.from('unegro_noticias').select('*').order('created_at', { ascending: false });
+        const { data: vids } = await _supabase.from('unegro_videos').select('*').order('secao');
+
+        const tbodyNews = document.querySelector('#table-news tbody');
+        tbodyNews.innerHTML = (news || []).map(n => `
+            <tr>
+                <td>${n.titulo}</td>
+                <td><button class="btn-del" onclick="deletarItem('unegro_noticias', '${n.id}')">Excluir</button></td>
+            </tr>
+        `).join('');
+
+        const tbodyVids = document.querySelector('#table-vids tbody');
+        tbodyVids.innerHTML = (vids || []).map(v => `
+            <tr>
+                <td>${v.titulo}</td>
+                <td>${v.secao}</td>
+                <td><button class="btn-del" onclick="deletarItem('unegro_videos', '${v.id}')">Excluir</button></td>
+            </tr>
+        `).join('');
+    }
+
+    async function deletarItem(tabela, id) {
+        if(!confirm("Tem certeza que deseja excluir este item permanentemente?")) return;
+        const { error } = await _supabase.from(tabela).delete().eq('id', id);
+        if(error) alert("Erro ao excluir: " + error.message);
+        else carregarDadosGerenciamento();
+    }
+
     async function salvarDestaque() {
-        const msg = document.getElementById('status-news');
         const payload = {
             titulo: document.getElementById('news-titulo').value,
             descricao: document.getElementById('news-desc').value,
             imagem_url: document.getElementById('news-img').value,
             link_externo: document.getElementById('news-link').value
         };
-
         const { error } = await _supabase.from('unegro_noticias').insert([payload]);
-        
-        msg.style.display = 'block';
-        if(error) {
-            msg.innerText = "ERRO: " + error.message;
-            msg.style.color = "red";
-        } else {
-            msg.innerText = "SUCESSO: DESTAQUE PUBLICADO!";
-            msg.style.color = "var(--gold)";
-            limparCampos('news');
-        }
+        if(error) alert("Erro: " + error.message);
+        else { alert("Destaque publicado!"); carregarDadosGerenciamento(); }
     }
 
-    // SALVAR VÍDEO
     async function salvarVideo() {
-        const msg = document.getElementById('status-vid');
         const payload = {
             titulo: document.getElementById('vid-titulo').value,
             youtube_id: document.getElementById('vid-id').value,
             secao: document.getElementById('vid-secao').value
         };
-
         const { error } = await _supabase.from('unegro_videos').insert([payload]);
-        
-        msg.style.display = 'block';
-        if(error) {
-            msg.innerText = "ERRO: " + error.message;
-            msg.style.color = "red";
-        } else {
-            msg.innerText = "SUCESSO: VÍDEO CADASTRADO!";
-            msg.style.color = "var(--gold)";
-            limparCampos('vid');
-        }
-    }
-
-    function limparCampos(prefix) {
-        if(prefix === 'news') {
-            document.getElementById('news-titulo').value = '';
-            document.getElementById('news-desc').value = '';
-            document.getElementById('news-img').value = '';
-            document.getElementById('news-link').value = '';
-        } else {
-            document.getElementById('vid-titulo').value = '';
-            document.getElementById('vid-id').value = '';
-        }
+        if(error) alert("Erro: " + error.message);
+        else { alert("Vídeo cadastrado!"); carregarDadosGerenciamento(); }
     }
 </script>
 </body>
