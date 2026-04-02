@@ -447,6 +447,72 @@ body {
     mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%);
 }
 
+
+
+
+
+/* MÓDULO AGENDA INDEX - DREE.ONE */
+.secao-agenda { padding: 60px 20px; background: #000; border-top: 1px solid rgba(255,140,0,0.05); }
+.agenda-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 20px; 
+    max-width: 1200px; 
+    margin: 0 auto; 
+}
+
+.card-agenda {
+    background: rgba(13, 13, 13, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-left: 3px solid var(--laranja-solid);
+    padding: 25px;
+    border-radius: 12px;
+    transition: 0.4s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-agenda:hover {
+    background: rgba(20, 20, 20, 0.9);
+    border-color: var(--laranja-solid);
+    transform: translateY(-5px);
+}
+
+.ag-data { 
+    font-size: 10px; 
+    font-weight: 900; 
+    color: var(--laranja-solid); 
+    text-transform: uppercase; 
+    letter-spacing: 2px; 
+    margin-bottom: 10px;
+}
+
+.ag-titulo { 
+    font-size: 18px; 
+    font-weight: 850; 
+    color: #fff; 
+    margin-bottom: 8px; 
+    text-transform: uppercase;
+}
+
+.ag-local { 
+    font-size: 12px; 
+    color: #666; 
+    font-weight: 500; 
+}
+
+.ag-vazio {
+    grid-column: span 3;
+    text-align: center;
+    color: #333;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 40px;
+}
+        
+
     </style>
 </head>
 <body>
@@ -546,6 +612,17 @@ body {
 
     </div>
 </section>
+
+
+
+
+<section class="secao-agenda">
+    <h2 class="secao-titulo" style="font-size: 1.5rem; margin-bottom: 40px;">Agenda da Luta</h2>
+    <div id="agenda-dinamica" class="agenda-grid">
+        </div>
+</section>
+
+    
 
     <section id="filiacao">
         <div class="filiacao-box">
@@ -894,6 +971,59 @@ window.onload = () => {
     iniciarAtmosferaAncestral();
 };
 
+
+
+async function carregarAgendaIndex() {
+    try {
+        // Busca os 3 próximos eventos do banco
+        const { data: eventos, error } = await _supabase
+            .from('agenda_unegro')
+            .select('*')
+            .order('data', { ascending: true })
+            .limit(3);
+
+        if (error) throw error;
+
+        const container = document.getElementById('agenda-dinamica');
+        
+        if (!eventos || eventos.length === 0) {
+            container.innerHTML = '<div class="ag-vazio">Nenhum evento agendado no momento.</div>';
+            return;
+        }
+
+        container.innerHTML = eventos.map(ev => {
+            // Formata a data de YYYY-MM-DD para DD/MM
+            const dataObj = new Date(ev.data + 'T00:00:00');
+            const dia = dataObj.getDate().toString().padStart(2, '0');
+            const mes = dataObj.toLocaleString('pt-BR', { month: 'short' }).replace('.', '');
+
+            return `
+                <div class="card-agenda">
+                    <div>
+                        <div class="ag-data">${dia} ${mes}</div>
+                        <h3 class="ag-titulo">${ev.titulo}</h3>
+                        <div class="ag-local">📍 ${ev.local || 'Local a definir'}</div>
+                    </div>
+                    <div style="margin-top: 20px; font-size: 11px; color: #444; font-weight: bold;">
+                        UNEGRO VALE ➔
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (err) {
+        console.error("Erro ao carregar agenda:", err);
+    }
+}
+
+// Chame a função no seu window.onload
+const originalOnloadIndex = window.onload;
+window.onload = () => {
+    if (originalOnloadIndex) originalOnloadIndex();
+    carregarAgendaIndex(); // Chama a agenda
+    // ... suas outras funções (lideranças, etc)
+};
+       
 
     </script>
 </html>
