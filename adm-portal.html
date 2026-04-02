@@ -3,114 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão Estratégica | UNEGRO</title>
+    <title>Governança UNEGRO | Painel Estratégico</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;850&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #f1b434; --red: #8b0000; --black: #050505; --gray: #121212; --border: rgba(255,255,255,0.1); }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--black); color: #fff; }
+        :root { --gold: #f1b434; --red: #8b0000; --black: #050505; --gray: #111; --border: rgba(255,255,255,0.08); }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--black); color: #fff; overflow-x: hidden; }
 
-        /* TELA DE LOGIN ADM */
+        /* TELA DE LOGIN */
         #login-adm { position: fixed; inset: 0; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .login-card { background: var(--gray); padding: 50px; border-radius: 16px; border: 1px solid var(--gold); text-align: center; width: 340px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .login-card { background: #0a0a0a; padding: 50px; border-radius: 20px; border: 1px solid var(--gold); text-align: center; width: 340px; box-shadow: 0 0 50px rgba(241, 180, 52, 0.1); }
         
         /* LAYOUT PAINEL */
-        #painel-gestao { display: none; max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        header { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; }
-        header h1 { font-weight: 850; text-transform: uppercase; letter-spacing: -1px; font-size: 1.5rem; margin: 0; }
+        #painel-gestao { display: none; max-width: 1400px; margin: 40px auto; padding: 0 30px; }
+        header { border-bottom: 1px solid var(--border); padding-bottom: 25px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; }
+        header h1 { font-weight: 850; text-transform: uppercase; letter-spacing: -1px; font-size: 1.8rem; margin: 0; color: var(--gold); }
 
-        .grid-forms { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 50px; }
-        .form-card { background: var(--gray); border: 1px solid var(--border); border-radius: 16px; padding: 30px; }
-        .form-card h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin: 0 0 25px 0; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        /* GRIDS E CARDS */
+        .grid-forms { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-bottom: 50px; }
+        .form-card { background: var(--gray); border: 1px solid var(--border); border-radius: 16px; padding: 25px; display: flex; flex-direction: column; }
+        .form-card h2 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: #666; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; }
+        .form-card h2::before { content: ''; width: 8px; height: 8px; background: var(--gold); border-radius: 2px; }
 
-        label { font-size: 11px; text-transform: uppercase; color: #666; font-weight: bold; margin-bottom: 5px; display: block; }
+        label { font-size: 10px; text-transform: uppercase; color: #444; font-weight: 800; margin-bottom: 6px; display: block; }
         input, textarea, select { 
-            width: 100%; background: #000; border: 1px solid #333; color: #fff; 
-            padding: 12px; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; font-family: 'Inter';
+            width: 100%; background: #000; border: 1px solid #222; color: #fff; 
+            padding: 12px; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; font-size: 13px;
         }
-        input:focus, textarea:focus { border-color: var(--gold); outline: none; }
+        input:focus { border-color: var(--gold); outline: none; }
 
         .btn-post { 
-            width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; 
-            border-radius: 8px; font-weight: 850; text-transform: uppercase; cursor: pointer; transition: 0.2s;
+            width: 100%; padding: 14px; background: var(--gold); color: #000; border: none; 
+            border-radius: 8px; font-weight: 850; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-size: 11px;
         }
         .btn-post:hover { background: #fff; transform: translateY(-2px); }
 
-        /* TABELA DE GERENCIAMENTO */
-        .manage-section { background: var(--gray); border-radius: 16px; border: 1px solid var(--border); padding: 30px; margin-top: 40px; margin-bottom: 100px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { text-align: left; font-size: 10px; text-transform: uppercase; color: var(--gold); padding: 10px; border-bottom: 2px solid #222; }
-        td { padding: 12px 10px; font-size: 13px; border-bottom: 1px solid #222; }
-        .btn-del { background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold; }
+        /* GERENCIAMENTO */
+        .manage-section { background: #0a0a0a; border-radius: 16px; border: 1px solid var(--border); padding: 30px; margin-bottom: 100px; }
+        .manage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
         
-        @media (max-width: 800px) { .grid-forms { grid-template-columns: 1fr; } }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
+        th { text-align: left; color: #444; padding: 10px; border-bottom: 1px solid #222; text-transform: uppercase; font-size: 10px; }
+        td { padding: 12px 10px; border-bottom: 1px solid #1a1a1a; color: #ccc; }
+        
+        .btn-del { background: transparent; color: #ff4d4d; border: 1px solid #331111; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 9px; font-weight: bold; text-transform: uppercase; }
+        .btn-del:hover { background: #ff4d4d; color: #fff; }
+
+        @media (max-width: 1100px) { .grid-forms, .manage-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
     <div id="login-adm">
         <div class="login-card">
-            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="height: 50px; margin-bottom: 30px;">
-            <h2 style="font-size: 14px; margin-bottom: 20px; letter-spacing: 2px;">GESTÃO ESTRATÉGICA</h2>
-            <input type="text" id="adm-user" placeholder="Usuário">
-            <input type="password" id="adm-pass" placeholder="Senha">
-            <button class="btn-post" onclick="checkAdm()">ACESSAR PAINEL</button>
-            <p id="error-adm" style="color: red; font-size: 11px; margin-top: 15px; display: none; font-weight: bold;">Acesso Negado.</p>
+            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="height: 60px; margin-bottom: 30px;">
+            <h2 style="font-size: 12px; color: #666; letter-spacing: 3px; margin-bottom: 25px;">SISTEMA DE COMANDO</h2>
+            <input type="text" id="adm-user" placeholder="USUÁRIO">
+            <input type="password" id="adm-pass" placeholder="SENHA">
+            <button class="btn-post" onclick="checkAdm()">ENTRAR NO PAINEL</button>
+            <p id="error-adm" style="color: #ff4d4d; font-size: 10px; margin-top: 20px; display: none; font-weight: bold; text-transform: uppercase;">Acesso Negado</p>
         </div>
     </div>
 
     <div id="painel-gestao">
         <header>
-            <h1>Governança do Portal</h1>
-            <button onclick="location.reload()" style="background: transparent; color: #666; border: none; cursor: pointer; font-size: 11px; font-weight: bold;">DESCONECTAR</button>
+            <div>
+                <p style="color: var(--gold); font-size: 10px; font-weight: bold; margin: 0; letter-spacing: 2px;">UNIÃO DE NEGROS PELA IGUALDADE</p>
+                <h1>Painel de Governança</h1>
+            </div>
+            <button onclick="location.reload()" style="background: #222; color: #fff; border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 10px; font-weight: bold;">DESCONECTAR</button>
         </header>
 
         <div class="grid-forms">
             <div class="form-card">
-                <h2>📢 Novo Destaque (Notícia)</h2>
-                <label>Título do Destaque</label>
-                <input type="text" id="news-titulo" placeholder="Título impactante">
-                <label>Descrição Curta</label>
-                <textarea id="news-desc" rows="3" placeholder="Resumo para o portal..."></textarea>
-                <label>URL da Imagem</label>
-                <input type="text" id="news-img" placeholder="Link da foto no Storage">
-                <label>Link (Opcional)</label>
-                <input type="text" id="news-link" placeholder="Link de destino">
-                <button class="btn-post" onclick="salvarDestaque()">Publicar Destaque</button>
+                <h2>Notícias / Destaques</h2>
+                <label>Título Curto</label>
+                <input type="text" id="news-titulo" placeholder="Ex: Plenária Vale 2026">
+                <label>Resumo da Pauta</label>
+                <textarea id="news-desc" rows="3" placeholder="O que está acontecendo?"></textarea>
+                <label>Link da Imagem (Storage)</label>
+                <input type="text" id="news-img" placeholder="https://...">
+                <label>Link Externo (Opcional)</label>
+                <input type="text" id="news-link" placeholder="Para ler mais...">
+                <button class="btn-post" onclick="salvarDestaque()">Publicar Notícia</button>
             </div>
 
             <div class="form-card">
-                <h2>🎥 Conteúdo Audiovisual</h2>
+                <h2>Audiovisual / Lideranças</h2>
                 <label>Título ou Nome do Líder</label>
-                <input type="text" id="vid-titulo" placeholder="Ex: Adriano S. - Depoimento">
-                <label>ID do YouTube</label>
+                <input type="text" id="vid-titulo" placeholder="Ex: Edson L. - Formação">
+                <label>ID do Vídeo YouTube</label>
                 <input type="text" id="vid-id" placeholder="Ex: dQw4w9WgXcQ">
-                <label>Seção</label>
+                <label>Seção de Exibição</label>
                 <select id="vid-secao">
                     <option value="liderancas">Nossas Lideranças</option>
                     <option value="nacional">UNEGRO Nacional</option>
                 </select>
+                <div style="flex: 1;"></div>
                 <button class="btn-post" onclick="salvarVideo()" style="background: #fff; color: #000;">Cadastrar Vídeo</button>
+            </div>
+
+            <div class="form-card">
+                <h2>Agenda / Compromissos</h2>
+                <label>Título do Evento</label>
+                <input type="text" id="ag-titulo" placeholder="Ex: Reunião de Base">
+                <label>Data da Ação</label>
+                <input type="date" id="ag-data">
+                <label>Local / Endereço / Meet</label>
+                <input type="text" id="ag-local" placeholder="Onde vai ser?">
+                <label>Detalhes Rápidos</label>
+                <textarea id="ag-desc" rows="2" placeholder="O que os filiados devem saber?"></textarea>
+                <button class="btn-post" onclick="salvarAgenda()" style="background: var(--red); color: #fff;">Agendar Luta</button>
             </div>
         </div>
 
         <div class="manage-section">
-            <h2 style="font-size: 1rem; color: var(--gold);">📁 GERENCIAR CONTEÚDO</h2>
-            
-            <div style="margin-top: 30px;">
-                <h3 style="font-size: 12px; color: #666;">DESTAQUES ATIVOS</h3>
-                <table id="table-news">
-                    <thead><tr><th>Título</th><th style="width: 100px;">Ações</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+            <h2 style="font-size: 1rem; color: var(--gold); margin-bottom: 30px;">Gerenciamento de Ativos</h2>
+            <div class="manage-grid">
+                
+                <div>
+                    <h3 style="font-size: 10px; color: #444; border-bottom: 1px solid #222; padding-bottom: 10px;">DESTAQUES</h3>
+                    <table id="table-news"><tbody></tbody></table>
+                </div>
 
-            <div style="margin-top: 40px;">
-                <h3 style="font-size: 12px; color: #666;">VÍDEOS CADASTRADOS</h3>
-                <table id="table-vids">
-                    <thead><tr><th>Título</th><th>Seção</th><th style="width: 100px;">Ações</th></tr></thead>
-                    <tbody></tbody>
-                </table>
+                <div>
+                    <h3 style="font-size: 10px; color: #444; border-bottom: 1px solid #222; padding-bottom: 10px;">VÍDEOS</h3>
+                    <table id="table-vids"><tbody></tbody></table>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 10px; color: #444; border-bottom: 1px solid #222; padding-bottom: 10px;">AGENDA</h3>
+                    <table id="table-agenda"><tbody></tbody></table>
+                </div>
+
             </div>
         </div>
     </div>
@@ -126,82 +151,55 @@
     function checkAdm() {
         const u = document.getElementById('adm-user').value.trim();
         const p = document.getElementById('adm-pass').value.trim();
-        
         if(u === 'unegro' && p === 'Unegrovale2026!') {
             document.getElementById('login-adm').style.display = 'none';
             document.getElementById('painel-gestao').style.display = 'block';
-            carregarDadosGerenciamento();
+            carregarTudo();
         } else {
             document.getElementById('error-adm').style.display = 'block';
         }
     }
 
-    // CARREGAR LISTAS
-    async function carregarDadosGerenciamento() {
+    async function carregarTudo() {
         const { data: news } = await _supabase.from('unegro_noticias').select('*').order('created_at', { ascending: false });
         const { data: vids } = await _supabase.from('unegro_videos').select('*').order('secao');
+        const { data: agenda } = await _supabase.from('agenda_unegro').select('*').order('data', { ascending: true });
 
-        const tbodyNews = document.querySelector('#table-news tbody');
-        tbodyNews.innerHTML = (news || []).map(n => `
-            <tr>
-                <td>${n.titulo}</td>
-                <td><button class="btn-del" onclick="deletarItem('unegro_noticias', '${n.id}')">Excluir</button></td>
-            </tr>
+        document.querySelector('#table-news tbody').innerHTML = (news || []).map(n => `
+            <tr><td>${n.titulo}</td><td style="text-align:right"><button class="btn-del" onclick="deletar('unegro_noticias','${n.id}')">Excluir</button></td></tr>
         `).join('');
 
-        const tbodyVids = document.querySelector('#table-vids tbody');
-        tbodyVids.innerHTML = (vids || []).map(v => `
-            <tr>
-                <td>${v.titulo}</td>
-                <td style="text-transform:uppercase; font-size:10px; color:#666">${v.secao}</td>
-                <td><button class="btn-del" onclick="deletarItem('unegro_videos', '${v.id}')">Excluir</button></td>
-            </tr>
+        document.querySelector('#table-vids tbody').innerHTML = (vids || []).map(v => `
+            <tr><td>${v.titulo}</td><td style="text-align:right"><button class="btn-del" onclick="deletar('unegro_videos','${v.id}')">Excluir</button></td></tr>
+        `).join('');
+
+        document.querySelector('#table-agenda tbody').innerHTML = (agenda || []).map(a => `
+            <tr><td>${new Date(a.data).toLocaleDateString('pt-BR')} - ${a.titulo}</td><td style="text-align:right"><button class="btn-del" onclick="deletar('agenda_unegro','${a.id}')">Excluir</button></td></tr>
         `).join('');
     }
 
-    // DELETAR
-    async function deletarItem(tabela, id) {
-        if(!confirm("Deseja apagar este conteúdo permanentemente?")) return;
+    async function deletar(tabela, id) {
+        if(!confirm("Remover permanentemente?")) return;
         const { error } = await _supabase.from(tabela).delete().eq('id', id);
-        if(error) alert("Erro: " + error.message);
-        else carregarDadosGerenciamento();
+        if(!error) carregarTudo();
     }
 
-    // SALVAR NOTÍCIA
     async function salvarDestaque() {
-        const payload = {
-            titulo: document.getElementById('news-titulo').value,
-            descricao: document.getElementById('news-desc').value,
-            imagem_url: document.getElementById('news-img').value,
-            link_externo: document.getElementById('news-link').value
-        };
+        const payload = { titulo: document.getElementById('news-titulo').value, descricao: document.getElementById('news-desc').value, imagem_url: document.getElementById('news-img').value, link_externo: document.getElementById('news-link').value };
         const { error } = await _supabase.from('unegro_noticias').insert([payload]);
-        if(error) alert("Erro ao salvar.");
-        else { alert("Destaque publicado!"); carregarDadosGerenciamento(); limparCampos('news'); }
+        if(!error) { alert("Publicado!"); carregarTudo(); }
     }
 
-    // SALVAR VÍDEO
     async function salvarVideo() {
-        const payload = {
-            titulo: document.getElementById('vid-titulo').value,
-            youtube_id: document.getElementById('vid-id').value,
-            secao: document.getElementById('vid-secao').value
-        };
+        const payload = { titulo: document.getElementById('vid-titulo').value, youtube_id: document.getElementById('vid-id').value, secao: document.getElementById('vid-secao').value };
         const { error } = await _supabase.from('unegro_videos').insert([payload]);
-        if(error) alert("Erro ao cadastrar.");
-        else { alert("Vídeo adicionado!"); carregarDadosGerenciamento(); limparCampos('vid'); }
+        if(!error) { alert("Vídeo Cadastrado!"); carregarTudo(); }
     }
 
-    function limparCampos(tipo) {
-        if(tipo === 'news') {
-            document.getElementById('news-titulo').value = '';
-            document.getElementById('news-desc').value = '';
-            document.getElementById('news-img').value = '';
-            document.getElementById('news-link').value = '';
-        } else {
-            document.getElementById('vid-titulo').value = '';
-            document.getElementById('vid-id').value = '';
-        }
+    async function salvarAgenda() {
+        const payload = { titulo: document.getElementById('ag-titulo').value, data: document.getElementById('ag-data').value, local: document.getElementById('ag-local').value, descricao: document.getElementById('ag-desc').value };
+        const { error } = await _supabase.from('agenda_unegro').insert([payload]);
+        if(!error) { alert("Agenda Atualizada!"); carregarTudo(); }
     }
 </script>
 </body>
