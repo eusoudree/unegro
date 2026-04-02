@@ -699,6 +699,21 @@ body {
                             <option value="Feminino">Feminino</option>
                         </select>
                     </div>
+
+
+<div class="input-group">
+                    <label>Cor/Raça (Auto declaração)</label>
+                    <select id="raca" class="input-style" required>
+                        <option value="" disabled selected>Selecione</option>
+                        <option value="Preta">Preta</option>
+                        <option value="Parda">Parda</option>
+                        <option value="Branca">Branca</option>
+                        <option value="Amarela">Amarela</option>
+                        <option value="Indígena">Indígena</option>
+                    </select>
+                </div>
+
+                    
                     <div class="input-group"><label>RG</label><input type="text" id="rg" class="input-style" required></div>
                     <div class="input-group"><label>CPF</label><input type="text" id="cpf" class="input-style" required></div>
                     <div class="input-group"><label>WhatsApp</label><input type="tel" id="whatsapp" class="input-style" required></div>
@@ -747,291 +762,234 @@ body {
    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-   <script>
-        // 1. CONFIGURAÇÃO UNIFICADA DO SUPABASE
-        const SUPABASE_URL = 'https://huxemmuzhlntwimgiukt.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs';
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <script>
+    // 1. CONFIGURAÇÃO UNIFICADA DO SUPABASE
+    const SUPABASE_URL = 'https://huxemmuzhlntwimgiukt.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    window.carregarLiderancas = async function() {
+        try {
+            const { data, error } = await _supabase
+                .from('liderancas_unegro')
+                .select('*')
+                .order('ordem', { ascending: true });
 
-window.carregarLiderancas = async function() {
-            try {
-                const { data, error } = await _supabase
-                    .from('liderancas_unegro')
-                    .select('*')
-                    .order('ordem', { ascending: true });
+            if (error) throw error;
 
-                if (error) throw error;
+            const coord = data.filter(i => i.tipo === 'COORDENACAO')[0];
+            const vale = data.filter(i => i.tipo === 'VALE');
+            let htmlFinal = "";
 
-                const coord = data.filter(i => i.tipo === 'COORDENACAO')[0];
-                const vale = data.filter(i => i.tipo === 'VALE');
-                let htmlFinal = "";
-
-                // FUNÇÃO BLINDADA: Ela busca qualquer coluna que tenha 'mini' no nome
-                const getBio = (item) => {
-                    // Tenta achar a chave que contém 'mini' (resolve o problema do ã)
-                   console.log("Dados do item:", item); // Isso vai mostrar no F12 exatamente o que o banco enviou
-    return item['mini_descricão'] || item['mini_descricao'] || item.mini_descricao || item.biografia || "Liderança UNEGRO Vale.";
-};
-
-                const gerarCardHTML = (lider, extraLabel = "") => {
-                    const label = extraLabel || lider.cargo || 'Liderança Vale';
-                    return `
-                        <div class="card-lider" onclick='abrirModal(${JSON.stringify(lider)})'>
-                            <div class="img-bg" style="background-image: url('${lider.foto_url}')"></div>
-                            <div class="card-static-info">
-                                <span class="info-city">${lider.cidade}</span>
-                                <h3 class="info-name">${lider.nome}</h3>
-                            </div>
-                            <div class="card-hover-overlay">
-                                <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">${label}</span>
-                                <h2 style="font-weight: 900; text-transform: uppercase; margin-bottom: 5px;">${lider.nome}</h2>
-                                <p class="hover-bio">${getBio(lider)}</p>
-                                <div style="display: flex; gap: 10px; align-items: center;">
-                                    <a href="${lider.instagram_url}" target="_blank" onclick="event.stopPropagation();" class="btn-insta-mosaico">@Instagram</a>
-                                    <span style="font-size: 10px; font-weight: 900;">VER BIO ➔</span>
-                                </div>
-                            </div>
-                        </div>`;
-                };
-
-                if (coord) htmlFinal += gerarCardHTML(coord, "COORDENAÇÃO GERAL");
-                htmlFinal += vale.map(v => gerarCardHTML(v)).join('');
-
-                document.getElementById('mosaico-completo').innerHTML = htmlFinal;
-            } catch (err) {
-                console.error("Erro ao carregar mosaico:", err.message);
-            }
-        };
-
-
-        window.abrirModal = (lider) => {
-            // IDs do Modal precisam existir no seu HTML (ID="modal-lider", etc)
-            const modalFoto = document.getElementById('modal-foto');
-            const modalNome = document.getElementById('modal-nome');
-            const modalBio = document.getElementById('modal-bio');
-            const modalInsta = document.getElementById('modal-insta');
-
-            if(modalFoto) modalFoto.style.backgroundImage = `url("${lider.foto_url}")`;
-            if(modalNome) modalNome.innerText = lider.nome;
-            if(modalBio) modalBio.innerText = lider.biografia || lider['mini_descricão'];
-            if(modalInsta) modalInsta.href = lider.instagram_url;
-
-            const modalElement = document.getElementById('modal-lider');
-            if(modalElement) {
-                modalElement.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            }
-        };
-
-        window.fecharModal = () => {
-            const modalElement = document.getElementById('modal-lider');
-            if(modalElement) modalElement.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        };
-
-        // 4. SISTEMA DE FILIAÇÃO E PDF
-        async function processarCadastro() {
-            const quiz = document.getElementById('quiz').value;
-            const aceite = document.getElementById('aceite').checked;
-            const campos = ['nome', 'nascimento', 'rg', 'cpf', 'endereco', 'numero', 'bairro', 'cep', 'cidade', 'whatsapp', 'email'];
-
-            for(let campo of campos) {
-                if(!document.getElementById(campo).value) {
-                    alert("Por favor, preencha todos os campos obrigatórios.");
-                    document.getElementById(campo).focus();
-                    return;
-                }
-            }
-
-            if(quiz !== "10" || !aceite) { alert("Valide o desafio matemático e aceite os termos."); return; }
-
-            const payload = {
-                nome: document.getElementById('nome').value,
-                nascimento: document.getElementById('nascimento').value,
-                sexo: document.getElementById('sexo').value,
-                rg: document.getElementById('rg').value,
-                cpf: document.getElementById('cpf').value,
-                endereco: document.getElementById('endereco').value,
-                numero: document.getElementById('numero').value,
-                complemento: document.getElementById('complemento').value || "",
-                bairro: document.getElementById('bairro').value,
-                cep: document.getElementById('cep').value,
-                cidade: document.getElementById('cidade').value,
-                whatsapp: document.getElementById('whatsapp').value,
-                email: document.getElementById('email').value,
-                profissao: document.getElementById('profissao').value || "",
-                escolaridade: document.getElementById('escolaridade').value,
-                movimento_social: document.getElementById('movimento').value || ""
+            const getBio = (item) => {
+                return item['mini_descricão'] || item['mini_descricao'] || item.mini_descricao || item.biografia || "Liderança UNEGRO Vale.";
             };
 
-            try {
-                const { error } = await _supabase.from('unegro_filiados').insert([payload]);
-                if (!error) {
-                    alert("Filiação realizada com sucesso!");
-                    gerarPDF(payload);
-                } else {
-                    throw error;
-                }
-            } catch (e) {
-                alert("Erro ao salvar no banco. Tente novamente.");
-            }
-        }
-
-        function gerarPDF(payload) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            let y = 20;
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(14);
-            doc.text("FICHA DE FILIAÇÃO NACIONAL - UNEGRO", 105, y, { align: "center" });
-            y += 15;
-            doc.line(20, y, 190, y);
-            y += 10;
-
-            doc.setFontSize(10);
-            const drawRow = (label, value) => {
-                doc.setFont("helvetica", "bold"); doc.text(`${label}:`, 20, y);
-                doc.setFont("helvetica", "normal"); doc.text(`${value}`, 60, y);
-                y += 8;
+            const gerarCardHTML = (lider, extraLabel = "") => {
+                const label = extraLabel || lider.cargo || 'Liderança Vale';
+                return `
+                    <div class="card-lider" onclick='abrirModal(${JSON.stringify(lider)})'>
+                        <div class="img-bg" style="background-image: url('${lider.foto_url}')"></div>
+                        <div class="card-static-info">
+                            <span class="info-city">${lider.cidade}</span>
+                            <h3 class="info-name">${lider.nome}</h3>
+                        </div>
+                        <div class="card-hover-overlay">
+                            <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">${label}</span>
+                            <h2 style="font-weight: 900; text-transform: uppercase; margin-bottom: 5px;">${lider.nome}</h2>
+                            <p class="hover-bio">${getBio(lider)}</p>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <a href="${lider.instagram_url}" target="_blank" onclick="event.stopPropagation();" class="btn-insta-mosaico">@Instagram</a>
+                                <span style="font-size: 10px; font-weight: 900;">VER BIO ➔</span>
+                            </div>
+                        </div>
+                    </div>`;
             };
 
-            drawRow("Nome Completo", payload.nome.toUpperCase());
-            drawRow("Nascimento", payload.nascimento);
-            drawRow("Cidade", payload.cidade);
-            drawRow("WhatsApp", payload.whatsapp);
-            drawRow("E-mail", payload.email);
+            if (coord) htmlFinal += gerarCardHTML(coord, "COORDENAÇÃO GERAL");
+            htmlFinal += vale.map(v => gerarCardHTML(v)).join('');
 
-            y += 20;
-            doc.text(`Local e data: ${payload.cidade}, ${new Date().toLocaleDateString('pt-BR')}`, 20, y);
-            window.open(doc.output('bloburl'), '_blank');
+            document.getElementById('mosaico-completo').innerHTML = htmlFinal;
+        } catch (err) {
+            console.error("Erro ao carregar mosaico:", err.message);
+        }
+    };
+
+    window.abrirModal = (lider) => {
+        const modalNome = document.getElementById('modal-nome');
+        const modalBio = document.getElementById('modal-bio');
+        const modalInsta = document.getElementById('modal-insta');
+
+        if(modalNome) modalNome.innerText = lider.nome;
+        if(modalBio) modalBio.innerText = lider.biografia || lider['mini_descricão'];
+        if(modalInsta) modalInsta.href = lider.instagram_url;
+
+        const modalElement = document.getElementById('modal-lider');
+        if(modalElement) {
+            modalElement.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    };
+
+    // 4. SISTEMA DE FILIAÇÃO E PDF (ATUALIZADO COM RAÇA)
+    async function processarCadastro() {
+        const quiz = document.getElementById('quiz').value;
+        const aceite = document.getElementById('aceite').checked;
+        const campos = ['nome', 'nascimento', 'rg', 'cpf', 'endereco', 'numero', 'bairro', 'cep', 'cidade', 'whatsapp', 'email', 'raca'];
+
+        for(let campo of campos) {
+            if(!document.getElementById(campo).value) {
+                alert("Por favor, preencha todos os campos obrigatórios.");
+                document.getElementById(campo).focus();
+                return;
+            }
         }
 
-        // 5. CARREGAMENTO INICIAL
-        window.onload = () => {
-            carregarLiderancas();
+        if(quiz !== "10" || !aceite) { alert("Valide o desafio matemático e aceite os termos."); return; }
+
+        const payload = {
+            nome: document.getElementById('nome').value,
+            nascimento: document.getElementById('nascimento').value,
+            sexo: document.getElementById('sexo').value,
+            raca: document.getElementById('raca').value, // NOVO CAMPO
+            rg: document.getElementById('rg').value,
+            cpf: document.getElementById('cpf').value,
+            endereco: document.getElementById('endereco').value,
+            numero: document.getElementById('numero').value,
+            complemento: document.getElementById('complemento').value || "",
+            bairro: document.getElementById('bairro').value,
+            cep: document.getElementById('cep').value,
+            cidade: document.getElementById('cidade').value,
+            whatsapp: document.getElementById('whatsapp').value,
+            email: document.getElementById('email').value,
+            profissao: document.getElementById('profissao').value || "",
+            escolaridade: document.getElementById('escolaridade').value,
+            movimento_social: document.getElementById('movimento').value || ""
         };
 
-
-
-
-
-// --- MÓDULO: ATMOSFERA ANCESTRAL ---
-async function iniciarAtmosferaAncestral() {
-    const overlay = document.getElementById('ancestral-overlay');
-    if (!overlay) return;
-
-   
-
-    // Referências fixas (Leci e Orlando) caso o banco esteja vazio ou para intercalar
-    const referencias = [
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQd-iTVw7Wna6Hk1Y7dVTIsXTO6dhvdUAVD5w&s', // Leci
-        'https://jornalempoderado.com.br/wp-content/uploads/2025/09/Imagem-do-WhatsApp-de-2025-09-06-as-10.35.50_0e8c4375.jpg' // Orlando
-    ];
-
-   
-
-    let index = 0;
-
-    function manifestarFace() {
-        // Remove faces antigas para não pesar a memória
-        const antigas = document.querySelectorAll('.spirit-face');
-        antigas.forEach(a => {
-            if (parseFloat(a.style.opacity) > 0) {
-                a.style.opacity = '0';
-                setTimeout(() => a.remove(), 4000);
-            }
-        });
-
-        const face = document.createElement('div');
-        face.className = 'spirit-face';
-        face.style.backgroundImage = `url('${listaFotos[index]}')`;
-
-        // Posicionamento aleatório mas equilibrado
-        const lado = Math.random() > 0.5 ? 'left' : 'right';
-        face.style[lado] = Math.random() * 20 + '%';
-        face.style.top = Math.random() * 30 + 10 + '%';
-
-        // Efeito de movimento bem lento (zoom in)
-        face.style.transform = 'scale(1)';
-
-        overlay.appendChild(face);
-
-        // Fade In
-        setTimeout(() => {
-            face.style.opacity = '0.6'; // Subi de 0.35 para 0.6
-            face.style.transform = 'scale(1.15)';
-        }, 100)
-
-        index = (index + 1) % listaFotos.length;
+        try {
+            const { error } = await _supabase.from('unegro_filiados').insert([payload]);
+            if (!error) {
+                alert("Filiação realizada com sucesso!");
+                gerarPDF(payload);
+            } else { throw error; }
+        } catch (e) { alert("Erro ao salvar no banco. Verifique se o campo 'raca' existe na sua tabela."); }
     }
 
-    // Ciclo: manifesta uma face a cada 9 segundos
-    manifestarFace();
-    setInterval(manifestarFace, 9000);
-}
+    function gerarPDF(payload) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        let y = 20;
 
-// Integrando ao seu onload existente
-const originalOnload = window.onload;
-window.onload = () => {
-    if (originalOnload) originalOnload();
-    iniciarAtmosferaAncestral();
-};
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.text("FICHA DE FILIAÇÃO NACIONAL - UNEGRO", 105, y, { align: "center" });
+        y += 15;
+        doc.line(20, y, 190, y);
+        y += 10;
 
+        doc.setFontSize(10);
+        const drawRow = (label, value) => {
+            doc.setFont("helvetica", "bold"); doc.text(`${label}:`, 20, y);
+            doc.setFont("helvetica", "normal"); doc.text(`${value}`, 60, y);
+            y += 8;
+        };
 
+        drawRow("Nome Completo", payload.nome.toUpperCase());
+        drawRow("Nascimento", payload.nascimento);
+        drawRow("Auto Declaração", payload.raca); // NOVO CAMPO NO PDF
+        drawRow("Cidade", payload.cidade);
+        drawRow("WhatsApp", payload.whatsapp);
+        drawRow("E-mail", payload.email);
 
-async function carregarAgendaIndex() {
-    try {
-        // Busca os 3 próximos eventos do banco
-        const { data: eventos, error } = await _supabase
-            .from('agenda_unegro')
-            .select('*')
-            .order('data', { ascending: true })
-            .limit(3);
+        y += 20;
+        doc.text(`Local e data: ${payload.cidade}, ${new Date().toLocaleDateString('pt-BR')}`, 20, y);
+        window.open(doc.output('bloburl'), '_blank');
+    }
 
-        if (error) throw error;
+    // --- MÓDULO: ATMOSFERA ANCESTRAL (APENAS REFERÊNCIAS) ---
+    async function iniciarAtmosferaAncestral() {
+        const overlay = document.getElementById('ancestral-overlay');
+        if (!overlay) return;
 
-        const container = document.getElementById('agenda-dinamica');
-        
-        if (!eventos || eventos.length === 0) {
-            container.innerHTML = '<div class="ag-vazio">Nenhum evento agendado no momento.</div>';
-            return;
+        const listaFotos = [
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQd-iTVw7Wna6Hk1Y7dVTIsXTO6dhvdUAVD5w&s', // Leci
+            'https://jornalempoderado.com.br/wp-content/uploads/2025/09/Imagem-do-WhatsApp-de-2025-09-06-as-10.35.50_0e8c4375.jpg' // Orlando
+        ];
+
+        let index = 0;
+
+        function manifestarFace() {
+            const antigas = document.querySelectorAll('.spirit-face');
+            antigas.forEach(a => {
+                if (parseFloat(a.style.opacity) > 0) {
+                    a.style.opacity = '0';
+                    setTimeout(() => a.remove(), 4000);
+                }
+            });
+
+            const face = document.createElement('div');
+            face.className = 'spirit-face';
+            face.style.backgroundImage = `url('${listaFotos[index]}')`;
+
+            const lado = Math.random() > 0.5 ? 'left' : 'right';
+            face.style[lado] = Math.random() * 20 + '%';
+            face.style.top = Math.random() * 30 + 10 + '%';
+            face.style.transform = 'scale(1)';
+
+            overlay.appendChild(face);
+
+            setTimeout(() => {
+                face.style.opacity = '0.6';
+                face.style.transform = 'scale(1.15)';
+            }, 100);
+
+            index = (index + 1) % listaFotos.length;
         }
 
-        container.innerHTML = eventos.map(ev => {
-            // Formata a data de YYYY-MM-DD para DD/MM
-            const dataObj = new Date(ev.data + 'T00:00:00');
-            const dia = dataObj.getDate().toString().padStart(2, '0');
-            const mes = dataObj.toLocaleString('pt-BR', { month: 'short' }).replace('.', '');
-
-            return `
-                <div class="card-agenda">
-                    <div>
-                        <div class="ag-data">${dia} ${mes}</div>
-                        <h3 class="ag-titulo">${ev.titulo}</h3>
-                        <div class="ag-local">📍 ${ev.local || 'Local a definir'}</div>
-                    </div>
-                    <div style="margin-top: 20px; font-size: 11px; color: #444; font-weight: bold;">
-                        UNEGRO VALE ➔
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-    } catch (err) {
-        console.error("Erro ao carregar agenda:", err);
+        manifestarFace();
+        setInterval(manifestarFace, 9000);
     }
-}
 
-// Chame a função no seu window.onload
-const originalOnloadIndex = window.onload;
-window.onload = () => {
-    if (originalOnloadIndex) originalOnloadIndex();
-    carregarAgendaIndex(); // Chama a agenda
-    // ... suas outras funções (lideranças, etc)
-};
-       
+    async function carregarAgendaIndex() {
+        try {
+            const { data: eventos, error } = await _supabase
+                .from('agenda_unegro')
+                .select('*')
+                .order('data', { ascending: true })
+                .limit(3);
 
-    </script>
+            if (error) throw error;
+            const container = document.getElementById('agenda-dinamica');
+            
+            if (!eventos || eventos.length === 0) {
+                container.innerHTML = '<div class="ag-vazio">Nenhum evento agendado no momento.</div>';
+                return;
+            }
+
+            container.innerHTML = eventos.map(ev => {
+                const dataObj = new Date(ev.data + 'T00:00:00');
+                const dia = dataObj.getDate().toString().padStart(2, '0');
+                const mes = dataObj.toLocaleString('pt-BR', { month: 'short' }).replace('.', '');
+                return `
+                    <div class="card-agenda">
+                        <div>
+                            <div class="ag-data">${dia} ${mes}</div>
+                            <h3 class="ag-titulo">${ev.titulo}</h3>
+                            <div class="ag-local">📍 ${ev.local || 'Local a definir'}</div>
+                        </div>
+                        <div style="margin-top: 20px; font-size: 11px; color: #444; font-weight: bold;">
+                            UNEGRO SP ➔
+                        </div>
+                    </div>`;
+            }).join('');
+        } catch (err) { console.error("Erro ao carregar agenda:", err); }
+    }
+
+    window.onload = () => {
+        carregarLiderancas();
+        carregarAgendaIndex();
+        iniciarAtmosferaAncestral();
+    };
+</script>
 </html>
