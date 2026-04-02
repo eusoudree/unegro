@@ -3,55 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Área do Filiado | UNEGRO</title>
+    <title>Território Filiado | UNEGRO</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #f1b434; --red: #8b0000; --black: #0a0a0a; --gray: #1a1a1a; --glass: rgba(255, 255, 255, 0.05); }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Inter', sans-serif; background: var(--black); color: white; }
+        :root { 
+            --gold: #f1b434; 
+            --red: #8b0000; 
+            --black: #000; 
+            --deep-gray: #101010; 
+            --light-gray: #1a1a1a;
+            --border-color: rgba(255, 255, 255, 0.05);
+            --font-display: 'Anton', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+        
+        body, html { margin: 0; padding: 0; height: 100%; font-family: var(--font-body); background: var(--black); color: #fff; overflow: hidden; -webkit-font-smoothing: antialiased; }
 
-        /* Login Screen */
+        /* Estilo Globais de Inputs e Botões (Login e Adm) */
+        input, textarea { background: #000; border: 1px solid #222; color: #fff; padding: 12px; border-radius: 4px; font-family: var(--font-body); }
+        input:focus { border-color: var(--gold); outline: none; }
+        .btn { cursor: pointer; border: none; border-radius: 4px; padding: 12px 20px; font-weight: 700; background: var(--gold); color: #000; text-transform: uppercase; font-family: var(--font-body); transition: 0.2s; font-size: 11px; letter-spacing: 1px; }
+        .btn:hover { background: #fff; transform: translateY(-1px); }
+
+        /* --- Tela de Login Reformulada --- */
         #lock-screen { position: fixed; inset: 0; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
-        .login-card { background: var(--gray); padding: 40px; border-radius: 16px; border: 1px solid var(--gold); text-align: center; width: 100%; max-width: 360px; }
-        .login-card input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; }
+        .login-card { text-align: center; width: 100%; max-width: 320px; }
+        .login-card .nav-logo { width: 100px; margin: 0 auto 30px; }
+        .login-card h1 { font-family: var(--font-display); text-transform: uppercase; color: #fff; margin: 0 0 10px 0; font-size: 1.8rem; letter-spacing: 1px;}
+        .login-card p { color: #888; margin: 0 0 30px 0; font-size: 0.9rem;}
 
-        /* Layout Estrutural */
-        #main-content { display: none; height: 100vh; grid-template-columns: 250px 1fr; }
+        /* --- Layout Principal Moderno --- */
+        #main-content { display: none; height: 100vh; grid-template-columns: 240px 1fr; }
         
         /* Sidebar Navigation */
-        nav { background: var(--gray); border-right: 1px solid #333; display: flex; flex-direction: column; padding: 20px; }
-        .nav-logo { width: 120px; margin: 0 auto 30px; display: block; }
-        .nav-btn { background: transparent; border: none; color: #888; padding: 15px; text-align: left; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; margin-bottom: 5px; }
-        .nav-btn:hover, .nav-btn.active { background: var(--glass); color: var(--gold); }
+        nav { background: var(--deep-gray); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 30px 20px; }
+        .nav-logo { width: 90px; margin: 0 auto 40px; display: block; }
+        .nav-btn { background: transparent; border: none; color: #888; padding: 12px; text-align: left; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s; margin-bottom: 5px; font-family: var(--font-body); font-size: 13px;}
+        .nav-btn:hover { color: #fff; }
+        .nav-btn.active { background: #000; color: var(--gold); border-bottom: 2px solid var(--gold); border-radius: 4px 4px 0 0;}
 
         /* Main View */
-        main { overflow-y: auto; padding: 40px; position: relative; }
-        .welcome-header { margin-bottom: 40px; border-bottom: 1px solid #333; padding-bottom: 20px; }
-        .welcome-header h2 { color: var(--gold); margin: 0; text-transform: uppercase; font-size: 1.2rem; }
-        .welcome-header span { color: #666; font-size: 0.9rem; }
+        main { overflow-y: auto; padding: 50px; position: relative; }
+        
+        /* Header Limpo e Imponente */
+        .welcome-header { margin-bottom: 50px; }
+        .welcome-header h1 { font-family: var(--font-display); text-transform: uppercase; color: var(--gold); margin: 0 0 5px 0; font-size: 2.2rem; letter-spacing: 1.5px; }
+        .welcome-header .territorio-tag { color: #888; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 8px;}
+        .welcome-header .territorio-tag::before { content: ''; width: 6px; height: 6px; background: var(--red); border-radius: 50%; display: inline-block;}
 
         /* Sections */
         .content-section { display: none; }
-        .content-section.active { display: block; }
+        .content-section.active { display: block; animation: fadeIn 0.3s ease; }
+        .content-section h2 { font-family: var(--font-display); text-transform: uppercase; color: #fff; font-size: 1.2rem; letter-spacing: 1px; margin-bottom: 30px;}
 
-        /* Cards Style */
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .item-card { background: var(--gray); padding: 20px; border-radius: 12px; border: 1px solid #333; position: relative; }
-        .item-card h3 { margin: 0 0 10px; color: var(--gold); font-size: 1.1rem; }
-        .item-card p { font-size: 0.9rem; color: #bbb; }
-        .btn-link { display: inline-block; margin-top: 15px; color: var(--gold); text-decoration: none; font-weight: bold; font-size: 0.8rem; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 4px; }
-
-        /* Recados (Chat Adaptado) */
-        #chat-display { height: 400px; overflow-y: auto; background: #121212; border-radius: 12px; padding: 20px; margin-bottom: 15px; }
-        .msg-box { background: var(--glass); padding: 12px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--gold); }
-        .chat-input-area { display: flex; gap: 10px; }
-        .chat-input-area input { flex: 1; background: #000; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; }
-
-        .btn { cursor: pointer; border: none; border-radius: 6px; padding: 14px; font-weight: 700; background: var(--gold); color: var(--black); text-transform: uppercase; }
+        /* Cards Modernos */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
         
+        /* Card de Agenda (Destaque para Data) */
+        .agenda-card { background: var(--light-gray); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); transition: 0.2s; position: relative;}
+        .agenda-card span { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1.5px;}
+        .agenda-card h3 { margin: 5px 0; color: #fff; font-size: 14px; font-family: var(--font-body); font-weight: 600; }
+        .agenda-card p { font-size: 13px; color: #aaa; margin: 0; line-height: 1.5;}
+        
+        /* Card de Material (Sutil e Focado no Link) */
+        .material-card { background: transparent; border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s;}
+        .material-card:hover { border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.01); }
+        .material-card h3 { margin: 0; color: #fff; font-size: 13px; font-weight: 600; font-family: var(--font-body); }
+        .material-card a { color: var(--gold); text-decoration: none; font-size: 11px; font-weight: bold; border-bottom: 1px solid transparent; transition: 0.2s; letter-spacing: 1px; text-transform: uppercase;}
+        .material-card a:hover { border-color: var(--gold); }
+
+        /* Área de Vídeo (Mais Limpa) */
+        .video-container { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); position: relative;}
+        .video-container iframe { width: 100%; height: 100%; border: none; }
+        /* Efeito sutil CRT por cima */
+        .video-container::after { content: ''; position: absolute; inset: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%); background-size: 100% 4px; pointer-events: none; opacity: 0.3;}
+
+        /* Mural de Recados (Adaptado do Chat) */
+        #chat-display { height: 350px; overflow-y: auto; background: var(--deep-gray); border-radius: 8px; padding: 20px; margin-bottom: 15px; border: 1px solid var(--border-color);}
+        .msg-box { background: rgba(255,255,255,0.01); padding: 12px; border-radius: 4px; margin-bottom: 8px; border-left: 2px solid #333;}
+        .msg-box.user-is-filiado { border-left-color: var(--gold); }
+        .msg-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;}
+        .msg-user { font-weight: 700; color: #fff; font-size: 12px; }
+        .msg-city { font-size: 10px; color: #666; font-style: italic; }
+        .msg-text { font-size: 13px; color: #ccc; line-height: 1.5;}
+
+        .chat-input-area { display: flex; gap: 10px; }
+        .chat-input-area input { flex: 1; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Mobile (Simples) */
         @media (max-width: 768px) {
             #main-content { grid-template-columns: 1fr; }
-            nav { display: none; } /* Ideal criar um menu mobile depois */
+            nav { position: fixed; bottom: 0; left: 0; width: 100%; flex-direction: row; padding: 10px; border-right: none; border-top: 1px solid var(--border-color); z-index: 1000;}
+            .nav-logo { display: none; }
+            .nav-btn { padding: 8px; font-size: 11px; margin-bottom: 0;}
+            main { padding: 20px 20px 80px 20px; }
+            .welcome-header h1 { font-size: 1.8rem;}
         }
     </style>
 </head>
@@ -59,11 +108,12 @@
 
     <div id="lock-screen">
         <div class="login-card">
-            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="height: 60px; margin-bottom: 20px;">
-            <h2>Portal do Filiado</h2>
-            <input type="text" id="user-name" placeholder="Seu nome oficial">
-            <input type="email" id="user-email" placeholder="E-mail de cadastro">
-            <button class="btn" style="width: 100%" onclick="validarAcesso()">Acessar Território</button>
+            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" class="nav-logo">
+            <h1>Território do Filiado</h1>
+            <p>Acesse com seus dados de cadastro.</p>
+            <input type="text" id="user-name" placeholder="Nome completo">
+            <input type="email" id="user-email" placeholder="E-mail oficial">
+            <button class="btn" style="width: 100%; margin-top: 20px;" onclick="validarAcesso()">Acessar Território</button>
             <p id="error-msg" style="color: #ff4d4d; font-size: 12px; margin-top: 20px; display: none;">Cadastro não localizado.</p>
         </div>
     </div>
@@ -73,48 +123,50 @@
             <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" class="nav-logo">
             <button class="nav-btn active" onclick="switchTab('inicio')">Dashboard</button>
             <button class="nav-btn" onclick="switchTab('agenda')">Agenda de Luta</button>
-            <button class="nav-btn" onclick="switchTab('materiais')">Materiais de Apoio</button>
+            <button class="nav-btn" onclick="switchTab('materiais')">Biblioteca de Apoio</button>
             <button class="nav-btn" onclick="switchTab('recados')">Mural de Recados</button>
         </nav>
 
         <main>
             <div class="welcome-header">
-                <h2 id="welcome-text">Bem-vindo à luta, Filiado</h2>
-                <span id="welcome-city">Território Vale do Paraíba</span>
+                <h1 id="welcome-text">Seja bem-vindo, Filiado</h1>
+                <div class="territorio-tag" id="welcome-city">Vale do Paraíba | São Paulo</div>
             </div>
 
             <section id="inicio" class="content-section active">
-                <h3>Conteúdos Exclusivos</h3>
-                <div id="video-wrapper" style="width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid var(--gold);">
+                <h2>Formação e Conteúdos</h2>
+                <div class="video-container" id="video-wrapper">
                     </div>
             </section>
 
             <section id="agenda" class="content-section">
-                <h3>Próximas Ações</h3>
+                <h2>Próximas Ações</h2>
                 <div class="card-grid" id="agenda-list">
-                    <p>Carregando agenda...</p>
+                    <p>Atualizando agenda...</p>
                 </div>
             </section>
 
             <section id="materiais" class="content-section">
-                <h3>Biblioteca de Apoio</h3>
+                <h2>Documentos e Materiais</h2>
                 <div class="card-grid" id="materiais-list">
-                    <p>Carregando materiais...</p>
+                    <p>Consultando acervo...</p>
                 </div>
             </section>
 
             <section id="recados" class="content-section">
-                <h3>Mural da Comunidade</h3>
+                <h2>Mural da militância</h2>
                 <div id="chat-display"></div>
                 <div class="chat-input-area">
-                    <input type="text" id="chat-input" placeholder="Deixe um recado para a militância...">
-                    <button class="btn" onclick="enviarMensagem()">Enviar</button>
+                    <input type="text" id="chat-input" placeholder="Escreva sua mensagem...">
+                    <button class="btn" onclick="enviarMensagem()">➤</button>
                 </div>
             </section>
         </main>
     </div>
 
 <script>
+    // Mantenha o mesmo script anterior aqui. Apenas as funções renderAgenda e renderMateriais foram simplificadas para o novo CSS.
+
     const CONFIG = {
         URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
         KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
@@ -124,17 +176,23 @@
     let dadosUser = { nome: null, cidade: null };
 
     async function validarAcesso() {
+        // ... (lógica de login igual ao anterior)
+        const btn = document.querySelector('.btn');
         const n = document.getElementById('user-name').value.trim();
         const e = document.getElementById('user-email').value.trim();
+
+        if(!n || !e) return;
+        btn.innerText = "VALIDANDO TERRITÓRIO...";
 
         const { data } = await _supabase.from('unegro_filiados').select('nome, cidade').ilike('nome', n).ilike('email', e).limit(1);
 
         if (data && data.length > 0) {
             dadosUser.nome = data[0].nome;
-            dadosUser.cidade = data[0].cidade;
+            dadosUser.cidade = data[0].cidade || "Vale do Paraíba";
             
-            document.getElementById('welcome-text').innerText = `Bem-vindo à luta, ${dadosUser.nome.split(' ')[0]}!`;
-            document.getElementById('welcome-city').innerText = `Território: ${dadosUser.cidade || 'Vale do Paraíba'}`;
+            // Boas-vindas com o primeiro nome apenas para ser mais pessoal
+            document.getElementById('welcome-text').innerText = `Seja bem-vindo, ${dadosUser.nome.split(' ')[0]}!`;
+            document.getElementById('welcome-city').innerText = `${dadosUser.cidade} | São Paulo`;
             
             document.getElementById('lock-screen').style.display = 'none';
             document.getElementById('main-content').style.display = 'grid';
@@ -144,6 +202,7 @@
             iniciarRecados();
         } else {
             document.getElementById('error-msg').style.display = 'block';
+            btn.innerText = "ACESSSAR TERRITÓRIO";
         }
     }
 
@@ -155,43 +214,48 @@
     }
 
     async function carregarAgenda() {
-        const { data } = await _supabase.from('agenda_unegro').select('*').order('data', { ascending: true });
+        const { data } = await _supabase.from('agenda_unegro').select('*').order('data', { ascending: true }).limit(6);
         const list = document.getElementById('agenda-list');
-        if (data) {
+        if (data && data.length > 0) {
             list.innerHTML = data.map(i => `
-                <div class="item-card">
-                    <span>${new Date(i.data).toLocaleDateString('pt-BR')}</span>
+                <div class="agenda-card">
+                    <span>${new Date(i.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
                     <h3>${i.titulo}</h3>
-                    <p>${i.descricao}</p>
+                    <p>${i.descricao || ''}</p>
                 </div>
             `).join('');
-        }
+        } else { list.innerHTML = "<p style='color: #666; grid-column: 1/-1;'>Nenhuma ação agendada no momento.</p>"; }
     }
 
     async function carregarMateriais() {
         const { data } = await _supabase.from('materiais_unegro').select('*').order('titulo');
         const list = document.getElementById('materiais-list');
-        if (data) {
+        if (data && data.length > 0) {
             list.innerHTML = data.map(i => `
-                <div class="item-card">
+                <div class="material-card">
                     <h3>${i.titulo}</h3>
-                    <a href="${i.link}" target="_blank" class="btn-link">ACESSAR MATERIAL</a>
+                    <a href="${i.link}" target="_blank">Acessar</a>
                 </div>
             `).join('');
-        }
+        } else { list.innerHTML = "<p style='color: #666; grid-column: 1/-1;'>Biblioteca vazia.</p>"; }
     }
 
-    // Lógica de Recados (Baseada no seu chat anterior)
+    // Lógica de Recados Modernizada
     async function iniciarRecados() {
-        const { data: msgs } = await _supabase.from('live_chat').select('*').order('created_at', { ascending: false }).limit(20);
+        const { data: msgs } = await _supabase.from('live_chat').select('*').order('created_at', { ascending: false }).limit(30);
         if (msgs) msgs.reverse().forEach(renderMsg);
         _supabase.channel('mural').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'live_chat' }, p => renderMsg(p.new)).subscribe();
     }
 
     function renderMsg(m) {
         const d = document.createElement('div');
-        d.className = 'msg-box';
-        d.innerHTML = `<strong>${m.user_name} (${m.cidade})</strong><br>${m.content}`;
+        d.className = `msg-box ${m.user_name.toLowerCase() === dadosUser.nome.toLowerCase() ? 'user-is-filiado' : ''}`;
+        d.innerHTML = `
+            <div class="msg-info">
+                <span class="msg-user">${m.user_name.toUpperCase()}</span>
+                <span class="msg-city">${m.cidade || ''}</span>
+            </div>
+            <div class="msg-text">${m.content}</div>`;
         const container = document.getElementById('chat-display');
         container.appendChild(d);
         container.scrollTop = container.scrollHeight;
@@ -199,10 +263,14 @@
 
     async function enviarMensagem() {
         const i = document.getElementById('chat-input');
-        if (!i.value.trim()) return;
-        await _supabase.from('live_chat').insert([{ user_name: dadosUser.nome, cidade: dadosUser.cidade, content: i.value }]);
+        const t = i.value.trim();
+        if (!t) return;
         i.value = '';
+        await _supabase.from('live_chat').insert([{ user_name: dadosUser.nome, cidade: dadosUser.cidade, content: t }]);
     }
+    
+    // Enviar com Enter
+    document.getElementById('chat-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') enviarMensagem(); });
 </script>
 </body>
 </html>
