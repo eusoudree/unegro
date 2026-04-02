@@ -10,9 +10,9 @@
         :root { --gold: #f1b434; --red: #8b0000; --black: #050505; --gray: #121212; --border: rgba(255,255,255,0.1); }
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--black); color: #fff; }
 
-        /* LOGIN ADM */
+        /* TELA DE LOGIN ADM */
         #login-adm { position: fixed; inset: 0; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .login-card { background: var(--gray); padding: 40px; border-radius: 12px; border: 1px solid var(--gold); text-align: center; width: 320px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .login-card { background: var(--gray); padding: 50px; border-radius: 16px; border: 1px solid var(--gold); text-align: center; width: 340px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         
         /* LAYOUT PAINEL */
         #painel-gestao { display: none; max-width: 1200px; margin: 40px auto; padding: 0 20px; }
@@ -24,10 +24,16 @@
         .form-card h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin: 0 0 25px 0; border-bottom: 1px solid #222; padding-bottom: 10px; }
 
         label { font-size: 11px; text-transform: uppercase; color: #666; font-weight: bold; margin-bottom: 5px; display: block; }
-        input, textarea, select { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; font-family: 'Inter'; }
+        input, textarea, select { 
+            width: 100%; background: #000; border: 1px solid #333; color: #fff; 
+            padding: 12px; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; font-family: 'Inter';
+        }
         input:focus, textarea:focus { border-color: var(--gold); outline: none; }
 
-        .btn-post { width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; border-radius: 8px; font-weight: 850; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
+        .btn-post { 
+            width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; 
+            border-radius: 8px; font-weight: 850; text-transform: uppercase; cursor: pointer; transition: 0.2s;
+        }
         .btn-post:hover { background: #fff; transform: translateY(-2px); }
 
         /* TABELA DE GERENCIAMENTO */
@@ -36,10 +42,7 @@
         th { text-align: left; font-size: 10px; text-transform: uppercase; color: var(--gold); padding: 10px; border-bottom: 2px solid #222; }
         td { padding: 12px 10px; font-size: 13px; border-bottom: 1px solid #222; }
         .btn-del { background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold; }
-        .btn-del:hover { background: var(--red); }
         
-        .status-msg { font-size: 12px; text-align: center; margin-top: 10px; display: none; }
-
         @media (max-width: 800px) { .grid-forms { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -47,12 +50,12 @@
 
     <div id="login-adm">
         <div class="login-card">
-            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="height: 50px; margin-bottom: 20px;">
-            <h2 style="font-size: 14px; margin-bottom: 20px;">GESTÃO ESTRATÉGICA</h2>
+            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="height: 50px; margin-bottom: 30px;">
+            <h2 style="font-size: 14px; margin-bottom: 20px; letter-spacing: 2px;">GESTÃO ESTRATÉGICA</h2>
             <input type="text" id="adm-user" placeholder="Usuário">
             <input type="password" id="adm-pass" placeholder="Senha">
             <button class="btn-post" onclick="checkAdm()">ACESSAR PAINEL</button>
-            <p id="error-adm" style="color: red; font-size: 11px; margin-top: 15px; display: none;">Credenciais incorretas.</p>
+            <p id="error-adm" style="color: red; font-size: 11px; margin-top: 15px; display: none; font-weight: bold;">Acesso Negado.</p>
         </div>
     </div>
 
@@ -72,14 +75,14 @@
                 <label>URL da Imagem</label>
                 <input type="text" id="news-img" placeholder="Link da foto no Storage">
                 <label>Link (Opcional)</label>
-                <input type="text" id="news-link" placeholder="URL para conteúdo completo">
+                <input type="text" id="news-link" placeholder="Link de destino">
                 <button class="btn-post" onclick="salvarDestaque()">Publicar Destaque</button>
             </div>
 
             <div class="form-card">
                 <h2>🎥 Conteúdo Audiovisual</h2>
                 <label>Título ou Nome do Líder</label>
-                <input type="text" id="vid-titulo" placeholder="Ex: Edson L. - Formação">
+                <input type="text" id="vid-titulo" placeholder="Ex: Adriano S. - Depoimento">
                 <label>ID do YouTube</label>
                 <input type="text" id="vid-id" placeholder="Ex: dQw4w9WgXcQ">
                 <label>Seção</label>
@@ -87,7 +90,7 @@
                     <option value="liderancas">Nossas Lideranças</option>
                     <option value="nacional">UNEGRO Nacional</option>
                 </select>
-                <button class="btn-post" onclick="salvarVideo()" style="background: #fff;">Cadastrar Vídeo</button>
+                <button class="btn-post" onclick="salvarVideo()" style="background: #fff; color: #000;">Cadastrar Vídeo</button>
             </div>
         </div>
 
@@ -95,7 +98,7 @@
             <h2 style="font-size: 1rem; color: var(--gold);">📁 GERENCIAR CONTEÚDO</h2>
             
             <div style="margin-top: 30px;">
-                <h3 style="font-size: 12px; color: #666; text-transform: uppercase;">Notícias / Destaques</h3>
+                <h3 style="font-size: 12px; color: #666;">DESTAQUES ATIVOS</h3>
                 <table id="table-news">
                     <thead><tr><th>Título</th><th style="width: 100px;">Ações</th></tr></thead>
                     <tbody></tbody>
@@ -103,7 +106,7 @@
             </div>
 
             <div style="margin-top: 40px;">
-                <h3 style="font-size: 12px; color: #666; text-transform: uppercase;">Vídeos Cadastrados</h3>
+                <h3 style="font-size: 12px; color: #666;">VÍDEOS CADASTRADOS</h3>
                 <table id="table-vids">
                     <thead><tr><th>Título</th><th>Seção</th><th style="width: 100px;">Ações</th></tr></thead>
                     <tbody></tbody>
@@ -119,10 +122,11 @@
     };
     const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
+    // LOGIN
     function checkAdm() {
-        const u = document.getElementById('adm-user').value;
-        const p = document.getElementById('adm-pass').value;
-        // Senha atualizada conforme solicitado
+        const u = document.getElementById('adm-user').value.trim();
+        const p = document.getElementById('adm-pass').value.trim();
+        
         if(u === 'unegro' && p === 'Unegrovale2026!') {
             document.getElementById('login-adm').style.display = 'none';
             document.getElementById('painel-gestao').style.display = 'block';
@@ -132,6 +136,7 @@
         }
     }
 
+    // CARREGAR LISTAS
     async function carregarDadosGerenciamento() {
         const { data: news } = await _supabase.from('unegro_noticias').select('*').order('created_at', { ascending: false });
         const { data: vids } = await _supabase.from('unegro_videos').select('*').order('secao');
@@ -154,13 +159,15 @@
         `).join('');
     }
 
+    // DELETAR
     async function deletarItem(tabela, id) {
-        if(!confirm("Deseja apagar este conteúdo do portal?")) return;
+        if(!confirm("Deseja apagar este conteúdo permanentemente?")) return;
         const { error } = await _supabase.from(tabela).delete().eq('id', id);
         if(error) alert("Erro: " + error.message);
         else carregarDadosGerenciamento();
     }
 
+    // SALVAR NOTÍCIA
     async function salvarDestaque() {
         const payload = {
             titulo: document.getElementById('news-titulo').value,
@@ -169,14 +176,11 @@
             link_externo: document.getElementById('news-link').value
         };
         const { error } = await _supabase.from('unegro_noticias').insert([payload]);
-        if(error) alert("Falha ao publicar.");
-        else { 
-            alert("Destaque publicado com sucesso!"); 
-            limparCampos('news');
-            carregarDadosGerenciamento(); 
-        }
+        if(error) alert("Erro ao salvar.");
+        else { alert("Destaque publicado!"); carregarDadosGerenciamento(); limparCampos('news'); }
     }
 
+    // SALVAR VÍDEO
     async function salvarVideo() {
         const payload = {
             titulo: document.getElementById('vid-titulo').value,
@@ -184,12 +188,8 @@
             secao: document.getElementById('vid-secao').value
         };
         const { error } = await _supabase.from('unegro_videos').insert([payload]);
-        if(error) alert("Falha ao cadastrar vídeo.");
-        else { 
-            alert("Vídeo adicionado à biblioteca!"); 
-            limparCampos('vid');
-            carregarDadosGerenciamento(); 
-        }
+        if(error) alert("Erro ao cadastrar.");
+        else { alert("Vídeo adicionado!"); carregarDadosGerenciamento(); limparCampos('vid'); }
     }
 
     function limparCampos(tipo) {
