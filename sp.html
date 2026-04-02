@@ -762,96 +762,39 @@ body {
    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-  <script>
+ <script>
     // 1. CONFIGURAÇÃO UNIFICADA DO SUPABASE
     const SUPABASE_URL = 'https://huxemmuzhlntwimgiukt.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    window.carregarLiderancas = async function() {
-        try {
-            const { data, error } = await _supabase
-                .from('liderancas_unegro')
-                .select('*')
-                .order('ordem', { ascending: true });
-
-            if (error) throw error;
-
-            const coord = data.filter(i => i.tipo === 'COORDENACAO')[0];
-            const vale = data.filter(i => i.tipo === 'VALE');
-            let htmlFinal = "";
-
-            const getBio = (item) => {
-                return item['mini_descricão'] || item['mini_descricao'] || item.mini_descricao || item.biografia || "Liderança UNEGRO Vale.";
-            };
-
-            const gerarCardHTML = (lider, extraLabel = "") => {
-                const label = extraLabel || lider.cargo || 'Liderança Vale';
-                return `
-                    <div class="card-lider" onclick='abrirModal(${JSON.stringify(lider)})'>
-                        <div class="img-bg" style="background-image: url('${lider.foto_url}')"></div>
-                        <div class="card-static-info">
-                            <span class="info-city">${lider.cidade}</span>
-                            <h3 class="info-name">${lider.nome}</h3>
-                        </div>
-                        <div class="card-hover-overlay">
-                            <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(0,0,0,0.6);">${label}</span>
-                            <h2 style="font-weight: 900; text-transform: uppercase; margin-bottom: 5px;">${lider.nome}</h2>
-                            <p class="hover-bio">${getBio(lider)}</p>
-                            <div style="display: flex; gap: 10px; align-items: center;">
-                                <a href="${lider.instagram_url}" target="_blank" onclick="event.stopPropagation();" class="btn-insta-mosaico">@Instagram</a>
-                                <span style="font-size: 10px; font-weight: 900;">VER BIO ➔</span>
-                            </div>
-                        </div>
-                    </div>`;
-            };
-
-            if (coord) htmlFinal += gerarCardHTML(coord, "COORDENAÇÃO GERAL");
-            htmlFinal += vale.map(v => gerarCardHTML(v)).join('');
-
-            document.getElementById('mosaico-completo').innerHTML = htmlFinal;
-        } catch (err) {
-            console.error("Erro ao carregar mosaico:", err.message);
-        }
-    };
-
-    window.abrirModal = (lider) => {
-        const modalNome = document.getElementById('modal-nome');
-        const modalBio = document.getElementById('modal-bio');
-        const modalInsta = document.getElementById('modal-insta');
-
-        if(modalNome) modalNome.innerText = lider.nome;
-        if(modalBio) modalBio.innerText = lider.biografia || lider['mini_descricão'];
-        if(modalInsta) modalInsta.href = lider.instagram_url;
-
-        const modalElement = document.getElementById('modal-lider');
-        if(modalElement) {
-            modalElement.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-    };
-
-    // 4. SISTEMA DE FILIAÇÃO E PDF (ATUALIZADO COM RAÇA)
+    // 2. SISTEMA DE FILIAÇÃO E PDF
     async function processarCadastro() {
         const quiz = document.getElementById('quiz').value;
         const aceite = document.getElementById('aceite').checked;
-        const campos = ['nome', 'nascimento', 'rg', 'cpf', 'endereco', 'numero', 'bairro', 'cep', 'cidade', 'whatsapp', 'email', 'raca'];
+        
+        // Lista de IDs para validação (incluindo o novo campo raca)
+        const campos = ['nome', 'nascimento', 'sexo', 'raca', 'rg', 'cpf', 'endereco', 'numero', 'bairro', 'cep', 'cidade', 'whatsapp', 'email', 'profissao', 'escolaridade'];
 
         for(let campo of campos) {
-            if(!document.getElementById(campo).value) {
+            const el = document.getElementById(campo);
+            if(!el || !el.value) {
                 alert("Por favor, preencha todos os campos obrigatórios.");
-                document.getElementById(campo).focus();
+                if(el) el.focus();
                 return;
             }
         }
 
-        if(quiz !== "10" || !aceite) { alert("Valide o desafio matemático e aceite os termos."); return; }
+        if(quiz !== "10" || !aceite) { 
+            alert("Valide o desafio matemático e aceite os termos."); 
+            return; 
+        }
 
         const payload = {
             nome: document.getElementById('nome').value,
             nascimento: document.getElementById('nascimento').value,
             sexo: document.getElementById('sexo').value,
-            raca: document.getElementById('raca').value, // NOVO CAMPO
+            raca: document.getElementById('raca').value, // Auto declaração Étnico Racial
             rg: document.getElementById('rg').value,
             cpf: document.getElementById('cpf').value,
             endereco: document.getElementById('endereco').value,
@@ -871,43 +814,52 @@ body {
             const { error } = await _supabase.from('unegro_filiados').insert([payload]);
             if (!error) {
                 alert("Filiação realizada com sucesso!");
-                gerarPDF(payload);
-            } else { throw error; }
-        } catch (e) { alert("Erro ao salvar no banco. Verifique se o campo 'raca' existe na sua tabela."); }
+                generateSinglePDF(payload);
+            } else {
+                throw error;
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Erro ao salvar no banco. Certifique-se que a coluna 'raca' existe na tabela.");
+        }
     }
 
-    function gerarPDF(payload) {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+    // FUNÇÃO DE DESENHO DO PDF (CONFORME SEU EXEMPLO)
+    function drawPage(doc, payload) {
         let y = 20;
-
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold"); doc.setFontSize(14);
         doc.text("FICHA DE FILIAÇÃO NACIONAL - UNEGRO", 105, y, { align: "center" });
-        y += 15;
-        doc.line(20, y, 190, y);
-        y += 10;
-
+        y += 15; doc.setDrawColor(139, 0, 0); doc.line(20, y, 190, y); y += 10;
         doc.setFontSize(10);
-        const drawRow = (label, value) => {
-            doc.setFont("helvetica", "bold"); doc.text(`${label}:`, 20, y);
-            doc.setFont("helvetica", "normal"); doc.text(`${value}`, 60, y);
+        
+        const row = (l, v) => {
+            doc.setFont("helvetica", "bold"); doc.text(`${l}:`, 20, y);
+            doc.setFont("helvetica", "normal"); doc.text(`${v || ''}`, 60, y);
             y += 8;
         };
 
-        drawRow("Nome Completo", payload.nome.toUpperCase());
-        drawRow("Nascimento", payload.nascimento);
-        drawRow("Auto Declaração", payload.raca); // NOVO CAMPO NO PDF
-        drawRow("Cidade", payload.cidade);
-        drawRow("WhatsApp", payload.whatsapp);
-        drawRow("E-mail", payload.email);
+        row("Nome Completo", (payload.nome || "").toUpperCase());
+        row("Nascimento", payload.nascimento);
+        row("Auto Declaração", payload.raca); // Adicionado conforme pedido
+        row("RG / CPF", `${payload.rg || ''} / ${payload.cpf || ''}`);
+        row("Cidade", payload.cidade);
+        row("WhatsApp", payload.whatsapp);
+        row("Profissão", payload.profissao);
 
-        y += 20;
+        y += 10;
+        doc.setFont("helvetica", "bold");
         doc.text(`Local e data: ${payload.cidade}, ${new Date().toLocaleDateString('pt-BR')}`, 20, y);
+        y += 25; doc.setDrawColor(0); doc.line(20, y, 90, y); doc.line(110, y, 180, y);
+        y += 5; doc.text("Assinatura do Filiado", 35, y); doc.text("Responsável UNEGRO", 125, y);
+    }
+
+    function generateSinglePDF(item) {
+        const doc = new jspdf.jsPDF();
+        drawPage(doc, item);
         window.open(doc.output('bloburl'), '_blank');
     }
 
-    // --- MÓDULO: ATMOSFERA ANCESTRAL (APENAS REFERÊNCIAS) ---
+    // 3. MÓDULO: ATMOSFERA ANCESTRAL (APENAS ORLANDO E LECI)
     async function iniciarAtmosferaAncestral() {
         const overlay = document.getElementById('ancestral-overlay');
         if (!overlay) return;
@@ -922,10 +874,8 @@ body {
         function manifestarFace() {
             const antigas = document.querySelectorAll('.spirit-face');
             antigas.forEach(a => {
-                if (parseFloat(a.style.opacity) > 0) {
-                    a.style.opacity = '0';
-                    setTimeout(() => a.remove(), 4000);
-                }
+                a.style.opacity = '0';
+                setTimeout(() => a.remove(), 4000);
             });
 
             const face = document.createElement('div');
@@ -951,6 +901,7 @@ body {
         setInterval(manifestarFace, 9000);
     }
 
+    // 4. CARREGAR AGENDA DINÂMICA
     async function carregarAgendaIndex() {
         try {
             const { data: eventos, error } = await _supabase
@@ -960,36 +911,34 @@ body {
                 .limit(3);
 
             if (error) throw error;
-            const container = document.getElementById('agenda-dinamica');
+            const container = document.getElementById('agenda-sp');
+            if (!container) return;
             
             if (!eventos || eventos.length === 0) {
-                container.innerHTML = '<div class="ag-vazio">Nenhum evento agendado no momento.</div>';
+                container.innerHTML = '<div class="ag-vazio">Nenhum evento agendado.</div>';
                 return;
             }
 
             container.innerHTML = eventos.map(ev => {
                 const dataObj = new Date(ev.data + 'T00:00:00');
                 const dia = dataObj.getDate().toString().padStart(2, '0');
-                const mes = dataObj.toLocaleString('pt-BR', { month: 'short' }).replace('.', '');
+                const mes = dataObj.toLocaleString('pt-BR', { month: 'short' }).replace('.', '').toUpperCase();
+
                 return `
                     <div class="card-agenda">
-                        <div>
-                            <div class="ag-data">${dia} ${mes}</div>
-                            <h3 class="ag-titulo">${ev.titulo}</h3>
-                            <div class="ag-local">📍 ${ev.local || 'Local a definir'}</div>
-                        </div>
-                        <div style="margin-top: 20px; font-size: 11px; color: #444; font-weight: bold;">
-                            UNEGRO SP ➔
-                        </div>
+                        <div class="ag-data">${dia} ${mes}</div>
+                        <h3 class="ag-titulo">${ev.titulo}</h3>
+                        <div class="ag-local">📍 ${ev.local || 'Local a definir'}</div>
                     </div>`;
             }).join('');
-        } catch (err) { console.error("Erro ao carregar agenda:", err); }
+        } catch (err) {
+            console.error("Erro agenda:", err);
+        }
     }
 
     window.onload = () => {
-        carregarLiderancas();
-        carregarAgendaIndex();
         iniciarAtmosferaAncestral();
+        carregarAgendaIndex();
     };
 </script>
 </html>
