@@ -3,52 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal UNEGRO | Território de Luta</title>
+    <title>Portal Filiado | UNEGRO</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #f1b434; --red: #8b0000; --black: #0a0a0a; --dark: #121212; --border: rgba(255,255,255,0.1); }
+        :root { --gold: #f1b434; --red: #8b0000; --black: #050505; --gray: #121212; --border: rgba(255,255,255,0.1); }
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--black); color: #fff; }
-        
-        /* HEADER PORTAL */
-        header { background: #000; border-bottom: 2px solid var(--gold); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .logo-area { display: flex; align-items: center; gap: 15px; }
-        .logo-area img { height: 45px; }
-        .portal-title { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 1.2rem; }
 
-        /* GRID PRINCIPAL */
-        .portal-container { max-width: 1300px; margin: 30px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 350px; gap: 30px; }
+        /* HEADER CENTRALIZADO */
+        header { background: #000; border-bottom: 1px solid var(--border); padding: 10px 0; }
+        .header-content { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        .logo-area img { height: 40px; }
+        .user-tag { font-size: 10px; font-weight: bold; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* SEÇÃO DE NOTÍCIAS (BLOG) */
-        .news-section h2, .side-section h2 { font-family: 'Oswald', sans-serif; text-transform: uppercase; border-left: 4px solid var(--red); padding-left: 15px; margin-bottom: 25px; }
-        .news-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .news-card { background: var(--dark); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); transition: 0.3s; }
-        .news-card:hover { transform: translateY(-5px); border-color: var(--gold); }
-        .news-img { width: 100%; height: 180px; background: #222; object-fit: cover; }
-        .news-content { padding: 20px; }
-        .news-tag { color: var(--gold); font-size: 10px; font-weight: 900; text-transform: uppercase; margin-bottom: 8px; display: block; }
-        .news-content h3 { margin: 0 0 10px; font-size: 1.1rem; line-height: 1.3; }
-        .news-content p { font-size: 0.85rem; color: #aaa; margin-bottom: 15px; }
+        /* CONTAINER PRINCIPAL 1280px */
+        .main-wrapper { max-width: 1280px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 380px; gap: 30px; }
 
-        /* BIBLIOTECA DINÂMICA (BOX) */
-        .library-box { background: var(--dark); border-radius: 15px; padding: 25px; border: 1px solid var(--border); margin-bottom: 30px; }
-        .search-bar { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; }
-        .material-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #222; text-decoration: none; color: #ddd; transition: 0.2s; }
-        .material-item:hover { color: var(--gold); padding-left: 5px; }
-        .material-item span { font-size: 18px; }
+        h2 { font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 1.3rem; border-left: 4px solid var(--red); padding-left: 15px; margin-bottom: 20px; }
 
-        /* AGENDA LATERAL */
-        .event-card { background: #1a1a1a; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid var(--gold); }
-        .event-date { font-weight: 900; color: var(--gold); font-size: 0.8rem; }
-        .event-title { font-weight: 700; margin-top: 5px; display: block; }
+        /* BLOG / NOTÍCIAS */
+        .news-card { background: var(--gray); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
+        .news-img { width: 100%; height: 250px; background: #222; object-fit: cover; }
+        .news-body { padding: 25px; }
+        .news-tag { color: var(--gold); font-size: 10px; font-weight: 900; text-transform: uppercase; }
+        .news-body h3 { margin: 10px 0; font-size: 1.5rem; line-height: 1.2; }
 
-        /* LOGIN PADRÃO (REMANESCIDO) */
+        /* CALENDÁRIO INTERATIVO */
+        .cal-container { background: var(--gray); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 30px; }
+        .cal-header { text-align: center; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; color: var(--gold); font-size: 14px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+        .cal-day-name { font-size: 10px; color: #555; font-weight: bold; padding-bottom: 10px; }
+        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; border-radius: 50%; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
+        .cal-day:hover { background: rgba(255,255,255,0.1); }
+        .cal-day.has-event { border: 1px solid var(--gold); color: var(--gold); font-weight: bold; position: relative; }
+        .cal-day.has-event::after { content: ''; width: 4px; height: 4px; background: var(--gold); position: absolute; bottom: 4px; border-radius: 50%; }
+        .cal-day.active { background: var(--gold); color: #000; }
+
+        /* BOX DETALHE DA AÇÃO */
+        #event-detail { margin-top: 15px; padding: 15px; background: #000; border-radius: 8px; border: 1px solid #333; display: none; font-size: 13px; }
+        #event-detail b { color: var(--gold); display: block; margin-bottom: 5px; }
+
+        /* BIBLIOTECA */
+        .lib-box { background: var(--gray); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
+        .search-input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; }
+        .lib-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid #222; text-decoration: none; color: #aaa; font-size: 13px; }
+        .lib-item:hover { color: var(--gold); background: rgba(255,255,255,0.02); }
+
+        /* LOGIN PADRÃO CENTRALIZADO */
         #lock-screen { position: fixed; inset: 0; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 5000; }
-        .login-card { background: var(--dark); padding: 40px; border-radius: 16px; border: 1px solid var(--gold); text-align: center; width: 340px; }
+        .login-card { background: var(--gray); padding: 40px; border-radius: 16px; border: 1px solid var(--gold); text-align: center; width: 340px; }
         .login-card input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; }
-        .btn-gold { width: 100%; padding: 14px; background: var(--gold); border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 6px; }
 
-        @media (max-width: 900px) { .portal-container { grid-template-columns: 1fr; } .news-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) { .main-wrapper { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -56,54 +62,48 @@
     <div id="lock-screen">
         <div class="login-card">
             <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="height: 60px; margin-bottom: 20px;">
-            <h2 class="portal-title">Acesso do Filiado</h2>
-            <input type="text" id="user-name" placeholder="Seu Nome">
-            <input type="email" id="user-email" placeholder="Seu E-mail">
-            <button class="btn-gold" onclick="validarAcesso()">Entrar no Portal</button>
+            <h2 style="font-family: 'Oswald';">ACESSO FILIADO</h2>
+            <input type="text" id="user-name" placeholder="Nome">
+            <input type="email" id="user-email" placeholder="E-mail">
+            <button onclick="validarAcesso()" style="width: 100%; padding: 14px; background: var(--gold); border: none; font-weight: 900; border-radius: 6px; cursor: pointer;">ENTRAR</button>
         </div>
     </div>
 
     <header>
-        <div class="logo-area">
-            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" alt="UNEGRO">
-            <span class="portal-title">Portal de Notícias UNEGRO</span>
+        <div class="header-content">
+            <div class="logo-area"><img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png"></div>
+            <div class="user-tag" id="user-info"></div>
         </div>
-        <div id="user-info" style="font-size: 0.8rem; color: var(--gold);"></div>
     </header>
 
-    <div class="portal-container" id="main-content" style="display: none;">
+    <div class="main-wrapper" id="main-content" style="display: none;">
         
-        <div class="news-section">
-            <h2>Últimas da Luta</h2>
-            <div class="news-grid" id="news-list">
-                <div class="news-card">
-                    <img src="https://via.placeholder.com/400x200/1a1a1a/gold?text=Acao+UNEGRO" class="news-img">
-                    <div class="news-content">
-                        <span class="news-tag">Mobilização</span>
-                        <h3>UNEGRO convoca plenária regional para discutir ancestralidade</h3>
-                        <p>Encontro acontecerá no próximo sábado com lideranças do Vale...</p>
-                        <a href="#" style="color: var(--gold); font-size: 12px; font-weight: bold; text-decoration: none;">LER MAIS →</a>
-                    </div>
-                </div>
-                </div>
-        </div>
-
-        <div class="side-column">
-            
-            <div class="side-section">
-                <h2>Biblioteca Digital</h2>
-                <div class="library-box">
-                    <input type="text" class="search-bar" id="lib-search" placeholder="Buscar material (PDF, Livros...)" onkeyup="filtrarBiblioteca()">
-                    <div id="materiais-list">
-                        </div>
+        <div class="left-col">
+            <h2>Destaques da Luta</h2>
+            <div class="news-card">
+                <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" class="news-img" style="object-fit: contain; padding: 40px;">
+                <div class="news-body">
+                    <span class="news-tag">Mobilização Nacional</span>
+                    <h3>Plenária Regional UNEGRO: Estratégias para 2026</h3>
+                    <p>Lideranças se reúnem para alinhar o calendário de ações contra o racismo estrutural no Vale do Paraíba.</p>
                 </div>
             </div>
+        </div>
 
-            <div class="side-section">
-                <h2>Próximas Ações</h2>
-                <div id="agenda-list">
+        <div class="right-col">
+            
+            <h2>Agenda Interativa</h2>
+            <div class="cal-container">
+                <div class="cal-header" id="month-name">ABRIL 2026</div>
+                <div class="cal-grid" id="calendar-days">
                     </div>
-                <button class="btn-gold" style="font-size: 10px;" onclick="window.open('https://unegro.online/agenda', '_blank')">VER AGENDA COMPLETA</button>
+                <div id="event-detail"></div>
+            </div>
+
+            <h2>Biblioteca Digital</h2>
+            <div class="lib-box">
+                <input type="text" class="search-input" id="lib-search" placeholder="Pesquisar material..." onkeyup="filtrarLib()">
+                <div id="lib-list"></div>
             </div>
 
         </div>
@@ -116,7 +116,8 @@
         KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
     };
     const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
-    let todosMateriais = [];
+    let dadosAgenda = [];
+    let dadosMateriais = [];
 
     async function validarAcesso() {
         const n = document.getElementById('user-name').value;
@@ -124,43 +125,58 @@
         const { data } = await _supabase.from('unegro_filiados').select('*').ilike('nome', n).ilike('email', e).limit(1);
 
         if (data && data.length > 0) {
-            document.getElementById('user-info').innerText = `${data[0].nome.toUpperCase()} | ${data[0].cidade.toUpperCase()}`;
+            document.getElementById('user-info').innerText = `${data[0].nome.split(' ')[0]} | ${data[0].cidade}`;
             document.getElementById('lock-screen').style.display = 'none';
             document.getElementById('main-content').style.display = 'grid';
-            carregarPortal();
+            carregarDados();
         }
     }
 
-    async function carregarPortal() {
-        // Carregar Agenda
-        const { data: ag } = await _supabase.from('agenda_unegro').select('*').order('data', { ascending: true });
-        if(ag) document.getElementById('agenda-list').innerHTML = ag.map(i => `
-            <div class="event-card">
-                <span class="event-date">${new Date(i.data).toLocaleDateString('pt-BR')}</span>
-                <span class="event-title">${i.titulo}</span>
-            </div>
-        `).join('');
+    async function carregarDados() {
+        const { data: ag } = await _supabase.from('agenda_unegro').select('*');
+        const { data: mt } = await _supabase.from('materiais_unegro').select('*');
+        
+        dadosAgenda = ag || [];
+        dadosMateriais = mt || [];
 
-        // Carregar Biblioteca
-        const { data: mt } = await _supabase.from('materiais_unegro').select('*').order('titulo');
-        if(mt) {
-            todosMateriais = mt;
-            renderBiblioteca(mt);
+        renderCalendario();
+        renderLib(dadosMateriais);
+    }
+
+    function renderCalendario() {
+        const grid = document.getElementById('calendar-days');
+        const nomesDias = ['D','S','T','Q','Q','S','S'];
+        let html = nomesDias.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+        
+        // Gerando 30 dias para Abril
+        for(let i=1; i<=30; i++) {
+            const dataStr = `2026-04-${i.toString().padStart(2, '0')}`;
+            const temEvento = dadosAgenda.find(a => a.data === dataStr);
+            html += `<div class="cal-day ${temEvento ? 'has-event' : ''}" onclick="verEvento('${dataStr}')">${i}</div>`;
+        }
+        grid.innerHTML = html;
+    }
+
+    function verEvento(data) {
+        const ev = dadosAgenda.find(a => a.data === data);
+        const detail = document.getElementById('event-detail');
+        if(ev) {
+            detail.style.display = 'block';
+            detail.innerHTML = `<b>${ev.titulo}</b>${ev.descricao || 'Sem descrição.'}`;
+        } else {
+            detail.style.display = 'none';
         }
     }
 
-    function renderBiblioteca(lista) {
-        document.getElementById('materiais-list').innerHTML = lista.map(i => `
-            <a href="${i.link}" target="_blank" class="material-item">
-                <span>📄</span> ${i.titulo}
-            </a>
+    function renderLib(lista) {
+        document.getElementById('lib-list').innerHTML = lista.map(i => `
+            <a href="${i.link}" target="_blank" class="lib-item">📄 ${i.titulo}</a>
         `).join('');
     }
 
-    function filtrarBiblioteca() {
-        const termo = document.getElementById('lib-search').value.toLowerCase();
-        const filtrados = todosMateriais.filter(m => m.titulo.toLowerCase().includes(termo));
-        renderBiblioteca(filtrados);
+    function filtrarLib() {
+        const t = document.getElementById('lib-search').value.toLowerCase();
+        renderLib(dadosMateriais.filter(m => m.titulo.toLowerCase().includes(t)));
     }
 </script>
 </body>
