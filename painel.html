@@ -21,11 +21,11 @@
 
         /* DESTAQUE DINÂMICO */
         .news-card { background: var(--gray); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
-        .news-img { width: 100%; height: 400px; background: #000; object-fit: cover; }
+        .news-img { width: 100%; height: 450px; background: #000; object-fit: cover; }
         .news-body { padding: 30px; }
         .news-tag { color: var(--red); font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
-        .news-body h3 { margin: 15px 0; font-size: 2rem; line-height: 1.1; color: #fff; }
-        .news-body p { color: #aaa; line-height: 1.6; font-size: 15px; }
+        .news-body h3 { margin: 15px 0; font-size: 2.2rem; line-height: 1.1; color: #fff; }
+        .news-body p { color: #aaa; line-height: 1.6; font-size: 15px; margin-bottom: 20px; }
 
         /* GRIDS DE VÍDEOS */
         .video-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; margin-bottom: 20px; }
@@ -38,13 +38,21 @@
         .video-item::after { content: '▶'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--gold); font-size: 30px; }
         .video-label { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.8); padding: 8px; font-size: 10px; text-align: center; font-weight: bold; color: #fff; }
 
-        /* CALENDÁRIO E LIB */
-        .cal-container, .lib-box { background: var(--gray); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 30px; }
+        /* CALENDÁRIO */
+        .cal-container { background: var(--gray); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
-        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; border-radius: 50%; }
-        .has-event { border: 1px solid var(--gold); color: var(--gold); }
-        .cal-day.active { background: var(--gold); color: #000; }
-        
+        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; border-radius: 50%; transition: 0.2s; }
+        .cal-day:hover { background: rgba(255,255,255,0.1); }
+        .has-event { border: 1px solid var(--gold); color: var(--gold); font-weight: bold; position: relative; }
+        .cal-day.active { background: var(--gold) !important; color: #000 !important; font-weight: 900; }
+
+        /* DETALHE DO EVENTO */
+        #event-detail { margin-top: 20px; padding: 20px; background: #000; border-radius: 12px; border: 1px solid #333; display: none; }
+        .btn-sync { padding: 8px 12px; border-radius: 4px; text-decoration: none; font-size: 10px; font-weight: 850; text-align: center; cursor: pointer; border: none; flex: 1; transition: 0.2s; }
+        .btn-sync:hover { opacity: 0.8; }
+
+        /* BIBLIOTECA */
+        .lib-box { background: var(--gray); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-top: 30px; }
         .search-input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; }
         .lib-item { padding: 12px; border-bottom: 1px solid #222; color: #aaa; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
         .lib-item:hover { color: var(--gold); background: rgba(255,255,255,0.02); }
@@ -66,10 +74,10 @@
     <div id="lock-screen">
         <div class="login-card">
             <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="height: 50px; margin-bottom: 30px;">
-            <h2 style="font-family: 'Oswald';">PORTAL DO FILIADO</h2>
+            <h2 style="font-family: 'Oswald'; letter-spacing: 2px;">ACESSO FILIADO</h2>
             <input type="text" id="user-name" placeholder="Nome Completo" style="width:100%; padding:12px; margin-bottom:10px; background:#000; border:1px solid #333; color:#fff; border-radius:6px;">
             <input type="email" id="user-email" placeholder="E-mail" style="width:100%; padding:12px; margin-bottom:20px; background:#000; border:1px solid #333; color:#fff; border-radius:6px;">
-            <button onclick="validarAcesso()" style="width:100%; padding:15px; background:var(--gold); border:none; font-weight:900; border-radius:6px; cursor:pointer;">ENTRAR</button>
+            <button onclick="validarAcesso()" style="width:100%; padding:15px; background:var(--gold); border:none; font-weight:900; border-radius:6px; cursor:pointer; text-transform:uppercase;">Entrar</button>
         </div>
     </div>
 
@@ -93,10 +101,8 @@
     <div class="main-wrapper" id="main-content" style="display: none;">
         <div class="left-col">
             <div id="destaque-area"></div>
-
             <h2>Nossas Lideranças</h2>
             <div class="video-row" id="grid-liderancas"></div>
-
             <h2>UNEGRO Nacional</h2>
             <div class="video-row" id="grid-nacional"></div>
         </div>
@@ -105,12 +111,12 @@
             <h2>Agenda da Luta</h2>
             <div class="cal-container">
                 <div id="calendar-days" class="cal-grid"></div>
-                <div id="event-detail" style="margin-top:15px; padding:15px; background:#000; border-radius:8px; display:none; font-size:13px;"></div>
+                <div id="event-detail"></div>
             </div>
 
             <h2>Biblioteca Digital</h2>
             <div class="lib-box">
-                <input type="text" class="search-input" id="lib-search" placeholder="Pesquisar..." onkeyup="filtrarLib()">
+                <input type="text" class="search-input" id="lib-search" placeholder="Pesquisar material..." onkeyup="filtrarLib()">
                 <div id="lib-list"></div>
             </div>
         </div>
@@ -122,21 +128,22 @@
         KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
     };
     const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
+    let dadosMateriais = [];
 
     async function validarAcesso() {
-        const n = document.getElementById('user-name').value;
-        const e = document.getElementById('user-email').value;
+        const n = document.getElementById('user-name').value.trim();
+        const e = document.getElementById('user-email').value.trim();
         const { data } = await _supabase.from('unegro_filiados').select('*').ilike('nome', n).ilike('email', e).limit(1);
         if (data?.length > 0) {
             document.getElementById('user-info').innerText = `${data[0].nome} | ${data[0].cidade}`;
             document.getElementById('lock-screen').style.display = 'none';
             document.getElementById('main-content').style.display = 'grid';
             carregarDadosPortal();
-        }
+        } else { alert("Militante não localizado."); }
     }
 
     async function carregarDadosPortal() {
-        // 1. CARREGAR DESTAQUE (ÚLTIMO CADASTRADO)
+        // Notícias
         const { data: news } = await _supabase.from('unegro_noticias').select('*').order('created_at', { ascending: false }).limit(1);
         if(news?.length > 0) {
             document.getElementById('destaque-area').innerHTML = `
@@ -146,67 +153,86 @@
                         <span class="news-tag">Destaque Atual</span>
                         <h3>${news[0].titulo}</h3>
                         <p>${news[0].descricao}</p>
-                        ${news[0].link_externo ? `<a href="${news[0].link_externo}" target="_blank" style="color:var(--gold); font-weight:bold; text-decoration:none;">LER CONTEÚDO COMPLETO →</a>` : ''}
+                        ${news[0].link_externo ? `<a href="${news[0].link_externo}" target="_blank" style="color:var(--gold); font-weight:bold; text-decoration:none; font-size:12px;">LER CONTEÚDO COMPLETO →</a>` : ''}
                     </div>
                 </div>`;
         }
 
-        // 2. CARREGAR VÍDEOS
+        // Vídeos
         const { data: vids } = await _supabase.from('unegro_videos').select('*');
         if(vids) {
-            const liderHtml = vids.filter(v => v.secao === 'liderancas').map(v => createVideoCard(v)).join('');
-            const nacHtml = vids.filter(v => v.secao === 'nacional').map(v => createVideoCard(v)).join('');
-            document.getElementById('grid-liderancas').innerHTML = liderHtml || '<p style="font-size:12px; color:#444;">Nenhum vídeo cadastrado.</p>';
-            document.getElementById('grid-nacional').innerHTML = nacHtml || '<p style="font-size:12px; color:#444;">Nenhum vídeo cadastrado.</p>';
+            const createCard = (v) => `<div class="video-item" onclick="abrirModal('https://www.youtube.com/embed/${v.youtube_id}', '${v.titulo}', true)"><img src="https://img.youtube.com/vi/${v.youtube_id}/0.jpg"><div class="video-label">${v.titulo.toUpperCase()}</div></div>`;
+            document.getElementById('grid-liderancas').innerHTML = vids.filter(v => v.secao === 'liderancas').map(createCard).join('');
+            document.getElementById('grid-nacional').innerHTML = vids.filter(v => v.secao === 'nacional').map(createCard).join('');
         }
 
-        // 3. CARREGAR AGENDA E BIBLIOTECA
+        // Agenda e Biblioteca
         const { data: ag } = await _supabase.from('agenda_unegro').select('*');
         const { data: mt } = await _supabase.from('materiais_unegro').select('*').order('titulo');
         renderCalendario(ag || []);
-        renderLib(mt || []);
-    }
-
-    function createVideoCard(v) {
-        return `
-            <div class="video-item" onclick="abrirModal('https://www.youtube.com/embed/${v.youtube_id}', '${v.titulo}', true)">
-                <img src="https://img.youtube.com/vi/${v.youtube_id}/0.jpg">
-                <div class="video-label">${v.titulo.toUpperCase()}</div>
-            </div>`;
+        dadosMateriais = mt || [];
+        renderLib(dadosMateriais);
     }
 
     function renderCalendario(eventos) {
         const grid = document.getElementById('calendar-days');
-        let html = '';
+        const diasSemana = ['D','S','T','Q','Q','S','S'];
+        let html = diasSemana.map(d => `<div style="font-size:10px; color:#444; font-weight:800; padding-bottom:10px;">${d}</div>`).join('');
+        
         for(let i=1; i<=30; i++) {
             const dataStr = `2026-04-${i.toString().padStart(2, '0')}`;
-            const temEv = eventos.find(e => e.data === dataStr);
-            html += `<div class="cal-day ${temEv ? 'has-event' : ''}" onclick="verEvento('${dataStr}', ${JSON.stringify(temEv)})">${i}</div>`;
+            const ev = eventos.find(e => e.data === dataStr);
+            const evParam = ev ? JSON.stringify(ev).replace(/"/g, '&quot;') : 'null';
+            html += `<div class="cal-day ${ev ? 'has-event' : ''}" onclick="verEvento('${dataStr}', ${evParam}, this)">${i}</div>`;
         }
         grid.innerHTML = html;
     }
 
-    function verEvento(data, ev) {
-        const d = document.getElementById('event-detail');
+    function verEvento(data, ev, el) {
+        document.querySelectorAll('.cal-day').forEach(d => d.classList.remove('active'));
+        if(el) el.classList.add('active');
+        const detail = document.getElementById('event-detail');
+        
         if(ev) {
-            d.style.display = 'block';
-            d.innerHTML = `<b style="color:var(--gold)">${ev.titulo}</b><br>${ev.descricao || ''}`;
-        } else { d.style.display = 'none'; }
+            const dLink = ev.data.replace(/-/g, '');
+            const gCal = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(ev.titulo)}&dates=${dLink}/${dLink}&details=${encodeURIComponent(ev.descricao || '')}&location=${encodeURIComponent(ev.local || '')}`;
+            
+            detail.style.display = 'block';
+            detail.innerHTML = `
+                <b style="color:var(--gold); text-transform:uppercase; font-size:14px;">${ev.titulo}</b>
+                <p style="margin:8px 0; font-size:12px; color:#ccc;">📍 <b>Local:</b> ${ev.local || 'A definir'}</p>
+                <p style="margin:0 0 15px 0; font-size:12px; color:#999;">${ev.descricao || ''}</p>
+                <div style="display:flex; gap:8px;">
+                    <a href="${gCal}" target="_blank" class="btn-sync" style="background:#4285F4; color:white;">+ GOOGLE</a>
+                    <button onclick="baixarICS('${ev.titulo}', '${ev.data}', '${ev.local}', '${ev.descricao}')" class="btn-sync" style="background:#fff; color:#000;">+ ICLOUD</button>
+                </div>`;
+        } else { detail.style.display = 'none'; }
+    }
+
+    function baixarICS(titulo, data, local, desc) {
+        const d = data.replace(/-/g, '');
+        const ics = ['BEGIN:VCALENDAR','VERSION:2.0','BEGIN:VEVENT',`SUMMARY:${titulo}`,`DTSTART:${d}T090000Z`,`DTEND:${d}T100000Z`,`LOCATION:${local || ''}`,`DESCRIPTION:${desc || ''}`,'END:VEVENT','END:VCALENDAR'].join('\n');
+        const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.setAttribute('download', `evento.ics`);
+        link.click();
     }
 
     function renderLib(lista) {
-        document.getElementById('lib-list').innerHTML = lista.map(i => `
-            <div class="lib-item" onclick="abrirModal('${i.link}', '${i.titulo}', false)">
-                📄 ${i.titulo}
-            </div>`).join('');
+        document.getElementById('lib-list').innerHTML = lista.map(i => `<div class="lib-item" onclick="abrirModal('${i.link}', '${i.titulo}', false)">📄 ${i.titulo}</div>`).join('');
+    }
+
+    function filtrarLib() {
+        const t = document.getElementById('lib-search').value.toLowerCase();
+        renderLib(dadosMateriais.filter(m => m.titulo.toLowerCase().includes(t)));
     }
 
     function abrirModal(url, titulo, isVid) {
-        const m = document.getElementById('pdf-modal');
         const v = document.getElementById('pdf-viewer');
         v.src = isVid ? `${url}?autoplay=1` : `${url}#toolbar=0`;
         document.getElementById('modal-title').innerText = titulo;
-        m.style.display = 'block';
+        document.getElementById('pdf-modal').style.display = 'block';
         document.body.style.overflow = 'hidden';
     }
 
