@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filiados Santo André | UNEGRO</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root { --gold: #f1b434; --red: #8b0000; --black: #0a0a0a; --gray: #1a1a1a; }
+        body { font-family: 'Inter', sans-serif; background: var(--black); color: white; margin: 0; padding: 40px; }
+        
+        /* Login Overlay */
+        #login-screen { position: fixed; inset: 0; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .login-box { background: var(--gray); padding: 40px; border-radius: 12px; border: 1px solid var(--gold); text-align: center; width: 300px; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: none; box-sizing: border-box; }
+        
+        header { border-bottom: 2px solid var(--gold); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; }
+        h1 { color: var(--gold); margin: 0; text-transform: uppercase; font-size: 1.5rem; }
+        .city-tag { background: var(--gold); color: var(--black); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-left: 10px; }
+
+        .stats-bar { background: var(--gray); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: flex; justify-content: space-between; }
+        
+        table { width: 100%; border-collapse: collapse; background: var(--gray); border-radius: 8px; overflow: hidden; }
+        th { background: #252525; color: var(--gold); padding: 15px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+        td { padding: 15px; border-bottom: 1px solid #333; font-size: 14px; }
+        
+        .btn { cursor: pointer; border: none; border-radius: 4px; padding: 8px 15px; font-weight: 700; transition: 0.2s; text-transform: uppercase; font-size: 10px; }
+        .btn-gold { background: var(--gold); color: var(--black); }
+        .btn-red { background: var(--red); color: white; }
+        .btn:hover { opacity: 0.8; transform: translateY(-1px); }
+        
+        #admin-content { display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 style="color: var(--gold); margin-bottom: 20px;">Acesso Santo André</h2>
+            <input type="text" id="user" placeholder="Usuário">
+            <input type="password" id="pass" placeholder="Senha">
+            <button class="btn btn-gold" style="width: 100%; margin-top: 10px;" onclick="checkLogin()">Entrar</button>
+            <p id="error-msg" style="color: var(--red); font-size: 12px; margin-top: 15px; display: none;">Acesso negado.</p>
+        </div>
+    </div>
+
+    <div id="admin-content">
+        <header>
+            <div style="display: flex; align-items: center;">
+                <h1>Filiados</h1>
+                <span class="city-tag">SANTO ANDRÉ - SP</span>
+            </div>
+            <button class="btn btn-gold" onclick="generateAllPDFs()">Gerar PDF Consolidado (Santo André)</button>
+        </header>
+
+        <div class="stats-bar">
+            <span id="counter">Filtrando registros de Santo André...</span>
+            <span style="color: #666;">Ficha de Filiação Nacional - UNEGRO</span>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>WhatsApp</th>
+                    <th>Profissão</th>
+                    <th>Escolaridade</th>
+                    <th style="text-align: right;">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+<script>
+    const CONFIG = {
+        URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
+        KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
+    };
+
+    const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
+    let dataList = [];
+
+    function checkLogin() {
+        const u = document.getElementById('user').value;
+        const p = document.getElementById('pass').value;
+        
+        // Credenciais atualizadas para Santo André
+        if(u === 'unegro' && p === 'unegroSantoAndre') { 
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'block';
+            loadSantoAndreData();
+        } else {
+            document.getElementById('error-msg').style.display = 'block';
+        }
+    }
+
+    async function loadSantoAndreData() {
+        // Filtro atualizado para 'Santo André'
+        const { data, error } = await _supabase
+            .from('unegro_filiados')
+            .select('*')
+            .eq('cidade', 'Santo André') 
+            .order('nome', { ascending: true });
+
+        if (error) return console.error(error);
+
+        // Remove duplicatas pelo nome
+        dataList = Array.from(new Map(data.map(item => [item.nome.toLowerCase(), item])).values());
+        
+        render();
+    }
+
+    function render() {
+        const tbody = document.getElementById('tableBody');
+        document.getElementById('counter').innerText = `${dataList.length} registros encontrados em Santo André.`;
+        
+        tbody.innerHTML = dataList.map(item => `
+            <tr>
+                <td><b>${item.nome.toUpperCase()}</b></td>
+                <td>${item.whatsapp}</td>
+                <td>${item.profissao}</td>
+                <td>${item.escolaridade}</td>
+                <td style="text-align: right;">
+                    <button class="btn btn-red" onclick='generateSinglePDF(${JSON.stringify(item)})'>PDF Individual</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function drawPage(doc, payload) {
+        let y = 20;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.text("FICHA DE FILIAÇÃO NACIONAL - UNEGRO", 105, y, { align: "center" });
+        y += 15;
+        doc.setDrawColor(139, 0, 0);
+        doc.line(20, y, 190, y);
+        y += 10;
+        doc.setFontSize(10);
+        const row = (l, v) => {
+            doc.setFont("helvetica", "bold"); doc.text(`${l}:`, 20, y);
+            doc.setFont("helvetica", "normal"); doc.text(`${v || ''}`, 60, y);
+            y += 8;
+        };
+        row("Nome Completo", payload.nome.toUpperCase());
+        row("Data de Nascimento", payload.nascimento);
+        row("Sexo", payload.sexo);
+        row("RG / CPF", `${payload.rg} / ${payload.cpf}`);
+        row("Endereço", `${payload.endereco}, ${payload.numero}`);
+        row("Cidade", payload.cidade);
+        row("Contato", `${payload.whatsapp} / ${payload.email}`);
+        row("Profissão", payload.profissao);
+        row("Movimento Social", payload.movimento_social);
+
+        y += 10;
+        doc.setFont("helvetica", "bold");
+        doc.text(`Local e data: ${payload.cidade}, ${new Date().toLocaleDateString('pt-BR')}`, 20, y);
+        y += 25;
+        doc.line(20, y, 90, y); doc.line(110, y, 180, y);
+        y += 5;
+        doc.text("Assinatura do Filiado", 35, y);
+        doc.text("Responsável UNEGRO", 125, y);
+    }
+
+    function generateSinglePDF(item) {
+        const doc = new jspdf.jsPDF();
+        drawPage(doc, item);
+        window.open(doc.output('bloburl'), '_blank');
+    }
+
+    function generateAllPDFs() {
+        const doc = new jspdf.jsPDF();
+        dataList.forEach((item, i) => {
+            drawPage(doc, item);
+            if (i < dataList.length - 1) doc.addPage();
+        });
+        window.open(doc.output('bloburl'), '_blank');
+    }
+</script>
+</body>
+</html>
