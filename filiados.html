@@ -1,171 +1,77 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ADM | UNEGRO Vale do Paraíba</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADM | UNEGRO Vale do Paraíba</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root { --gold: #f1b434; --red: #8b0000; --black: #0a0a0a; --gray: #1a1a1a; }
+        body { font-family: 'Inter', sans-serif; background: var(--black); color: white; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        #login-screen { position: fixed; inset: 0; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .login-box { background: var(--gray); padding: 40px; border-radius: 12px; border: 1px solid var(--gold); text-align: center; width: 300px; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: none; box-sizing: border-box; background: #000; color: #fff; border: 1px solid #333; }
 
-<style>
-:root { --gold:#f1b434; --red:#8b0000; --black:#0a0a0a; --gray:#1a1a1a; }
+        #admin-content { display: none; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
+        header { border-bottom: 2px solid var(--gold); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 15px; flex-wrap: wrap; gap: 20px; }
+        h1 { color: var(--gold); margin: 0; text-transform: uppercase; font-size: 1.5rem; }
 
-body {
-    font-family:'Inter', sans-serif;
-    background:var(--black);
-    color:white;
-    margin:0;
-    display:flex;
-    flex-direction:column;
-    min-height:100vh;
-}
+        .stats-card { background: var(--gray); padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
 
-/* Login */
-#login-screen {
-    position:fixed;
-    inset:0;
-    background:var(--black);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:1000;
-}
+        .filter-group { display: flex; align-items: center; gap: 10px; background: #000; padding: 5px 15px; border-radius: 8px; border: 1px solid #333; }
+        .filter-group select { background: transparent; color: var(--gold); border: none; padding: 8px; font-weight: bold; outline: none; cursor: pointer; }
 
-.login-box {
-    background:var(--gray);
-    padding:40px;
-    border-radius:12px;
-    border:1px solid var(--gold);
-    text-align:center;
-    width:300px;
-}
+        table { width: 100%; border-collapse: collapse; background: var(--gray); border-radius: 8px; overflow: hidden; }
+        th { background: #252525; color: var(--gold); padding: 15px; text-align: left; font-size: 11px; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid #333; font-size: 13px; }
+        tr:hover { background: #222; }
 
-.login-box input {
-    width:100%;
-    padding:12px;
-    margin:10px 0;
-    border-radius:6px;
-    background:#000;
-    color:#fff;
-    border:1px solid #333;
-}
+        .btn { cursor: pointer; border: none; border-radius: 4px; padding: 8px 14px; font-weight: 700; font-size: 10px; display: inline-flex; gap: 5px; }
+        .btn-gold { background: var(--gold); color: var(--black); }
+        .btn-outline-red { background: transparent; color: #ff4444; border: 1px solid #441111; }
 
-/* Admin */
-#admin-content {
-    display:none;
-    padding:40px;
-    max-width:1200px;
-    margin:0 auto;
-}
-
-header {
-    border-bottom:2px solid var(--gold);
-    margin-bottom:30px;
-    display:flex;
-    justify-content:space-between;
-    flex-wrap:wrap;
-    gap:20px;
-}
-
-h1 { color:var(--gold); margin:0; }
-
-.filter-group {
-    display:flex;
-    flex-direction:column;
-    gap:5px;
-    background:#000;
-    padding:10px;
-    border-radius:8px;
-    border:1px solid #333;
-}
-
-select {
-    background:#000;
-    color:var(--gold);
-    border:none;
-    padding:8px;
-    font-weight:bold;
-    outline:none;
-    cursor:pointer;
-}
-
-/* tabela */
-table {
-    width:100%;
-    border-collapse:collapse;
-    background:var(--gray);
-}
-
-th {
-    background:#252525;
-    color:var(--gold);
-    padding:15px;
-    font-size:11px;
-}
-
-td {
-    padding:15px;
-    border-bottom:1px solid #333;
-    font-size:13px;
-}
-
-tr:hover { background:#222; }
-
-.btn {
-    cursor:pointer;
-    border:none;
-    border-radius:4px;
-    padding:8px 14px;
-    font-weight:700;
-    font-size:10px;
-}
-
-.btn-gold { background:var(--gold); color:#000; }
-.btn-outline-red { border:1px solid #441111; color:#ff4444; background:none; }
-
-.stats-card {
-    background:var(--gray);
-    padding:20px;
-    margin-bottom:20px;
-}
-</style>
+        footer { text-align: center; padding: 40px; margin-top: auto; border-top: 1px solid #222; }
+    </style>
 </head>
-
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen">
     <div class="login-box">
-        <h2 style="color:var(--gold)">Restrito</h2>
+        <h2 style="color: var(--gold);">Restrito</h2>
         <input type="text" id="user" placeholder="Usuário">
         <input type="password" id="pass" placeholder="Senha">
         <button class="btn btn-gold" onclick="checkLogin()">Entrar</button>
-        <p id="error-msg" style="color:red;display:none;">Credenciais inválidas</p>
+        <p id="error-msg" style="color: var(--red); display:none;">Credenciais inválidas</p>
     </div>
 </div>
 
-<!-- ADMIN -->
 <div id="admin-content">
 <header>
     <div>
         <h1>Gestão de Filiados</h1>
-        <small>UNEGRO VALE DO PARAÍBA</small>
+        <small style="color:#666;">UNEGRO VALE DO PARAÍBA - SP</small>
     </div>
 
-    <div class="filter-group">
-        <label>Filtrar cidades</label>
+    <div style="display:flex; gap:15px; align-items:center;">
+        <div class="filter-group">
+            <label style="font-size:10px; color:#666;">FILTRAR CIDADE:</label>
 
-        <select id="cityFilter" multiple onchange="applyFilter()" style="height:100px;">
-        </select>
+            <!-- ALTERAÇÃO AQUI -->
+            <select id="cityFilter" multiple onchange="applyFilter()" style="height:70px;">
+                <option value="TODAS">TODAS</option>
+            </select>
 
-        <label style="font-size:11px;">
-            <input type="checkbox" id="excludeMode" onchange="applyFilter()">
-            Excluir selecionadas
-        </label>
+            <!-- NOVO -->
+            <label style="font-size:10px; color:#666;">
+                <input type="checkbox" id="excludeMode" onchange="applyFilter()">
+                EXCLUIR
+            </label>
+        </div>
+
+        <button class="btn btn-gold" onclick="generateAllPDFs()">Gerar PDFs</button>
     </div>
-
-    <button class="btn btn-gold" onclick="generateAllPDFs()">Gerar PDFs</button>
 </header>
 
 <div class="stats-card">
@@ -179,12 +85,16 @@ tr:hover { background:#222; }
 <th>Cidade</th>
 <th>WhatsApp</th>
 <th>Raça</th>
-<th>Ações</th>
+<th></th>
 </tr>
 </thead>
 <tbody id="tableBody"></tbody>
 </table>
 </div>
+
+<footer>
+    <span style="color:#444;">Tecnologia Dree.One</span>
+</footer>
 
 <script>
 const CONFIG = {
@@ -194,8 +104,8 @@ KEY:'SUA_KEY_AQUI'
 
 const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
-let fullDataList = [];
-let filteredDataList = [];
+let fullDataList=[];
+let filteredDataList=[];
 
 function checkLogin(){
     const u=document.getElementById('user').value;
@@ -211,12 +121,8 @@ function checkLogin(){
 }
 
 async function loadData(){
-    const {data} = await _supabase
-    .from('unegro_filiados')
-    .select('*')
-    .order('nome',{ascending:true});
-
-    fullDataList = data;
+    const {data}=await _supabase.from('unegro_filiados').select('*').order('nome',{ascending:true});
+    fullDataList=data;
     populateCityFilter(data);
     applyFilter();
 }
@@ -225,7 +131,7 @@ function populateCityFilter(list){
     const select=document.getElementById('cityFilter');
     const cities=[...new Set(list.map(i=>i.cidade))].sort();
 
-    select.innerHTML='';
+    select.innerHTML='<option value="TODAS">TODAS</option>';
     cities.forEach(c=>{
         if(c) select.innerHTML+=`<option value="${c}">${c}</option>`;
     });
@@ -236,7 +142,7 @@ function applyFilter(){
     const selected=[...select.selectedOptions].map(o=>o.value);
     const exclude=document.getElementById('excludeMode').checked;
 
-    if(selected.length===0){
+    if(selected.length===0 || selected.includes("TODAS")){
         filteredDataList=fullDataList;
     } else if(exclude){
         filteredDataList=fullDataList.filter(i=>!selected.includes(i.cidade));
@@ -250,10 +156,10 @@ function applyFilter(){
 function render(list){
     document.getElementById('counter').innerText=`${list.length} registros`;
 
-    document.getElementById('tableBody').innerHTML = list.map(i=>`
+    document.getElementById('tableBody').innerHTML=list.map(i=>`
     <tr>
-        <td>${i.nome}</td>
-        <td>${i.cidade}</td>
+        <td><b>${i.nome}</b></td>
+        <td>${i.cidade||''}</td>
         <td>${i.whatsapp||''}</td>
         <td>${i.raca||''}</td>
         <td>
