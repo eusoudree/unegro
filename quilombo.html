@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quilombo Digital | UNEGRO Vale do Paraíba</title>
+    <title>Quilombo Digital | UNEGRO</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@300;400;900&display=swap" rel="stylesheet">
     
@@ -24,18 +24,19 @@
             overflow-x: hidden;
         }
 
-        /* Nav Padrão Print */
+        /* Nav Corrigida com a Logo Oficial */
         .nav-unegro { 
-            display: flex; justify-content: space-between; align-items: center; padding: 25px 50px; 
+            display: flex; justify-content: space-between; align-items: center; padding: 20px 50px; 
             background: rgba(0,0,0,0.9); position: fixed; top: 0; width: 100%; z-index: 1000;
         }
-        .nav-logo { font-weight: 900; letter-spacing: 1px; line-height: 1; }
-        .nav-logo span { display: block; font-size: 10px; color: #888; font-weight: 400; letter-spacing: 3px; margin-top: 4px; }
+        .nav-logo { display: flex; align-items: center; }
+        .nav-logo img { height: 45px; width: auto; }
+        
         .nav-links { display: flex; gap: 30px; align-items: center; }
         .nav-links a { color: #fff; text-decoration: none; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
         .btn-acesso { border: 1px solid var(--laranja); padding: 10px 20px; border-radius: 4px; color: var(--laranja) !important; }
 
-        /* Header Monumental conforme Print */
+        /* Header Monumental */
         .quilombo-intro { text-align: center; padding: 180px 20px 80px; max-width: 1000px; margin: auto; }
         .black-money-tag { color: var(--laranja); font-weight: 800; text-transform: uppercase; letter-spacing: 4px; font-size: 10px; margin-bottom: 20px; display: block; }
         .quilombo-intro h1 { 
@@ -47,10 +48,10 @@
         .manifesto { color: #888; font-size: 15px; line-height: 1.8; max-width: 850px; margin: 0 auto; text-align: center; }
         .manifesto strong { color: var(--laranja); }
 
-        /* Layout em Duas Colunas */
+        /* Layout em Duas Colunas (Sidebar na Direita) */
         .main-layout { display: flex; max-width: 1400px; margin: 0 auto; padding: 0 50px 100px; gap: 50px; }
         
-        /* Coluna da Esquerda: Grid */
+        /* Coluna da Esquerda: Grid e Paginação */
         .content-side { flex: 1; }
         .grid-quilombo { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; }
         
@@ -89,7 +90,9 @@
 <body>
 
     <nav class="nav-unegro">
-        <div class="nav-logo">UNEGRO<span>VALE DO PARAÍBA</span></div>
+        <a href="index.html" class="nav-logo">
+            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" alt="Logo UNEGRO">
+        </a>
         <div class="nav-links">
             <a href="index.html">Início</a>
             <a href="filiados.html" class="btn-acesso">Acesso Filiados</a>
@@ -102,7 +105,7 @@
         <h1>Territórios de AXÉ</h1>
         <div class="divider"></div>
         <p class="manifesto">
-            O fortalecimento do <strong>Black Money</strong> é o alicerce para a emancipação da nossa comunidade. Ao circularmos riqueza dentro do nosso próprio ecossistema, transformamos o consumo em um ato político e de cura. Fortalecer a economia preta no Vale do Paraíba não é apenas sobre negócios; é sobre garantir que o nosso <strong>legado, autonomia e proteção</strong> sejam sustentados por mãos que entendem o valor da nossa ancestralidade.
+            O fortalecimento do <strong>Black Money</strong> é o alicerce para a emancipação da nossa comunidade. Ao circularmos riqueza dentro do nosso próprio ecossistema, transformamos o consumo em um ato político e de cura. Fortalecer a economia preta não é apenas sobre negócios; é sobre garantir que o nosso <strong>legado, autonomia e proteção</strong> sejam sustentados por mãos que entendem o valor da nossa ancestralidade.
         </p>
     </div>
 
@@ -200,7 +203,7 @@
                     <span class="cat-tag">${o.cidade} • ${o.unegro_categorias?.nome || 'Ofício'}</span>
                     <h2 class="filiado-nome">${o.filiado_nome}</h2>
                     <div class="titulo-trabalho">${o.titulo_servico}</div>
-                    <p class="descricao">${o.descricao || 'Filiado à UNEGRO Vale do Paraíba.'}</p>
+                    <p class="descricao">${o.descricao || 'Filiado à UNEGRO.'}</p>
                     <a href="https://wa.me/${o.whatsapp}" target="_blank" class="btn-fortalecer">Fortalecer Elo</a>
                 </div>
             `).join('');
