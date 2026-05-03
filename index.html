@@ -5,30 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNEGRO | SÃO PAULO - Ancestralidade e Luta</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://unpkg.com/scrollreveal"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-
-    /* RESET SELECT */
-    select.input-style {
-        appearance: none; -webkit-appearance: none; -moz-appearance: none;
-        background-color: #000; color: #fff; border: 1px solid #222; border-radius: 10px;
-        padding: 14px 40px 14px 14px; font-size: 0.95rem; cursor: pointer;
-        background-image: url("data:image/svg+xml;utf8,<svg fill='%23ff8c00' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-        background-repeat: no-repeat; background-position: right 12px center; background-size: 18px;
-    }
-    select::-ms-expand { display: none; }
-    select.input-style:focus { outline: none; border-color: #ff8c00; box-shadow: 0 0 0 1px rgba(255,140,0,0.3); }
-
         :root {
             --preto: #000000;
-            --laranja-fogo: linear-gradient(135deg, #ff8c00 0%, #ff4500 100%);
-            --cinza-deep: #080808;
+            --laranja-solid: #ff8c00;
             --cinza-card: #0d0d0d;
             --texto: #ffffff;
-            --laranja-solid: #ff8c00;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
@@ -45,532 +29,150 @@
         
         .nav-unegro { display: flex; justify-content: flex-end; padding: 25px 50px; background: transparent; }
         .nav-links { display: flex; gap: 40px; align-items: center; }
-        .nav-links a, .dropbtn {
-            color: rgba(255, 255, 255, 0.4); text-decoration: none; font-size: 11px;
-            font-weight: 500; text-transform: uppercase; letter-spacing: 2px;
-            background: none; border: none; cursor: pointer; transition: color 0.4s ease;
-        }
-        .nav-links a:hover, .dropdown:hover .dropbtn { color: #f1b434; }
+        .nav-links a { color: rgba(255, 255, 255, 0.4); text-decoration: none; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; transition: 0.4s; }
+        .nav-links a:hover { color: #f1b434; }
 
-        .dropdown { position: relative; }
-        .dropdown-content {
-            display: none; position: absolute; background: rgba(10, 10, 10, 0.95); min-width: 180px;
-            right: 0; z-index: 1000; padding: 10px 0; margin-top: 5px; border: 1px solid rgba(255, 255, 255, 0.05);
-            max-height: 400px; overflow-y: auto; /* Trava a altura para suportar as 645 cidades */
-        }
-        
-        /* Custom Scrollbar para o Dropdown */
-        .dropdown-content::-webkit-scrollbar { width: 5px; }
-        .dropdown-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
-        .dropdown-content::-webkit-scrollbar-thumb { background: var(--laranja-solid); border-radius: 10px; }
-
-        .dropdown-content a { color: rgba(255, 255, 255, 0.5); padding: 10px 20px; display: block; font-size: 10px; letter-spacing: 1px; }
-        .dropdown-content a:hover { background: rgba(241, 180, 52, 0.05); color: #f1b434; }
-        .dropdown:hover .dropdown-content { display: block; }
-
-        section { padding: 120px 20px; max-width: 1100px; margin: auto; }
-        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        section { padding: 100px 20px; max-width: 1100px; margin: auto; }
         .secao-titulo { color: var(--laranja-solid); text-transform: uppercase; letter-spacing: 5px; margin-bottom: 20px; font-size: 2.2rem; font-weight: 900; text-align: center; }
-        .texto-longo { font-size: 1.15rem; line-height: 2; color: #ccc; text-align: justify; margin-bottom: 30px; }
         .texto-manifesto { font-size: 1rem; line-height: 1.8; color: #aaa; text-align: center; max-width: 800px; margin: 0 auto 50px; }
 
-        .perso-container { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
-        .perso-card { background: var(--cinza-card); border: 1px solid #222; border-radius: 25px; width: 320px; overflow: hidden; transition: 0.5s; text-align: center; }
-        .perso-img { width: 100%; height: 320px; background-size: cover; background-position: top center; filter: grayscale(1); transition: 0.6s; border-bottom: 3px solid var(--laranja-solid); }
-        .perso-card:hover { border-color: var(--laranja-solid); transform: translateY(-10px); }
-        .perso-card:hover .perso-img { filter: grayscale(0); }
-        .insta-btn { display: inline-block; margin: 20px 0; color: var(--laranja-solid); border: 1px solid var(--laranja-solid); padding: 8px 25px; border-radius: 30px; text-decoration: none; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; }
-        .insta-btn:hover { background: var(--laranja-solid); color: #000; }
-
-        /* CARDS DE DESTAQUE (QUILOMBO E TERREIROS) */
+        /* CARDS DE DESTAQUE */
         .grid-destaques { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        .card-destaque { background: rgba(13, 13, 13, 0.8); border: 1px solid rgba(255, 140, 0, 0.2); padding: 30px; border-radius: 12px; transition: 0.4s; text-align: left; position: relative; overflow: hidden; }
-        .card-destaque::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--laranja-solid); }
-        .card-destaque:hover { background: rgba(20, 20, 20, 0.95); transform: translateY(-5px); border-color: var(--laranja-solid); box-shadow: 0 10px 30px rgba(255, 140, 0, 0.1); }
+        .card-destaque { background: rgba(13, 13, 13, 0.8); border: 1px solid rgba(255, 140, 0, 0.2); padding: 30px; border-radius: 12px; transition: 0.4s; text-align: left; position: relative; border-left: 4px solid var(--laranja-solid); }
+        .card-destaque:hover { background: rgba(20, 20, 20, 0.95); transform: translateY(-5px); }
+        
+        .titulo-item { font-size: 1.3rem; font-weight: 800; color: #fff; margin-bottom: 5px; }
         .tag-cidade { color: var(--laranja-solid); font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; display: block; }
-        .titulo-item { font-size: 1.3rem; font-weight: 800; margin-bottom: 5px; color: #fff; }
-        .sub-item { font-size: 0.85rem; color: #888; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; }
-        .btn-veja-mais { display: inline-block; margin-top: 10px; color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; text-decoration: none; border: 1px solid #333; padding: 10px 20px; border-radius: 30px; transition: 0.3s; }
+        
+        /* BOTÕES */
+        .btn-veja-mais { 
+            display: inline-block; margin-top: 15px; color: #fff; font-size: 10px; font-weight: 900; 
+            text-transform: uppercase; text-decoration: none; border: 1px solid #333; padding: 10px 25px; 
+            border-radius: 30px; transition: 0.3s; background: transparent; cursor: pointer;
+        }
         .btn-veja-mais:hover { background: var(--laranja-solid); color: #000; border-color: var(--laranja-solid); }
         
-        .btn-central { display: flex; justify-content: center; margin-top: 20px; }
+        .btn-central { display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 30px; }
         .btn-ver-todos { background: var(--laranja-solid); color: #000; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; transition: 0.4s; }
         .btn-ver-todos:hover { background: #fff; transform: scale(1.05); }
 
-        /* MÓDULO AGENDA INDEX */
-        .secao-agenda { padding: 60px 20px; background: #000; border-top: 1px solid rgba(255,140,0,0.05); }
-        .agenda-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
-        .card-agenda { background: rgba(13, 13, 13, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-left: 3px solid var(--laranja-solid); padding: 25px; border-radius: 12px; transition: 0.4s; display: flex; flex-direction: column; justify-content: space-between; }
-        .card-agenda:hover { background: rgba(20, 20, 20, 0.9); border-color: var(--laranja-solid); transform: translateY(-5px); }
-        .ag-data { font-size: 10px; font-weight: 900; color: var(--laranja-solid); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
-        .ag-titulo { font-size: 18px; font-weight: 850; color: #fff; margin-bottom: 8px; text-transform: uppercase; }
-        .ag-local { font-size: 12px; color: #666; font-weight: 500; }
-        .ag-vazio { grid-column: span 3; text-align: center; color: #333; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; padding: 40px; }
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .modal-content { background: #151515; width: 90%; max-width: 600px; padding: 40px; border-radius: 20px; border: 1px solid #333; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 25px; background: none; border: none; color: #fff; font-size: 35px; cursor: pointer; }
 
-        /* ATMOSFERA ANCESTRAL */
-        #ancestral-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: -2; overflow: hidden; }
-        .spirit-face { position: absolute; width: 80vh; height: 80vh; background-size: cover; background-position: center; opacity: 0; filter: grayscale(100%) contrast(110%) brightness(65%); transition: opacity 4s ease-in-out, transform 10s linear; pointer-events: none; -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%); mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%); }
-
-        /* FORM FILIAÇÃO */
-        .filiacao-box { max-width: 1000px; margin: 50px auto; background: var(--cinza-card); padding: 50px; border-radius: 40px; border: 1px solid rgba(255,140,0,0.1); }
-        .grid-form { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .span-2 { grid-column: span 2; } .span-3 { grid-column: span 3; }
-        .input-group label { display: block; color: #888; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; text-align: left; }
-        .input-style { width: 100%; padding: 14px; background: #000; border: 1px solid #222; color: #fff; border-radius: 10px; font-size: 0.95rem; }
-        .desafio-box { grid-column: span 3; background: rgba(255,140,0,0.03); padding: 25px; border: 1px dashed rgba(255,140,0,0.2); border-radius: 20px; margin-top: 20px; }
-        .btn-enviar { width: 100%; padding: 22px; background: var(--laranja-fogo); border: none; border-radius: 15px; font-weight: 900; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; color: #000; transition: 0.4s; letter-spacing: 2px; }
-
-        @media (max-width: 900px) { .grid-form { grid-template-columns: 1fr 1fr; } .span-3, .span-2 { grid-column: span 2; } }
-        @media (max-width: 600px) {
-            section { padding: 80px 15px; }
-            .grid-form { display: flex !important; flex-direction: column !important; gap: 15px; }
-            .grid-form > * { width: 100% !important; }
-            .span-3, .span-2 { grid-column: unset !important; }
-            .filiacao-box { padding: 25px 15px; border-radius: 25px; }
-        }
+        footer { text-align: center; padding: 40px; background: #000; border-top: 1px solid #111; }
     </style>
 </head>
 <body>
-    <div id="ancestral-overlay"></div>
-
-  <nav class="nav-unegro">
-    <div class="nav-links">
-        <a href="index.html">Início</a>
-        <a href="quilombo.html">Quilombo Digital</a>
-        <a href="terreiros.html">Terreiros</a>
-
-        <div class="dropdown">
-            <button class="dropbtn">Cidades</button>
-            <div class="dropdown-content" id="nav-dropdown-cidades">
-                <a href="filiados.html">Todas as Cidades</a>
-                <!-- Cidades de SP injetadas via API -->
-            </div>
+    <nav class="nav-unegro">
+        <div class="nav-links">
+            <a href="index.html">Início</a>
+            <a href="quilombo.html">Quilombo Digital</a>
+            <a href="terreiros.html">Terreiros</a>
+            <a href="portal.html">Área do Filiado</a>
         </div>
-
-        <a href="portal.html">Área do Filiado</a>
-    </div>
-</nav>
-
-    <section class="hero">
-          <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" style="max-width:400px;" alt="Logo UNEGRO">
-        <p style="letter-spacing: 8px; color: #888; text-transform: uppercase; font-weight: bold; margin-top: 15px;">Estado de São Paulo • SP</p>
-    </section>
-
-    <section id="unegro">
-        <h2 class="secao-titulo">História e Luta</h2>
-        <div class="texto-longo">
-            <p>A União de Negros pela Igualdade (UNEGRO) é uma entidade nacional suprapartidária fundada em 14 de julho de 1988, em Salvador, na Bahia. Com a integridade de uma entidade fundada por comunistas, a UNEGRO construiu um programa de cunho classista e abertamente marxista, lutando para transformar um povo escravizado em construtores de uma nova nação.</p>
-        </div>
-    </section>
+    </nav>
 
     <!-- SEÇÃO: QUILOMBO DIGITAL -->
-    <section id="preview-quilombo" style="background: rgba(5, 5, 5, 0.9); border-radius: 50px; margin-bottom: 50px;">
+    <section id="preview-quilombo">
         <h2 class="secao-titulo">Quilombo Digital</h2>
-        <p class="texto-manifesto">O fortalecimento do Black Money é o alicerce para a emancipação da nossa comunidade. Girar a economia entre os nossos não é apenas sobre negócios; é um ato político de sobrevivência, autonomia e construção de um legado próspero para os que virão.</p>
+        <p class="texto-manifesto">O fortalecimento do Black Money é o alicerce para a emancipação da nossa comunidade. Girar a economia entre os nossos é um ato político de sobrevivência.</p>
         
-        <div class="grid-destaques" id="grid-saberes-index">
-            <div style="color: #666; text-align: center; width: 100%; grid-column: span 3;">Carregando os ofícios do Quilombo...</div>
-        </div>
+        <div class="grid-destaques" id="grid-saberes-index"></div>
         
         <div class="btn-central">
-            <a href="quilombo.html" class="btn-ver-todos">Acessar o Catálogo Completo</a>
+            <a href="quilombo.html" class="btn-ver-todos">Acessar Catálogo</a>
+            <!-- BOTÃO QUE VOCÊ PEDIU -->
+            <a href="cadastrar-saber.html" class="btn-ver-todos" style="background: transparent; border: 1px solid var(--laranja-solid); color: var(--laranja-solid);">Filie-se e faça parte da nossa rede</a>
         </div>
     </section>
 
     <!-- SEÇÃO: TERREIROS -->
-    <section id="preview-terreiros" style="background: rgba(8, 8, 8, 0.9); border-radius: 50px; margin-bottom: 50px;">
+    <section id="preview-terreiros">
         <h2 class="secao-titulo">Territórios de Axé</h2>
-        <p class="texto-manifesto">Nossos terreiros são espaços de cura, resistência e preservação da nossa ancestralidade. Mapear e conectar nossos territórios sagrados no estado de São Paulo é o nosso dever ético para proteger a nossa fé e manter nossa raiz inabalável.</p>
+        <p class="texto-manifesto">Mapear e conectar nossos territórios sagrados em São Paulo é o nosso dever ético para proteger a nossa fé e manter nossa raiz inabalável.</p>
         
-        <div class="grid-destaques" id="grid-terreiros-index">
-            <div style="color: #666; text-align: center; width: 100%; grid-column: span 3;">Carregando o mapa de Terreiros...</div>
-        </div>
+        <div class="grid-destaques" id="grid-terreiros-index"></div>
 
         <div class="btn-central">
             <a href="terreiros.html" class="btn-ver-todos">Ver Mapeamento Completo</a>
         </div>
     </section>
 
-    <section id="liderancas" style="background: #050505; border-radius: 50px;">
-        <h2 class="secao-titulo">Nossas Referências</h2>
-        <div class="perso-container">
-            <div class="perso-card">
-                <div class="perso-img" style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQd-iTVw7Wna6Hk1Y7dVTIsXTO6dhvdUAVD5w&s');"></div>
-                <div class="perso-info">
-                    <h4 style="margin-top: 15px;">Leci Brandão</h4>
-                    <a href="https://www.instagram.com/lecibrandao/" target="_blank" class="insta-btn">Instagram</a>
-                </div>
-            </div>
-            <div class="perso-card">
-                <div class="perso-img" style="background-image: url('https://jornalempoderado.com.br/wp-content/uploads/2025/09/Imagem-do-WhatsApp-de-2025-09-06-as-10.35.50_0e8c4375.jpg');"></div>
-                <div class="perso-info">
-                    <h4 style="margin-top: 15px;">Orlando Silva</h4>
-                    <a href="https://www.instagram.com/orlandosilvasp/" target="_blank" class="insta-btn">Instagram</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="midia" style="background: #050505; border-radius: 50px; margin-top: 50px;">
-    <h2 class="secao-titulo">Na Mídia</h2>
-
-    <div class="perso-container">
-        <div class="perso-card">
-            <div class="perso-img" style="background-image: url('https://images.unsplash.com/photo-1559027615-cd4628902d4a?q=80&w=1200');"></div>
-            <div class="perso-info">
-                <h6 style="color:#888; margin-top:15px;">Vermelho</h6>
-                <h4 style="margin-top:10px;">UNEGRO: 30 anos de resistência e luta.</h4>
-                <a href="#" target="_blank" class="insta-btn">Ler matéria</a>
-            </div>
-        </div>
-        <div class="perso-card">
-            <div class="perso-img" style="background-image: url('https://images.unsplash.com/photo-1509099836639-18ba1795216d?q=80&w=1200');"></div>
-            <div class="perso-info">
-                <h6 style="color:#888; margin-top:15px;">Geledés</h6>
-                <h4 style="margin-top:10px;">O combate ao racismo religioso no Brasil.</h4>
-                <a href="#" target="_blank" class="insta-btn">Ler matéria</a>
-            </div>
-        </div>
-        <div class="perso-card">
-            <div class="perso-img" style="background-image: url('https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?q=80&w=1200');"></div>
-            <div class="perso-info">
-                <h6 style="color:#888; margin-top:15px;">Brasil de Fato</h6>
-                <h4 style="margin-top:10px;">A juventude negra contra o genocídio.</h4>
-                <a href="#" target="_blank" class="insta-btn">Ler matéria</a>
-            </div>
+    <!-- MODAL GERAL -->
+    <div id="modal-detalhes" class="modal-overlay" onclick="fecharModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button onclick="fecharModal()" class="close-btn">&times;</button>
+            <span id="modal-tag" class="tag-cidade"></span>
+            <h2 id="modal-titulo" style="font-weight: 900; margin-bottom: 10px;"></h2>
+            <div id="modal-desc" style="color:#ccc; line-height: 1.6; margin-bottom: 30px;"></div>
+            <div id="modal-acao"></div>
         </div>
     </div>
-</section>
 
-<section class="secao-agenda">
-    <h2 class="secao-titulo" style="font-size: 1.5rem; margin-bottom: 40px;">Agenda da Luta</h2>
-    <div id="agenda-dinamica" class="agenda-grid">
-        </div>
-</section>
+    <footer>
+        <a href="https://dree.one/" target="_blank" style="color: #444; text-decoration: none; font-size: 12px; font-weight: bold;">
+            Tecnologia <span style="color: #f1b434;">Dree.One</span>
+        </a>
+    </footer>
 
-    <section id="filiacao">
-        <div class="filiacao-box">
-            <h2 class="secao-titulo">Ficha Nacional de Filiação</h2>
-            <form id="formFiliacao">
-                <div class="grid-form">
-                    <div class="input-group span-3"><label>Nome Completo</label><input type="text" id="nome" class="input-style" required></div>
-                    <div class="input-group span-2"><label>Endereço</label><input type="text" id="endereco" class="input-style" required></div>
-                    <div class="input-group"><label>Número</label><input type="text" id="numero" class="input-style" required></div>
-                    <div class="input-group"><label>Complemento</label><input type="text" id="complemento" class="input-style"></div>
-                    <div class="input-group"><label>Bairro</label><input type="text" id="bairro" class="input-style" required></div>
-                    <div class="input-group"><label>CEP</label><input type="text" id="cep" class="input-style" required></div>
-                    <div class="input-group">
-                        <label>Cidade (SP)</label>
-                        <select id="cidade-form" class="input-style" required>
-                            <option value="" disabled selected>Carregando cidades...</option>
-                        </select>
-                    </div>
-                    <div class="input-group"><label>Nascimento</label><input type="date" id="nascimento" class="input-style" required></div>
-                    
-                    <div class="input-group"><label>Sexo</label>
-                        <select id="sexo" class="input-style">
-                            <option value="" disabled selected>Selecione</option>
-                            <option value="Masculino">Masculino</option>
-                            <option value="Feminino">Feminino</option>
-                            <option value="Homem Trans">Homem Trans</option>
-                            <option value="Mulher Trans">Mulher Trans</option>
-                            <option value="Não Binário">Não Binário</option>
-                            <option value="Outro">Outro</option>
-                        </select>
-                    </div>
+    <script>
+        const SUPABASE_URL = 'https://huxemmuzhlntwimgiukt.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-                    <div class="input-group">
-                    <label>Cor/Raça (Auto declaração)</label>
-                    <select id="raca" class="input-style" required>
-                        <option value="" disabled selected>Selecione</option>
-                        <option value="Preta">Preta</option>
-                        <option value="Parda">Parda</option>
-                        <option value="Branca">Branca</option>
-                        <option value="Amarela">Amarela</option>
-                        <option value="Indígena">Indígena</option>
-                    </select>
-                </div>
-                    
-                    <div class="input-group"><label>RG</label><input type="text" id="rg" class="input-style" required></div>
-                    <div class="input-group"><label>CPF</label><input type="text" id="cpf" class="input-style" required></div>
-                    <div class="input-group"><label>WhatsApp</label><input type="tel" id="whatsapp-form" class="input-style" required></div>
-                    <div class="input-group span-3"><label>E-mail</label><input type="email" id="email" class="input-style" required></div>
-                    <div class="input-group span-2"><label>Profissão</label><input type="text" id="profissao" class="input-style"></div>
-                    <div class="input-group"><label>Escolaridade</label>
-                        <select id="escolaridade" class="input-style">
-                            <option value="Ensino Médio">Ensino Médio</option>
-                            <option value="Superior">Superior</option>
-                        </select>
-                    </div>
-                    <div class="input-group span-3"><label>Movimento Social</label><input type="text" id="movimento" class="input-style"></div>
+        window.dbData = { saberes: [], terreiros: [] };
 
-                    <div class="desafio-box">
-                        <p>Quanto é 5 + 5? <input type="number" id="quiz" style="width: 60px; background: #000; color: #fff; border: 1px solid #333; text-align: center;"></p>
-                        <label style="display: flex; gap: 10px; margin-top: 15px; cursor: pointer; font-size: 0.85rem; align-items: flex-start;">
-                            <input type="checkbox" id="aceite" required style="margin-top: 4px;">
-                            Declaro, para os devidos fins, que as informações prestadas são verdadeiras e que, ao submeter este formulário, formalizo minha filiação à UNEGRO, estando de acordo com sua Carta de Princípios e diretrizes organizativas.
-                        </label>
-                    </div>
-                </div>
-                <button type="button" onclick="processarCadastro()" class="btn-enviar" style="margin-top: 20px;">Filiar-se e Gerar PDF</button>
-            </form>
-        </div>
-    </section>
-
-  <footer style="text-align: center; padding: 40px; background: #000; border-top: 1px solid #111;">
-    <a href="https://www.dree.one/" target="_blank" style="color: #444; text-decoration: none; font-size: 12px; font-weight: bold; letter-spacing: 1px; transition: 0.3s;">
-        Tecnologia <span style="color: #f1b434;">Dree.One</span>
-    </a>
-</footer>
-
-   <script>
-    const SUPABASE_URL = 'https://huxemmuzhlntwimgiukt.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // FUNÇÃO: Carregar Cidades SP via IBGE para o Nav Dropdown e para o Formulário
-    async function carregarCidadesIBGE() {
-        try {
-            const res = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/SP/municipios');
-            const cidades = await res.json();
-            
-            // 1. Popula o Dropdown da Navbar
-            const navDropdown = document.getElementById('nav-dropdown-cidades');
-            if (navDropdown) {
-                // Apenas as primeiras do array ou você pode manter todas. O CSS já gerencia a barra de rolagem.
-                let linksHTML = '<a href="filiados.html">Todas as Cidades</a>';
-                cidades.forEach(c => {
-                    // Transforma o nome da cidade em slug para link (ex: São José dos Campos -> sao-jose-dos-campos)
-                    let slug = c.nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
-                    linksHTML += `<a href="filiados-${slug}.html">${c.nome}</a>`;
-                });
-                navDropdown.innerHTML = linksHTML;
-            }
-
-            // 2. Popula o Select do Formulário
-            const formSelect = document.getElementById('cidade-form');
-            if (formSelect) {
-                formSelect.innerHTML = '<option value="" disabled selected>Selecione sua cidade</option>';
-                cidades.forEach(c => {
-                    formSelect.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
-                });
-            }
-        } catch (error) {
-            console.error("Erro ao puxar cidades do IBGE", error);
-            document.getElementById('cidade-form').innerHTML = '<option value="" disabled selected>Erro ao carregar</option>';
-        }
-    }
-
-    async function carregarPreviewQuilombo() {
-        const container = document.getElementById('grid-saberes-index');
-        try {
-            const { data, error } = await _supabase
-                .from('unegro_servicos')
-                .select('*, unegro_categorias(nome)')
-                .eq('aprovado', true)
-                .order('created_at', { ascending: false })
-                .limit(3);
-
-            if (error) throw error;
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div style="color: #666; grid-column: span 3; text-align: center;">Nenhum saber cadastrado ainda.</div>';
-                return;
-            }
-
-            container.innerHTML = data.map(item => `
+        async function carregarDados() {
+            // Carregar Saberes
+            const { data: saberes } = await _supabase.from('unegro_servicos').select('*').eq('aprovado', true).limit(3);
+            window.dbData.saberes = saberes || [];
+            document.getElementById('grid-saberes-index').innerHTML = window.dbData.saberes.map((s, i) => `
                 <div class="card-destaque">
-                    <span class="tag-cidade">${item.cidade}</span>
-                    <h3 class="titulo-item">${item.filiado_nome}</h3>
-                    <div class="sub-item">${item.titulo_servico} • ${item.unegro_categorias?.nome || 'Ofício'}</div>
-                    <a href="https://wa.me/${item.whatsapp}" target="_blank" class="btn-veja-mais">Conectar</a>
-                </div>
-            `).join('');
-        } catch (err) {
-            console.error("Erro Quilombo Preview:", err);
-            container.innerHTML = '<div style="color: #ff4d4d; grid-column: span 3; text-align: center;">Erro ao carregar os dados do Quilombo.</div>';
-        }
-    }
+                    <span class="tag-cidade">${s.cidade}</span>
+                    <h3 class="titulo-item">${s.filiado_nome}</h3>
+                    <button type="button" onclick="abrirModal('saberes', ${i})" class="btn-veja-mais">Ver Detalhes</button>
+                </div>`).join('');
 
-    async function carregarPreviewTerreiros() {
-        const container = document.getElementById('grid-terreiros-index');
-        try {
-            const { data, error } = await _supabase
-                .from('unegro_terreiros')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .limit(3);
-
-            if (error) {
-                container.innerHTML = '<div style="color: #666; grid-column: span 3; text-align: center;">Aguardando o mapeamento dos primeiros terreiros.</div>';
-                return;
-            }
-
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div style="color: #666; grid-column: span 3; text-align: center;">Nenhum terreiro mapeado ainda.</div>';
-                return;
-            }
-
-            container.innerHTML = data.map(t => `
-                <div class="card-destaque" style="border-left: 4px solid #fff;">
-                    <span class="tag-cidade" style="color: #fff;">${t.cidade || 'São Paulo'}</span>
-                    <h3 class="titulo-item" style="color: var(--laranja-solid);">${t.nome || t.nome_terreiro || 'Terreiro'}</h3>
-                    <div class="sub-item" style="color: #ccc;">Liderança: ${t.sacerdote || t.lideranca || 'Não informado'}</div>
-                    <a href="terreiros.html" class="btn-veja-mais" style="border-color: #555;">Ver Detalhes</a>
-                </div>
-            `).join('');
-        } catch (err) {
-            console.error("Erro Terreiros Preview:", err);
-            container.innerHTML = '<div style="color: #666; grid-column: span 3; text-align: center;">Aguardando o mapeamento dos terreiros.</div>';
-        }
-    }
-
-    async function processarCadastro() {
-        const quiz = document.getElementById('quiz').value;
-        const aceite = document.getElementById('aceite').checked;
-        const campos = ['nome', 'nascimento', 'rg', 'cpf', 'endereco', 'numero', 'bairro', 'cep', 'cidade-form', 'whatsapp-form', 'email', 'raca'];
-
-        for(let campo of campos) {
-            if(!document.getElementById(campo).value) {
-                alert("Por favor, preencha todos os campos obrigatórios.");
-                document.getElementById(campo).focus();
-                return;
-            }
+            // Carregar Terreiros
+            const { data: terreiros } = await _supabase.from('unegro_terreiros').select('*').limit(3);
+            window.dbData.terreiros = terreiros || [];
+            document.getElementById('grid-terreiros-index').innerHTML = window.dbData.terreiros.map((t, i) => `
+                <div class="card-destaque" style="border-left-color: #fff;">
+                    <span class="tag-cidade" style="color:#fff;">${t.cidade}</span>
+                    <h3 class="titulo-item" style="color:var(--laranja-solid);">${t.nome}</h3>
+                    <button type="button" onclick="abrirModal('terreiros', ${i})" class="btn-veja-mais" style="border-color:#555;">Ver Detalhes</button>
+                </div>`).join('');
         }
 
-        if(quiz !== "10" || !aceite) { alert("Valide o desafio matemático e aceite os termos."); return; }
+        function abrirModal(tipo, index) {
+            const item = window.dbData[tipo][index];
+            const modal = document.getElementById('modal-detalhes');
+            
+            document.getElementById('modal-tag').innerText = item.cidade;
+            document.getElementById('modal-titulo').innerText = item.filiado_nome || item.nome;
+            
+            let desc = item.descricao || "Sem descrição disponível.";
+            if (tipo === 'terreiros' && item.endereco) desc = `<strong>📍 Endereço:</strong> ${item.endereco}<br><br>${desc}`;
+            document.getElementById('modal-desc').innerHTML = desc;
 
-        const payload = {
-            nome: document.getElementById('nome').value,
-            nascimento: document.getElementById('nascimento').value,
-            sexo: document.getElementById('sexo').value,
-            raca: document.getElementById('raca').value, 
-            rg: document.getElementById('rg').value,
-            cpf: document.getElementById('cpf').value,
-            endereco: document.getElementById('endereco').value,
-            numero: document.getElementById('numero').value,
-            complemento: document.getElementById('complemento').value || "",
-            bairro: document.getElementById('bairro').value,
-            cep: document.getElementById('cep').value,
-            cidade: document.getElementById('cidade-form').value,
-            whatsapp: document.getElementById('whatsapp-form').value,
-            email: document.getElementById('email').value,
-            profissao: document.getElementById('profissao').value || "",
-            escolaridade: document.getElementById('escolaridade').value,
-            movimento_social: document.getElementById('movimento').value || ""
-        };
+            const linkAcao = tipo === 'saberes' ? `https://wa.me/${item.whatsapp}` : item.instagram_url;
+            const textoAcao = tipo === 'saberes' ? 'Contatar via WhatsApp' : 'Ver Instagram';
+            
+            document.getElementById('modal-acao').innerHTML = linkAcao ? 
+                `<a href="${linkAcao}" target="_blank" class="btn-ver-todos">${textoAcao}</a>` : '';
 
-        try {
-            const { error } = await _supabase.from('unegro_filiados').insert([payload]);
-            if (!error) {
-                alert("Filiação realizada com sucesso!");
-                generateSinglePDF(payload);
-            } else { throw error; }
-        } catch (e) {
-            alert("Erro ao salvar no banco de dados. Tente novamente.");
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
-    }
 
-    function drawPage(doc, payload) {
-        let y = 20;
-        doc.setFont("helvetica", "bold"); doc.setFontSize(14);
-        doc.text("FICHA DE FILIAÇÃO ESTADUAL - UNEGRO SP", 105, y, { align: "center" });
-        y += 15; doc.setDrawColor(139, 0, 0); doc.line(20, y, 190, y); y += 10;
-        doc.setFontSize(10);
-        
-        const row = (l, v) => {
-            doc.setFont("helvetica", "bold"); doc.text(`${l}:`, 20, y);
-            doc.setFont("helvetica", "normal"); doc.text(`${v || '---'}`, 65, y);
-            y += 8;
-        };
-
-        row("NOME COMPLETO", (payload.nome || "").toUpperCase());
-        row("NASCIMENTO", payload.nascimento);
-        row("AUTO DECLARAÇÃO", payload.raca);
-        row("RG / CPF", `${payload.rg || ''} / ${payload.cpf || ''}`);
-        row("ENDEREÇO", `${payload.endereco || ''}, ${payload.numero || ''}`);
-        row("CIDADE / BAIRRO", `${payload.cidade || ''} - ${payload.bairro || ''}`);
-        row("CONTATO", `${payload.whatsapp || ''} / ${payload.email || ''}`);
-        row("PROFISSÃO", payload.profissao);
-
-        y += 15;
-        doc.setFont("helvetica", "bold");
-        doc.text(`Local e data: ${payload.cidade || 'SP'}, ${new Date().toLocaleDateString('pt-BR')}`, 20, y);
-        y += 25; doc.setDrawColor(0); doc.line(20, y, 90, y); doc.line(110, y, 180, y);
-        y += 5; doc.text("Assinatura do Filiado", 35, y); doc.text("Responsável UNEGRO", 125, y);
-    }
-
-    function generateSinglePDF(item) {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        drawPage(doc, item);
-        window.open(doc.output('bloburl'), '_blank');
-    }
-
-    async function iniciarAtmosferaAncestral() {
-        const overlay = document.getElementById('ancestral-overlay');
-        if (!overlay) return;
-
-        const referencias = [
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQd-iTVw7Wna6Hk1Y7dVTIsXTO6dhvdUAVD5w&s',
-            'https://jornalempoderado.com.br/wp-content/uploads/2025/09/Imagem-do-WhatsApp-de-2025-09-06-as-10.35.50_0e8c4375.jpg'
-        ];
-
-        let listaFotos = referencias;
-        try {
-            const { data: liderancas } = await _supabase.from('liderancas_unegro').select('foto_url');
-            if(liderancas) listaFotos = [...referencias, ...liderancas.map(l => l.foto_url)];
-        } catch (e) {}
-
-        let index = 0;
-        function manifestarFace() {
-            const antigas = document.querySelectorAll('.spirit-face');
-            antigas.forEach(a => { a.style.opacity = '0'; setTimeout(() => a.remove(), 4000); });
-
-            const face = document.createElement('div');
-            face.className = 'spirit-face';
-            face.style.backgroundImage = `url('${listaFotos[index]}')`;
-            const lado = Math.random() > 0.5 ? 'left' : 'right';
-            face.style[lado] = Math.random() * 20 + '%';
-            face.style.top = Math.random() * 30 + 10 + '%';
-            overlay.appendChild(face);
-
-            setTimeout(() => { face.style.opacity = '0.6'; face.style.transform = 'scale(1.15)'; }, 100);
-            index = (index + 1) % listaFotos.length;
+        function fecharModal() {
+            document.getElementById('modal-detalhes').style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
-        manifestarFace();
-        setInterval(manifestarFace, 9000);
-    }
 
-    async function carregarAgendaIndex() {
-        try {
-            const { data: eventos } = await _supabase.from('agenda_unegro').select('*').order('data', { ascending: true }).limit(3);
-            const container = document.getElementById('agenda-dinamica');
-            if (!eventos || eventos.length === 0) {
-                container.innerHTML = '<div class="ag-vazio">Nenhum evento agendado.</div>';
-                return;
-            }
-            container.innerHTML = eventos.map(ev => {
-                const d = new Date(ev.data + 'T00:00:00');
-                return `
-                    <div class="card-agenda">
-                        <div>
-                            <div class="ag-data">${d.getDate()} ${d.toLocaleString('pt-BR', { month: 'short' }).replace('.','')}</div>
-                            <h3 class="ag-titulo">${ev.titulo}</h3>
-                            <div class="ag-local">📍 ${ev.local || 'Local a definir'}</div>
-                        </div>
-                        <div style="margin-top: 20px; font-size: 11px; color: #444; font-weight: bold;">UNEGRO SP ➔</div>
-                    </div>`;
-            }).join('');
-        } catch (err) { console.error(err); }
-    }
-
-    window.onload = () => {
-        carregarCidadesIBGE(); // Injeta as cidades na nav e no form automaticamente
-        carregarPreviewQuilombo();
-        carregarPreviewTerreiros();
-        iniciarAtmosferaAncestral();
-        carregarAgendaIndex();
-    };
-</script>
+        window.onload = carregarDados;
+    </script>
 </body>
 </html>
