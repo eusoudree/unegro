@@ -12,7 +12,7 @@
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- ScrollReveal para manter o padrão de animação -->
+    <!-- ScrollReveal -->
     <script src="https://unpkg.com/scrollreveal"></script>
 
     <style>
@@ -29,24 +29,29 @@
             background-color: var(--preto);
             color: var(--texto);
             font-family: 'Inter', sans-serif;
-            /* Fundo idêntico à sua index */
             background-image: linear-gradient(rgba(0,0,0,0.92), rgba(0,0,0,0.95)), 
             url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 100 100"><g fill="%23222" fill-opacity="0.3"><path d="M50 20 L40 35 H60 L50 20 M50 80 L60 65 H40 L50 80 M20 50 L35 40 V60 L20 50 M80 50 L65 60 V40 L80 50"/></g></svg>');
             background-attachment: fixed;
         }
 
-        /* Navbar Padrão UNEGRO */
+        /* Navbar Padrão UNEGRO com Logo */
         .nav-unegro {
             display: flex;
-            justify-content: flex-end; 
-            padding: 25px 50px;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
+            justify-content: space-between; 
+            align-items: center;
+            padding: 15px 50px;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(15px);
             position: fixed;
             top: 0;
             width: 100%;
             z-index: 1000;
             border-bottom: 1px solid rgba(255,140,0,0.1);
+        }
+
+        .nav-logo img {
+            height: 50px; /* Tamanho ajustado para não poluir */
+            width: auto;
         }
 
         .nav-links { display: flex; gap: 40px; align-items: center; }
@@ -79,7 +84,7 @@
         }
 
         #map {
-            height: 650px;
+            height: 600px;
             width: 100%;
             border-radius: 20px;
             border: 1px solid rgba(255, 140, 0, 0.2);
@@ -88,19 +93,17 @@
             margin-top: 30px;
         }
 
-        /* Estilização Customizada dos Popups Leaflet */
+        /* Popups */
         .leaflet-popup-content-wrapper {
             background: var(--cinza-card) !important;
             color: #fff !important;
             border: 1px solid var(--laranja-solid) !important;
             border-radius: 12px !important;
-            padding: 10px;
         }
         .leaflet-popup-tip { background: var(--laranja-solid) !important; }
 
-        .popup-label { color: var(--laranja-solid); font-size: 9px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
+        .popup-label { color: var(--laranja-solid); font-size: 9px; text-transform: uppercase; font-weight: 800; }
         .popup-title { font-size: 18px; font-weight: 900; margin: 5px 0; text-transform: uppercase; }
-        .popup-info { font-size: 12px; color: #ccc; margin-bottom: 10px; line-height: 1.4; }
         .popup-btn {
             display: block;
             background: var(--laranja-solid);
@@ -112,26 +115,30 @@
             font-weight: 900;
             font-size: 11px;
             text-transform: uppercase;
-            transition: 0.3s;
+            margin-top: 10px;
         }
-        .popup-btn:hover { background: #fff; }
 
         footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; }
 
         @media (max-width: 768px) {
-            .nav-unegro { justify-content: center; padding: 20px; }
-            #map { height: 450px; }
-            .secao-titulo { font-size: 1.5rem; }
+            .nav-unegro { padding: 15px 20px; }
+            .nav-logo img { height: 40px; }
+            .nav-links { gap: 15px; }
+            .nav-links a { font-size: 9px; }
+            #map { height: 400px; }
         }
     </style>
 </head>
 <body>
 
     <nav class="nav-unegro">
+        <div class="nav-logo">
+            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" alt="Logo UNEGRO">
+        </div>
         <div class="nav-links">
             <a href="index.html">Início</a>
             <a href="live.html">Live</a>
-            <a href="adm.html">Painel Administrativo</a>
+            <a href="adm.html">Adm</a>
         </div>
     </nav>
 
@@ -147,57 +154,41 @@
     <footer>UNEGRO VALE • 2026</footer>
 
     <script>
-        // 1. CONEXÃO SUPABASE
         const CONFIG = {
             URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
             KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
         };
         const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
-        // 2. INICIALIZAÇÃO DO MAPA (FOCO NO VALE DO PARAÍBA)
-        const map = L.map('map', {
-            scrollWheelZoom: false // Evita zoom acidental ao rolar a página
-        }).setView([-23.18, -45.88], 9); 
+        const map = L.map('map', { scrollWheelZoom: false }).setView([-23.18, -45.88], 9); 
 
-        // Estilo Dark Matter (CartoDB)
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; UNEGRO Vale do Paraíba'
+            attribution: '&copy; UNEGRO Vale'
         }).addTo(map);
 
-        // 3. CARREGAR DADOS DO SUPABASE
         async function carregarTerreiros() {
             try {
-                const { data, error } = await _supabase
-                    .from('unegro_terreiros')
-                    .select('*');
-
+                const { data, error } = await _supabase.from('unegro_terreiros').select('*');
                 if (error) throw error;
 
                 data.forEach(t => {
-                    // Marcador personalizado (opcional, aqui usa o padrão)
                     const marker = L.marker([t.lat, t.lng]).addTo(map);
-
                     const content = `
-                        <div style="min-width: 200px;">
+                        <div style="min-width: 180px;">
                             <span class="popup-label">${t.cidade}</span>
                             <div class="popup-title">${t.nome}</div>
-                            <div class="popup-info">
-                                <strong>Zelador(a):</strong> ${t.zelador}<br>
-                                <strong>Endereço:</strong> ${t.endereco}
-                            </div>
+                            <div style="font-size: 11px; color: #ccc;">Zelador(a): ${t.zelador}</div>
                             ${t.instagram_url ? `<a href="${t.instagram_url}" target="_blank" class="popup-btn">Instagram</a>` : ''}
                         </div>
                     `;
                     marker.bindPopup(content);
                 });
             } catch (err) {
-                console.error("Erro ao carregar terreiros:", err.message);
+                console.error("Erro:", err.message);
             }
         }
 
-        // 4. EFEITOS DE ENTRADA
         ScrollReveal().reveal('.container-mapeamento', { delay: 200, distance: '50px', origin: 'bottom', opacity: 0 });
-
         window.onload = carregarTerreiros;
     </script>
 </body>
