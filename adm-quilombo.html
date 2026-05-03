@@ -169,10 +169,11 @@
         };
         const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
-        // 1. BLINDAGEM DE LOGIN
-        async function checkAuth() {
-            const { data: { session } } = await _supabase.auth.getSession();
-            if (!session) {
+        // 1. BLINDAGEM DE LOGIN MANUAL
+        function checkAuth() {
+            const authStatus = localStorage.getItem('unegro_auth_admin');
+            
+            if (authStatus !== 'ativo') {
                 // Redireciona para a página de login se não houver sessão ativa
                 window.location.href = 'filiados.html'; 
             } else {
@@ -182,9 +183,9 @@
             }
         }
 
-        // Função de Logout
-        async function logout() {
-            await _supabase.auth.signOut();
+        // Função de Logout Manual
+        function logout() {
+            localStorage.removeItem('unegro_auth_admin');
             window.location.href = 'filiados.html';
         }
 
