@@ -3,50 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastrar Ofício | Quilombo Digital</title>
+    <title>Integrar o Quilombo | UNEGRO</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@300;400;800;900&display=swap" rel="stylesheet">
     
     <style>
-        :root { --laranja: #ff8c00; --preto: #050505; --card: #0f0f0f; --borda: #222; }
+        :root { 
+            --gold-gradient: linear-gradient(to bottom, #f1b434, #8b6b23);
+            --laranja: #ff8c00; 
+            --preto: #050505; 
+            --card: #0a0a0a; 
+            --borda: #222;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        body { background: var(--preto); color: #fff; font-family: 'Inter', sans-serif; padding: 100px 20px; }
+        body { 
+            background: var(--preto); color: #fff; font-family: 'Inter', sans-serif; 
+            background-image: radial-gradient(circle at 50% 50%, rgba(20, 20, 20, 0.8), rgba(0, 0, 0, 1));
+            background-attachment: fixed;
+            padding-top: 130px; 
+            display: flex; flex-direction: column; min-height: 100vh;
+        }
         
-        .container { max-width: 600px; margin: 0 auto; background: var(--card); padding: 40px; border: 1px solid var(--borda); border-radius: 4px; }
-        .title { font-family: 'Syncopate', sans-serif; font-size: 22px; color: var(--laranja); text-transform: uppercase; margin-bottom: 10px; text-align: center; }
-        .subtitle { font-size: 12px; color: #888; text-align: center; margin-bottom: 30px; line-height: 1.6; }
+        /* Navbar Oficial */
+        .nav-unegro { 
+            display: flex; justify-content: space-between; align-items: center; padding: 20px 50px; 
+            background: rgba(0,0,0,0.9); position: fixed; top: 0; width: 100%; z-index: 1000;
+        }
+        .nav-logo { display: flex; align-items: center; }
+        .nav-logo img { height: 45px; width: auto; }
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .nav-links a { color: #fff; text-decoration: none; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+        .btn-acesso { border: 1px solid var(--laranja); padding: 10px 20px; border-radius: 4px; color: var(--laranja) !important; transition: 0.3s; }
+        .btn-acesso:hover { background: rgba(255,140,0,0.1); }
 
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #666; margin-bottom: 8px; font-weight: 700; }
+        /* Formulário */
+        .container { max-width: 650px; margin: 0 auto 60px; background: var(--card); padding: 50px; border: 1px solid var(--borda); }
+        .title { font-family: 'Cinzel', serif; font-size: 32px; text-transform: uppercase; margin-bottom: 15px; text-align: center; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; }
+        .subtitle { font-size: 13px; color: #888; text-align: center; margin-bottom: 40px; line-height: 1.8; border-bottom: 1px solid #111; padding-bottom: 20px; }
+        .subtitle strong { color: var(--laranja); }
+
+        .form-group { margin-bottom: 25px; }
+        .form-label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #666; margin-bottom: 8px; font-weight: 800; }
         .form-input, .form-select, .form-textarea { 
             width: 100%; background: #000; border: 1px solid var(--borda); color: #fff; 
-            padding: 15px; font-size: 13px; outline: none; transition: 0.3s;
+            padding: 16px; font-size: 13px; outline: none; transition: 0.3s; font-family: 'Inter', sans-serif;
         }
         .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--laranja); }
-        .form-textarea { resize: vertical; min-height: 100px; }
+        .form-textarea { resize: vertical; min-height: 120px; }
 
         .btn-submit { 
-            width: 100%; background: var(--laranja); color: #000; border: none; padding: 15px; 
-            font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s;
+            width: 100%; background: var(--laranja); color: #000; border: none; padding: 18px; 
+            font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s; margin-top: 10px;
         }
         .btn-submit:hover { background: #fff; }
         
-        .msg-sucesso { display: none; text-align: center; padding: 30px; border: 1px solid #4caf50; background: rgba(76, 175, 80, 0.1); margin-top: 20px; }
-        .msg-sucesso h3 { color: #4caf50; margin-bottom: 10px; text-transform: uppercase; font-size: 14px; }
-        .msg-sucesso p { font-size: 13px; color: #ccc; }
+        /* Mensagem de Sucesso */
+        .msg-sucesso { display: none; text-align: center; padding: 40px; border: 1px solid var(--laranja); background: rgba(255, 140, 0, 0.05); margin-top: 20px; }
+        .msg-sucesso h3 { color: var(--laranja); margin-bottom: 15px; text-transform: uppercase; font-size: 20px; font-family: 'Cinzel', serif; letter-spacing: 1px; }
+        .msg-sucesso p { font-size: 14px; color: #ccc; line-height: 1.6; }
+
+        /* Footer Oficial */
+        footer { 
+            text-align: center; padding: 40px 20px; color: #555; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #111; display: flex; flex-direction: column; gap: 8px; align-items: center; margin-top: auto;
+        }
+        .credito-dree { color: var(--laranja); text-decoration: none; font-weight: 900; transition: 0.3s; }
+        .credito-dree:hover { color: #fff; }
+
+        @media (max-width: 768px) {
+            .nav-unegro { padding: 15px 25px; }
+            .container { padding: 30px 20px; margin: 0 20px 40px; }
+            .nav-links a.link-hide { display: none; }
+        }
     </style>
 </head>
 <body>
 
+    <nav class="nav-unegro">
+        <a href="index.html" class="nav-logo">
+            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" alt="Logo UNEGRO">
+        </a>
+        <div class="nav-links">
+            <a href="index.html" class="link-hide">Início</a>
+            <a href="quilombo-digital.html" class="link-hide">Quilombo</a>
+            <a href="filiados.html" class="btn-acesso">Acesso Filiados</a>
+        </div>
+    </nav>
+
     <div class="container" id="formContainer">
-        <h1 class="title">Seu Saber no Quilombo</h1>
-        <p class="subtitle">Preencha os dados abaixo. Seu ofício passará por uma análise de curadoria antes de ser exibido publicamente.</p>
+        <h1 class="title">Integrar o Quilombo</h1>
+        <p class="subtitle">
+            Para fortalecer nossa rede de <strong>Black Money</strong> e garantir a segurança do nosso ecossistema, 
+            todos os dados são cruzados com a base de filiados da UNEGRO. Após o envio, a coordenação valida o seu ofício antes dele ir pro ar.
+        </p>
         
         <form id="formCadastro" onsubmit="submeterSaber(event)">
             
             <div class="form-group">
-                <label class="form-label">E-mail (Obrigatório ser o mesmo da filiação)</label>
+                <label class="form-label">E-mail (Precisa ser o mesmo da filiação UNEGRO)</label>
                 <input type="email" id="emailVerificacao" class="form-input" placeholder="seuemail@exemplo.com" required>
             </div>
 
@@ -57,7 +111,7 @@
 
             <div class="form-group">
                 <label class="form-label">Título do Trabalho / Ofício</label>
-                <input type="text" id="tituloServico" class="form-input" placeholder="Ex: Designer de Interiores" required>
+                <input type="text" id="tituloServico" class="form-input" placeholder="Ex: Eletricista Predial, Designer Gráfico..." required>
             </div>
 
             <div class="form-group">
@@ -86,18 +140,23 @@
 
             <div class="form-group">
                 <label class="form-label">Resumo do Serviço</label>
-                <textarea id="descricao" class="form-textarea" placeholder="Descreva seu trabalho, diferenciais e o que você oferece..." required></textarea>
+                <textarea id="descricao" class="form-textarea" placeholder="Descreva seu trabalho, seus diferenciais e o que você oferece para a nossa rede..." required></textarea>
             </div>
 
-            <button type="submit" class="btn-submit" id="btnSalvar">Enviar para Análise</button>
+            <button type="submit" class="btn-submit" id="btnSalvar">Enviar para Validação</button>
         </form>
     </div>
 
     <div class="container msg-sucesso" id="msgSucesso">
-        <h3>Cadastro Recebido com Sucesso!</h3>
-        <p>Seu ofício foi enviado para a coordenação. Assim que aprovado, ele estará visível no Quilombo Digital.</p>
-        <button class="btn-submit" style="margin-top: 20px;" onclick="window.location.reload()">Cadastrar Novo Saber</button>
+        <h3>Axé! Seu saber chegou na base.</h3>
+        <p>O cadastro tá na mão da coordenação. Assim que os dados baterem com a sua filiação, seu ofício entra na vitrine do Quilombo Digital pra girar a nossa economia.</p>
+        <button class="btn-submit" style="margin-top: 30px;" onclick="window.location.reload()">Cadastrar Novo Saber</button>
     </div>
+
+    <footer>
+        <span>UNEGRO VALE DO PARAÍBA • 2026</span>
+        <a href="https://www.dree.one/" target="_blank" class="credito-dree">Desenvolvido por Dree</a>
+    </footer>
 
     <script>
         const CONFIG = {
@@ -108,17 +167,23 @@
 
         async function init() {
             // Carrega Cidades do IBGE
-            const res = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/SP/municipios');
-            const cidades = await res.json();
-            const selCidade = document.getElementById('cidade');
-            selCidade.innerHTML = '<option value="">Selecione a cidade...</option>';
-            cidades.forEach(c => selCidade.innerHTML += `<option value="${c.nome}">${c.nome}</option>`);
+            try {
+                const res = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/SP/municipios');
+                const cidades = await res.json();
+                const selCidade = document.getElementById('cidade');
+                selCidade.innerHTML = '<option value="">Selecione a cidade...</option>';
+                cidades.forEach(c => selCidade.innerHTML += `<option value="${c.nome}">${c.nome}</option>`);
+            } catch (e) {
+                console.error("Erro ao puxar cidades do IBGE", e);
+            }
 
             // Carrega Categorias
             const { data } = await _supabase.from('unegro_categorias').select('*').order('nome');
             const selCat = document.getElementById('categoriaSelect');
             selCat.innerHTML = '<option value="">Selecione a Categoria...</option>';
-            data.forEach(cat => selCat.innerHTML += `<option value="${cat.id}">${cat.nome}</option>`);
+            if (data) {
+                data.forEach(cat => selCat.innerHTML += `<option value="${cat.id}">${cat.nome}</option>`);
+            }
         }
 
         async function loadSubcategorias(catId) {
@@ -127,20 +192,22 @@
             
             const { data } = await _supabase.from('unegro_subcategorias').select('*').eq('categoria_id', catId).order('nome');
             selSub.innerHTML = '<option value="">Selecione a Subcategoria...</option>';
-            data.forEach(sub => selSub.innerHTML += `<option value="${sub.id}">${sub.nome}</option>`);
+            if (data) {
+                data.forEach(sub => selSub.innerHTML += `<option value="${sub.id}">${sub.nome}</option>`);
+            }
         }
 
         async function submeterSaber(event) {
             event.preventDefault();
             const btn = document.getElementById('btnSalvar');
             const emailInput = document.getElementById('emailVerificacao').value;
-            btn.innerText = 'Verificando Filiação...';
+            btn.innerText = 'Buscando na base de Filiados...';
 
-            // 1. CHECAGEM DE FILIAÇÃO (Chama a função RPC segura)
+            // 1. CHECAGEM DE FILIAÇÃO (Chama a função RPC)
             const { data: isFiliado, error: rpcError } = await _supabase.rpc('check_filiado_ativo', { email_busca: emailInput });
 
             if (!isFiliado) {
-                alert('Acesso negado. Este e-mail não consta na base de filiados da UNEGRO. Você será redirecionado para a página de afiliação.');
+                alert('Acesso negado. Esse e-mail não consta na base de filiados da UNEGRO. Você será direcionado para se afiliar e fortalecer o movimento.');
                 window.location.href = 'https://www.unegro.online/';
                 return;
             }
@@ -156,18 +223,19 @@
                 categoria_id: document.getElementById('categoriaSelect').value,
                 subcategoria_id: document.getElementById('subcategoriaSelect').value,
                 descricao: document.getElementById('descricao').value,
-                aprovado: false // Exigirá aprovação do admin
+                aprovado: false // Trava de segurança para aprovação
             };
 
             const { error } = await _supabase.from('unegro_servicos').insert([payload]);
 
             if (error) {
-                alert('Erro ao processar o cadastro. Tente novamente mais tarde.');
+                alert('Erro na comunicação com o banco. Chama a coordenação.');
                 console.error(error);
-                btn.innerText = 'Enviar para Análise';
+                btn.innerText = 'Enviar para Validação';
             } else {
                 document.getElementById('formContainer').style.display = 'none';
                 document.getElementById('msgSucesso').style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
