@@ -34,7 +34,7 @@
             background-attachment: fixed;
         }
 
-        /* Navbar Padrão UNEGRO com Logo */
+        /* Navbar UNEGRO Vale do Paraíba */
         .nav-unegro {
             display: flex;
             justify-content: space-between; 
@@ -49,9 +49,16 @@
             border-bottom: 1px solid rgba(255,140,0,0.1);
         }
 
-        .nav-logo img {
-            height: 50px; /* Tamanho ajustado para não poluir */
-            width: auto;
+        .nav-logo { display: flex; align-items: center; gap: 15px; }
+        .nav-logo img { height: 50px; width: auto; }
+        .nav-logo span { 
+            color: #fff; 
+            font-size: 10px; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            font-weight: 800;
+            border-left: 1px solid #333;
+            padding-left: 15px;
         }
 
         .nav-links { display: flex; gap: 40px; align-items: center; }
@@ -68,7 +75,7 @@
 
         /* Container do Mapa */
         .container-mapeamento {
-            padding: 140px 20px 60px;
+            padding: 160px 20px 60px;
             max-width: 1200px;
             margin: auto;
             text-align: center;
@@ -120,12 +127,17 @@
 
         footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; }
 
+        @media (max-width: 900px) {
+            .nav-logo span { display: none; }
+        }
+
         @media (max-width: 768px) {
             .nav-unegro { padding: 15px 20px; }
             .nav-logo img { height: 40px; }
             .nav-links { gap: 15px; }
-            .nav-links a { font-size: 9px; }
+            .nav-links a { font-size: 9px; letter-spacing: 1px; }
             #map { height: 400px; }
+            .secao-titulo { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -134,24 +146,25 @@
     <nav class="nav-unegro">
         <div class="nav-logo">
             <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" alt="Logo UNEGRO">
+            <span>Vale do Paraíba</span>
         </div>
         <div class="nav-links">
             <a href="index.html">Início</a>
-            <a href="live.html">Live</a>
-            <a href="adm.html">Adm</a>
+            <a href="filiados.html">Acesso Filiados</a>
+            <a href="https://www.instagram.com/unegrovale" target="_blank">Instagram</a>
         </div>
     </nav>
 
     <div class="container-mapeamento">
         <h2 class="secao-titulo">Territórios de Axé</h2>
         <p style="color: #666; letter-spacing: 3px; text-transform: uppercase; font-size: 10px;">
-            Mapeamento Ancestral • Vale do Paraíba
+            Mapeamento Ancestral • UNEGRO Vale do Paraíba
         </p>
 
         <div id="map"></div>
     </div>
 
-    <footer>UNEGRO VALE • 2026</footer>
+    <footer>UNEGRO VALE DO PARAÍBA • 2026</footer>
 
     <script>
         const CONFIG = {
@@ -163,7 +176,7 @@
         const map = L.map('map', { scrollWheelZoom: false }).setView([-23.18, -45.88], 9); 
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; UNEGRO Vale'
+            attribution: '&copy; UNEGRO Vale do Paraíba'
         }).addTo(map);
 
         async function carregarTerreiros() {
