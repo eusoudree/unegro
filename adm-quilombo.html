@@ -38,7 +38,7 @@
         #loginContainer { max-width: 400px; margin: 60px auto; background: var(--card); padding: 40px; border: 1px solid var(--borda); border-radius: 4px; text-align: center; display: none; }
         
         /* Admin Container */
-        .admin-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: none; grid-template-columns: 1fr 2fr; gap: 40px; } /* Escondido por padrão, usa grid quando visível */
+        .admin-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: none; grid-template-columns: 1fr 2fr; gap: 40px; }
 
         .admin-box { background: var(--card); padding: 40px; border: 1px solid var(--borda); border-radius: 4px; }
         .box-title { font-family: 'Syncopate', sans-serif; font-size: 18px; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 1px; color: var(--laranja); border-bottom: 1px solid var(--borda); padding-bottom: 15px; }
@@ -63,7 +63,7 @@
         .table-responsive { overflow-x: auto; }
         .admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
         .admin-table th { background: #000; padding: 15px; color: var(--laranja); text-transform: uppercase; letter-spacing: 1px; font-size: 10px; border-bottom: 1px solid var(--borda); }
-        .admin-table td { padding: 15px; border-bottom: 1px solid var(--borda); color: #ccc; }
+        .admin-table td { padding: 15px; border-bottom: 1px solid var(--borda); color: #ccc; vertical-align: middle; }
         .admin-table tr:hover td { background: #111; }
         
         .action-btn { background: transparent; border: none; cursor: pointer; font-size: 11px; text-transform: uppercase; font-weight: 800; margin-right: 15px; transition: 0.3s; }
@@ -82,7 +82,7 @@
     <nav class="nav-unegro">
         <div class="nav-logo">GESTOR <span>QUILOMBO</span></div>
         <div class="nav-actions" id="navActions">
-            <a href="quilombo-digital.html" class="btn-acao">Ver Catálogo</a>
+            <a href="quilombo.html" class="btn-acao">Ver Catálogo</a>
             <button onclick="logout()" class="btn-acao" style="color: #ff4d4d;">Sair da Conta</button>
         </div>
     </nav>
@@ -124,7 +124,6 @@
 
                 <div class="form-group">
                     <label class="form-label">Território (Cidade SP)</label>
-                    <!-- Select Dinâmico do IBGE -->
                     <select id="cidade" class="form-select" required>
                         <option value="">Carregando cidades...</option>
                     </select>
@@ -137,7 +136,6 @@
 
                 <div class="form-group">
                     <label class="form-label">Categoria Principal</label>
-                    <!-- Puxa direto da Tabela unegro_categorias -->
                     <select id="categoriaSelect" class="form-select" onchange="loadSubcategorias(this.value)" required>
                         <option value="">Carregando categorias...</option>
                     </select>
@@ -145,7 +143,6 @@
 
                 <div class="form-group">
                     <label class="form-label">Subcategoria</label>
-                    <!-- Puxa direto da Tabela unegro_subcategorias -->
                     <select id="subcategoriaSelect" class="form-select" required>
                         <option value="">Selecione a categoria primeiro...</option>
                     </select>
@@ -163,14 +160,14 @@
 
         <!-- Tabela -->
         <div class="admin-box">
-            <h2 class="box-title">Registros Ativos</h2>
+            <h2 class="box-title">Gestão de Saberes</h2>
             <div class="table-responsive">
                 <table class="admin-table">
                     <thead>
                         <tr>
+                            <th>Status</th>
                             <th>Filiado</th>
-                            <th>Ofício</th>
-                            <th>Cidade</th>
+                            <th>Saber / Categoria</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -199,7 +196,6 @@
             
             btn.innerText = 'Validando...';
 
-            // Bate na tabela unegro_admins criada
             const { data, error } = await _supabase
                 .from('unegro_admins')
                 .select('*')
@@ -208,7 +204,6 @@
                 .single();
 
             if (data) {
-                // Sucesso: Grava e roda o checkAuth pra mudar a tela
                 localStorage.setItem('unegro_auth_admin', 'ativo');
                 checkAuth();
             } else {
@@ -223,12 +218,10 @@
             const authStatus = localStorage.getItem('unegro_auth_admin');
             
             if (authStatus !== 'ativo') {
-                // Mostra Login, esconde Admin
                 document.getElementById('loginContainer').style.display = 'block';
                 document.getElementById('adminContainer').style.display = 'none';
                 document.getElementById('navActions').style.display = 'none';
             } else {
-                // Esconde Login, mostra Admin
                 document.getElementById('loginContainer').style.display = 'none';
                 document.getElementById('adminContainer').style.display = 'grid';
                 document.getElementById('navActions').style.display = 'flex';
@@ -241,7 +234,7 @@
             document.getElementById('loginUsuario').value = '';
             document.getElementById('loginSenha').value = '';
             document.getElementById('btnEntrar').innerText = 'Acessar Gestão';
-            checkAuth(); // Roda de novo pra voltar pra tela de login
+            checkAuth();
         }
 
         // 3. INICIALIZAÇÃO DO DASHBOARD
@@ -262,8 +255,7 @@
                     select.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
                 });
             } catch (error) {
-                console.error("Erro ao carregar cidades do IBGE", error);
-                document.getElementById('cidade').innerHTML = '<option value="">Erro ao carregar cidades</option>';
+                console.error("Erro ao carregar cidades", error);
             }
         }
 
@@ -304,11 +296,12 @@
             });
         }
 
-        // 7. CARREGAR TABELA DE SABERES
+        // 7. CARREGAR TABELA COM FOCO EM APROVAÇÃO
         async function loadServicos() {
             const { data, error } = await _supabase
                 .from('unegro_servicos')
                 .select('*, unegro_categorias(nome), unegro_subcategorias(nome)')
+                .order('aprovado', { ascending: true }) // Ordena: Pendentes (false) primeiro
                 .order('created_at', { ascending: false });
 
             if (error) { console.error('Erro nos serviços:', error); return; }
@@ -317,12 +310,24 @@
             tbody.innerHTML = '';
 
             data.forEach(item => {
+                // Lógica visual do Status
+                const statusColor = item.aprovado ? '#4caf50' : '#ffc107';
+                const statusText = item.aprovado ? 'Aprovado' : 'Pendente';
+                const toggleAcao = item.aprovado ? 'Ocultar' : 'Aprovar';
+                const toggleCor = item.aprovado ? '#888' : '#4caf50';
+
                 tbody.innerHTML += `
                     <tr>
-                        <td><strong>${item.filiado_nome}</strong></td>
-                        <td>${item.titulo_servico}<br><span style="color:#666; font-size:10px;">${item.unegro_categorias?.nome}</span></td>
-                        <td>${item.cidade}</td>
                         <td>
+                            <span style="color: ${statusColor}; font-size: 10px; text-transform: uppercase; border: 1px solid ${statusColor}; padding: 4px 8px; border-radius: 4px; font-weight: 800;">${statusText}</span>
+                        </td>
+                        <td>
+                            <strong>${item.filiado_nome}</strong><br>
+                            <span style="color:#666; font-size:10px;">${item.cidade}</span>
+                        </td>
+                        <td>${item.titulo_servico}<br><span style="color:#888; font-size:10px;">${item.unegro_categorias?.nome}</span></td>
+                        <td>
+                            <button class="action-btn" style="color: ${toggleCor};" onclick="toggleStatus(${item.id}, ${item.aprovado})">${toggleAcao}</button>
                             <button class="action-btn btn-edit" onclick="editServico(${item.id})">Editar</button>
                             <button class="action-btn btn-delete" onclick="deleteServico(${item.id})">Excluir</button>
                         </td>
@@ -331,7 +336,20 @@
             });
         }
 
-        // 8. SALVAR / ATUALIZAR
+        // 8. ALTERNAR STATUS (Aprovar / Ocultar)
+        async function toggleStatus(id, statusAtual) {
+            const novoStatus = !statusAtual; 
+            const { error } = await _supabase.from('unegro_servicos').update({ aprovado: novoStatus }).eq('id', id);
+            
+            if (error) {
+                alert('Erro ao atualizar aprovação.');
+                console.error(error);
+            } else {
+                loadServicos(); // Atualiza a tabela na hora
+            }
+        }
+
+        // 9. SALVAR / ATUALIZAR
         async function handleFormSubmit(event) {
             event.preventDefault();
             const btn = document.getElementById('btnSalvar');
@@ -353,11 +371,13 @@
             if (id) {
                 result = await _supabase.from('unegro_servicos').update(payload).eq('id', id);
             } else {
+                // Se o ADMIN está cadastrando, já entra como Aprovado
+                payload.aprovado = true;
                 result = await _supabase.from('unegro_servicos').insert([payload]);
             }
 
             if (result.error) {
-                alert('Erro ao salvar. Verifique permissões do banco (RLS).');
+                alert('Erro ao salvar. Verifique permissões do banco.');
                 console.error(result.error);
             } else {
                 resetForm();
@@ -366,7 +386,7 @@
             btn.innerText = 'Salvar Registro';
         }
 
-        // 9. POPULAR FORMULÁRIO (EDITAR)
+        // 10. POPULAR FORMULÁRIO (EDITAR)
         async function editServico(id) {
             const { data, error } = await _supabase.from('unegro_servicos').select('*').eq('id', id).single();
             if (error) { console.error(error); return; }
@@ -384,7 +404,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 10. EXCLUIR
+        // 11. EXCLUIR
         async function deleteServico(id) {
             if(confirm('Tem certeza que deseja excluir este registro do Quilombo?')) {
                 const { error } = await _supabase.from('unegro_servicos').delete().eq('id', id);
@@ -400,7 +420,6 @@
             document.getElementById('subcategoriaSelect').innerHTML = '<option value="">Selecione a categoria primeiro...</option>';
         }
 
-        // START: A primeira coisa que a página faz é checar se exibe o login ou o painel.
         window.onload = checkAuth;
     </script>
 </body>
