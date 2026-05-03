@@ -20,7 +20,7 @@
         
         body { 
             background: var(--preto); color: #fff; font-family: 'Inter', sans-serif; 
-            padding-top: 100px; padding-bottom: 100px; display: none; /* Escondido até validar o login */
+            padding-top: 100px; padding-bottom: 100px;
         }
 
         .nav-unegro { 
@@ -30,16 +30,20 @@
         .nav-logo { font-family: 'Syncopate', sans-serif; font-size: 14px; color: #fff; letter-spacing: 2px; }
         .nav-logo span { color: var(--laranja); }
         
-        .nav-actions { display: flex; gap: 20px; align-items: center; }
+        .nav-actions { display: none; gap: 20px; align-items: center; } /* Escondido por padrão */
         .btn-acao { background: transparent; border: none; color: #888; text-decoration: none; font-size: 11px; text-transform: uppercase; font-weight: 700; cursor: pointer; transition: 0.3s; }
         .btn-acao:hover { color: var(--laranja); }
 
-        .admin-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 2fr; gap: 40px; }
+        /* Login Container */
+        #loginContainer { max-width: 400px; margin: 60px auto; background: var(--card); padding: 40px; border: 1px solid var(--borda); border-radius: 4px; text-align: center; display: none; }
+        
+        /* Admin Container */
+        .admin-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: none; grid-template-columns: 1fr 2fr; gap: 40px; } /* Escondido por padrão, usa grid quando visível */
 
         .admin-box { background: var(--card); padding: 40px; border: 1px solid var(--borda); border-radius: 4px; }
         .box-title { font-family: 'Syncopate', sans-serif; font-size: 18px; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 1px; color: var(--laranja); border-bottom: 1px solid var(--borda); padding-bottom: 15px; }
         
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
         .form-label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #666; margin-bottom: 8px; font-weight: 700; }
         .form-input, .form-select, .form-textarea { 
             width: 100%; background: #000; border: 1px solid var(--borda); color: #fff; 
@@ -77,13 +81,30 @@
 
     <nav class="nav-unegro">
         <div class="nav-logo">GESTOR <span>QUILOMBO</span></div>
-        <div class="nav-actions">
+        <div class="nav-actions" id="navActions">
             <a href="quilombo-digital.html" class="btn-acao">Ver Catálogo</a>
             <button onclick="logout()" class="btn-acao" style="color: #ff4d4d;">Sair da Conta</button>
         </div>
     </nav>
 
-    <div class="admin-container">
+    <!-- Tela de Login Integrada -->
+    <div id="loginContainer">
+        <h2 class="box-title" style="border:none; padding:0; margin-bottom: 25px;">Acesso Restrito</h2>
+        <form onsubmit="fazerLogin(event)">
+            <div class="form-group">
+                <label class="form-label">Usuário</label>
+                <input type="text" id="loginUsuario" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Senha</label>
+                <input type="password" id="loginSenha" class="form-input" required>
+            </div>
+            <button type="submit" class="btn-submit" id="btnEntrar">Acessar Gestão</button>
+        </form>
+    </div>
+
+    <!-- Painel de Gestão -->
+    <div class="admin-container" id="adminContainer">
         
         <!-- Formulário -->
         <div class="admin-box">
@@ -169,34 +190,68 @@
         };
         const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
-        // 1. BLINDAGEM DE LOGIN MANUAL
+        // 1. LÓGICA DE LOGIN INTEGRADA
+        async function fazerLogin(event) {
+            event.preventDefault();
+            const u = document.getElementById('loginUsuario').value;
+            const p = document.getElementById('loginSenha').value;
+            const btn = document.getElementById('btnEntrar');
+            
+            btn.innerText = 'Validando...';
+
+            // Bate na tabela unegro_admins criada
+            const { data, error } = await _supabase
+                .from('unegro_admins')
+                .select('*')
+                .eq('usuario', u)
+                .eq('senha', p)
+                .single();
+
+            if (data) {
+                // Sucesso: Grava e roda o checkAuth pra mudar a tela
+                localStorage.setItem('unegro_auth_admin', 'ativo');
+                checkAuth();
+            } else {
+                alert('Credenciais incorretas ou usuário não encontrado.');
+                console.error(error);
+                btn.innerText = 'Acessar Gestão';
+            }
+        }
+
+        // 2. CONTROLE DE VISIBILIDADE DAS TELAS
         function checkAuth() {
             const authStatus = localStorage.getItem('unegro_auth_admin');
             
             if (authStatus !== 'ativo') {
-                // Redireciona para a página de login se não houver sessão ativa
-                window.location.href = 'filiados.html'; 
+                // Mostra Login, esconde Admin
+                document.getElementById('loginContainer').style.display = 'block';
+                document.getElementById('adminContainer').style.display = 'none';
+                document.getElementById('navActions').style.display = 'none';
             } else {
-                // Se estiver logado, mostra o body da página e inicia os scripts
-                document.body.style.display = 'block';
+                // Esconde Login, mostra Admin
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('adminContainer').style.display = 'grid';
+                document.getElementById('navActions').style.display = 'flex';
                 initDashboard();
             }
         }
 
-        // Função de Logout Manual
         function logout() {
             localStorage.removeItem('unegro_auth_admin');
-            window.location.href = 'filiados.html';
+            document.getElementById('loginUsuario').value = '';
+            document.getElementById('loginSenha').value = '';
+            document.getElementById('btnEntrar').innerText = 'Acessar Gestão';
+            checkAuth(); // Roda de novo pra voltar pra tela de login
         }
 
-        // 2. INICIALIZAÇÃO DO DASHBOARD
+        // 3. INICIALIZAÇÃO DO DASHBOARD
         async function initDashboard() {
             await loadCidadesSP();
             await loadCategorias();
             await loadServicos();
         }
 
-        // 3. PUXAR CIDADES DE SÃO PAULO VIA IBGE
+        // 4. PUXAR CIDADES DE SÃO PAULO VIA IBGE
         async function loadCidadesSP() {
             try {
                 const response = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/SP/municipios');
@@ -212,7 +267,7 @@
             }
         }
 
-        // 4. PUXAR CATEGORIAS DA BASE DE DADOS
+        // 5. PUXAR CATEGORIAS DA BASE DE DADOS
         async function loadCategorias() {
             const { data, error } = await _supabase.from('unegro_categorias').select('*').order('nome');
             if (error) { console.error('Erro nas categorias:', error); return; }
@@ -224,7 +279,7 @@
             });
         }
 
-        // 5. PUXAR SUBCATEGORIAS CASCATA
+        // 6. PUXAR SUBCATEGORIAS CASCATA
         async function loadSubcategorias(categoriaId, preselectedId = null) {
             const select = document.getElementById('subcategoriaSelect');
             select.innerHTML = '<option value="">Carregando...</option>';
@@ -249,7 +304,7 @@
             });
         }
 
-        // 6. CARREGAR TABELA DE SABERES
+        // 7. CARREGAR TABELA DE SABERES
         async function loadServicos() {
             const { data, error } = await _supabase
                 .from('unegro_servicos')
@@ -276,7 +331,7 @@
             });
         }
 
-        // 7. SALVAR / ATUALIZAR
+        // 8. SALVAR / ATUALIZAR
         async function handleFormSubmit(event) {
             event.preventDefault();
             const btn = document.getElementById('btnSalvar');
@@ -311,7 +366,7 @@
             btn.innerText = 'Salvar Registro';
         }
 
-        // 8. POPULAR FORMULÁRIO (EDITAR)
+        // 9. POPULAR FORMULÁRIO (EDITAR)
         async function editServico(id) {
             const { data, error } = await _supabase.from('unegro_servicos').select('*').eq('id', id).single();
             if (error) { console.error(error); return; }
@@ -329,7 +384,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 9. EXCLUIR
+        // 10. EXCLUIR
         async function deleteServico(id) {
             if(confirm('Tem certeza que deseja excluir este registro do Quilombo?')) {
                 const { error } = await _supabase.from('unegro_servicos').delete().eq('id', id);
@@ -345,7 +400,7 @@
             document.getElementById('subcategoriaSelect').innerHTML = '<option value="">Selecione a categoria primeiro...</option>';
         }
 
-        // START
+        // START: A primeira coisa que a página faz é checar se exibe o login ou o painel.
         window.onload = checkAuth;
     </script>
 </body>
