@@ -100,17 +100,19 @@
             margin-top: 30px;
         }
 
-        /* Popups */
+        /* Customização dos Popups Leaflet */
         .leaflet-popup-content-wrapper {
             background: var(--cinza-card) !important;
             color: #fff !important;
             border: 1px solid var(--laranja-solid) !important;
             border-radius: 12px !important;
+            padding: 5px !important;
         }
         .leaflet-popup-tip { background: var(--laranja-solid) !important; }
 
         .popup-label { color: var(--laranja-solid); font-size: 9px; text-transform: uppercase; font-weight: 800; }
-        .popup-title { font-size: 18px; font-weight: 900; margin: 5px 0; text-transform: uppercase; }
+        .popup-title { font-size: 18px; font-weight: 900; margin: 5px 0; text-transform: uppercase; color: #fff; }
+        
         .popup-btn {
             display: block;
             background: var(--laranja-solid);
@@ -123,7 +125,9 @@
             font-size: 11px;
             text-transform: uppercase;
             margin-top: 10px;
+            transition: transform 0.2s ease;
         }
+        .popup-btn:hover { transform: scale(1.02); }
 
         footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; }
 
@@ -167,12 +171,14 @@
     <footer>UNEGRO VALE DO PARAÍBA • 2026</footer>
 
     <script>
+        // Configurações do Supabase
         const CONFIG = {
             URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
             KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
         };
         const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
+        // Inicialização do Mapa focado no Vale do Paraíba
         const map = L.map('map', { scrollWheelZoom: false }).setView([-23.18, -45.88], 9); 
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -181,27 +187,52 @@
 
         async function carregarTerreiros() {
             try {
+                // Busca todos os campos conforme Screenshot 2026-05-03 at 17.30.15.png
                 const { data, error } = await _supabase.from('unegro_terreiros').select('*');
                 if (error) throw error;
 
                 data.forEach(t => {
-                    const marker = L.marker([t.lat, t.lng]).addTo(map);
-                    const content = `
-                        <div style="min-width: 180px;">
-                            <span class="popup-label">${t.cidade}</span>
-                            <div class="popup-title">${t.nome}</div>
-                            <div style="font-size: 11px; color: #ccc;">Zelador(a): ${t.zelador}</div>
-                            ${t.instagram_url ? `<a href="${t.instagram_url}" target="_blank" class="popup-btn">Instagram</a>` : ''}
-                        </div>
-                    `;
-                    marker.bindPopup(content);
+                    if (t.lat && t.lng) {
+                        const marker = L.marker([t.lat, t.lng]).addTo(map);
+                        
+                        // Lógica Dinâmica: Se tiver informação exiba, se não, não exiba
+                        const content = `
+                            <div style="min-width: 220px; max-width: 280px; font-family: 'Inter', sans-serif;">
+                                ${t.foto_url ? `<img src="${t.foto_url}" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:10px; border: 1px solid rgba(255,140,0,0.3);">` : ''}
+                                
+                                <span class="popup-label">${t.cidade || 'Vale do Paraíba'}</span>
+                                <div class="popup-title">${t.nome}</div>
+                                
+                                <div style="display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: #eee; margin-top: 5px;">
+                                    ${t.zelador ? `<div><strong style="color:var(--laranja-solid)">Zelador(a):</strong> ${t.zelador}</div>` : ''}
+                                    ${t.endereco ? `<div><strong style="color:var(--laranja-solid)">Endereço:</strong> ${t.endereco}</div>` : ''}
+                                </div>
+
+                                ${t.biografia ? `
+                                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #333; font-size: 11px; color: #ccc; line-height: 1.4; font-style: italic;">
+                                        "${t.biografia}"
+                                    </div>
+                                ` : ''}
+
+                                ${t.instagram_url ? `
+                                    <a href="${t.instagram_url}" target="_blank" class="popup-btn">
+                                        Ver Instagram
+                                    </a>
+                                ` : ''}
+                            </div>
+                        `;
+                        
+                        marker.bindPopup(content);
+                    }
                 });
             } catch (err) {
-                console.error("Erro:", err.message);
+                console.error("Erro ao carregar dados do Supabase:", err.message);
             }
         }
 
+        // Animação de entrada
         ScrollReveal().reveal('.container-mapeamento', { delay: 200, distance: '50px', origin: 'bottom', opacity: 0 });
+        
         window.onload = carregarTerreiros;
     </script>
 </body>
