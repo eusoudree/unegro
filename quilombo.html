@@ -5,104 +5,174 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quilombo Digital | UNEGRO Vale do Paraíba</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/scrollreveal"></script>
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
     
     <style>
-        :root { --laranja: #ff8c00; --preto: #050505; --card: #0a0a0a; --texto-muted: #444; }
+        :root { 
+            --laranja: #ff8c00; 
+            --preto-profundo: #050505; 
+            --card-bg: #0a0a0a; 
+            --texto-cinza: #666;
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body { 
-            background: var(--preto); color: #fff; font-family: 'Inter', sans-serif; 
-            background-image: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.95)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 100 100"><path d="M50 20 L40 35 H60 Z" fill="%231a1a1a"/></svg>');
-            padding-top: 100px; background-attachment: fixed;
+            background: var(--preto-profundo); 
+            color: #fff; 
+            font-family: 'Inter', sans-serif; 
+            background-image: linear-gradient(rgba(0,0,0,0.92), rgba(0,0,0,0.95)), 
+            url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 100 100"><g fill="%23222" fill-opacity="0.3"><path d="M50 20 L40 35 H60 L50 20 M50 80 L60 65 H40 L50 80 M20 50 L35 40 V60 L20 50 M80 50 L65 60 V40 L80 50"/></g></svg>');
+            padding-top: 100px;
+            background-attachment: fixed;
         }
 
+        /* Navbar UNEGRO Vale do Paraíba */
         .nav-unegro { 
             display: flex; justify-content: space-between; align-items: center; padding: 15px 50px; 
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); position: fixed; top: 0; width: 100%; z-index: 1000; border-bottom: 2px solid var(--laranja); 
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); position: fixed; top: 0; width: 100%; z-index: 1000; border-bottom: 2px solid var(--laranja); 
         }
+        .nav-logo img { height: 50px; }
 
-        .header-quilombo { text-align: center; padding: 60px 20px 40px; }
-        .header-quilombo h1 { font-family: 'Syncopate', sans-serif; font-size: clamp(2rem, 5vw, 3rem); text-transform: uppercase; margin-bottom: 10px; }
+        /* Header Conceitual Quilombo */
+        .quilombo-intro { 
+            text-align: center; 
+            padding: 100px 20px 60px; 
+            max-width: 900px; 
+            margin: auto; 
+        }
+        .quilombo-intro h1 { 
+            font-family: 'Syncopate', sans-serif; 
+            font-size: clamp(2.5rem, 8vw, 4.5rem); 
+            text-transform: uppercase; 
+            letter-spacing: -3px;
+            line-height: 0.9;
+            margin-bottom: 30px;
+            background: linear-gradient(to bottom, #fff, var(--laranja));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .quilombo-intro .manifesto {
+            color: #ccc;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            text-align: justify;
+            border-left: 2px solid var(--laranja);
+            padding-left: 25px;
+        }
+        .black-money-tag {
+            color: var(--laranja);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 10px;
+            margin-bottom: 15px;
+            display: block;
+        }
 
         /* BUSCA E CONTROLES */
-        .controls-area { max-width: 1200px; margin: 0 auto 50px; padding: 0 20px; text-align: center; }
+        .controls-area { max-width: 1200px; margin: 0 auto 60px; padding: 0 20px; text-align: center; }
         
-        .search-box { position: relative; max-width: 500px; margin: 0 auto 30px; }
+        .search-box { position: relative; max-width: 600px; margin: 0 auto 40px; }
         .search-box input {
-            width: 100%; background: #000; border: 1px solid #222; border-radius: 50px; 
-            padding: 15px 25px; color: #fff; font-size: 13px; outline: none; transition: 0.4s; text-align: center;
+            width: 100%; background: #000; border: 1px solid #222; border-radius: 0px; 
+            padding: 20px 30px; color: #fff; font-size: 14px; outline: none; transition: 0.4s; 
+            text-align: center; text-transform: uppercase; letter-spacing: 2px;
         }
-        .search-box input:focus { border-color: var(--laranja); }
+        .search-box input:focus { border-color: var(--laranja); background: #080808; }
 
-        .filter-group { margin-bottom: 20px; }
-        .label-filtro { font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: var(--texto-muted); margin-bottom: 10px; display: block; font-weight: 800; }
+        .filter-group { margin-bottom: 25px; }
+        .label-filtro { font-size: 9px; text-transform: uppercase; letter-spacing: 3px; color: var(--texto-cinza); margin-bottom: 12px; display: block; font-weight: 800; }
 
         .btn-filtro { 
-            background: transparent; border: 1px solid #1a1a1a; color: #555; padding: 8px 18px; 
-            text-transform: uppercase; font-size: 9px; font-weight: 800; cursor: pointer; transition: 0.3s; margin: 3px;
+            background: transparent; border: 1px solid #1a1a1a; color: #444; padding: 10px 20px; 
+            text-transform: uppercase; font-size: 9px; font-weight: 800; cursor: pointer; transition: 0.3s; margin: 4px;
+            letter-spacing: 1px;
         }
-        .btn-filtro.active { border-color: var(--laranja); color: #fff; background: rgba(255,140,0,0.05); }
+        .btn-filtro.active { border-color: var(--laranja); color: #fff; background: rgba(255,140,0,0.1); }
 
-        /* GRID */
-        .grid-quilombo { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; max-width: 1200px; margin: auto; padding: 0 20px 100px; }
+        /* GRID DE SABERES */
+        .grid-quilombo { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
+            gap: 40px; 
+            max-width: 1300px; 
+            margin: auto; 
+            padding: 0 40px 100px; 
+        }
         
         .card-oficio { 
-            background: var(--card); border-left: 4px solid #1a1a1a; padding: 35px; 
-            transition: 0.3s; display: flex; flex-direction: column; justify-content: space-between;
+            background: var(--card-bg); 
+            border-left: 5px solid #111; 
+            padding: 40px; 
+            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex; flex-direction: column; justify-content: space-between;
         }
-        .card-oficio:hover { border-left-color: var(--laranja); transform: translateY(-5px); background: #0f0f0f; }
+        .card-oficio:hover { border-left-color: var(--laranja); transform: translateY(-10px); background: #0f0f0f; }
         
-        .cat-tag { color: var(--laranja); font-size: 9px; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; display: block; }
-        .nome-filiado { font-size: 22px; font-weight: 900; margin-bottom: 5px; }
-        .titulo-trabalho { color: #555; font-size: 13px; margin-bottom: 20px; font-weight: 700; text-transform: uppercase; }
-        .descricao { font-size: 13px; color: #888; line-height: 1.7; margin-bottom: 30px; }
+        .cat-tag { color: var(--laranja); font-size: 10px; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; display: block; letter-spacing: 2px; }
+        .nome-filiado { font-size: 26px; font-weight: 900; margin-bottom: 8px; letter-spacing: -1px; text-transform: uppercase; }
+        .titulo-trabalho { color: #555; font-size: 14px; margin-bottom: 25px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #1a1a1a; padding-bottom: 10px; }
+        .descricao { font-size: 14px; color: #888; line-height: 1.8; margin-bottom: 35px; text-align: justify; }
         
         .btn-fortalecer { 
             border: 1px solid var(--laranja); color: var(--laranja); text-align: center; 
-            padding: 15px; text-decoration: none; font-size: 10px; font-weight: 900; text-transform: uppercase; transition: 0.3s;
+            padding: 18px; text-decoration: none; font-size: 11px; font-weight: 900; text-transform: uppercase; 
+            letter-spacing: 2px; transition: 0.3s;
         }
         .btn-fortalecer:hover { background: var(--laranja); color: #000; }
 
+        footer { text-align: center; padding: 60px; color: #333; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
+
         @media (max-width: 768px) {
             .nav-unegro { padding: 15px 25px; }
-            .header-quilombo h1 { font-size: 1.8rem; }
+            .quilombo-intro h1 { font-size: 2.8rem; }
+            .quilombo-intro .manifesto { font-size: 0.95rem; text-align: left; }
+            .grid-quilombo { padding: 0 20px 60px; }
         }
     </style>
 </head>
 <body>
 
     <nav class="nav-unegro">
-        <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" height="50">
+        <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" alt="Logo UNEGRO">
         <div style="font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--laranja);">VALE DO PARAÍBA</div>
     </nav>
 
-    <div class="header-quilombo">
+    <div class="quilombo-intro">
+        <span class="black-money-tag">Economia Circular & Emancipação</span>
         <h1>Quilombo Digital</h1>
-        <p style="color: #333; letter-spacing: 4px; text-transform: uppercase; font-size: 9px;">Território de Saberes e Ofícios</p>
+        <p class="manifesto">
+            Este território foi forjado para fortalecer o <strong>Black Money</strong> e a circulação de riqueza dentro da nossa comunidade. Aqui, cada serviço contratado é um ato de resistência e um passo rumo à nossa autonomia econômica. Fortalecer um empreendedor negro é garantir que o nosso axé e a nossa prosperidade permaneçam onde pertencem: entre nós.
+        </p>
     </div>
 
     <div class="controls-area">
         <div class="search-box">
-            <input type="text" id="campoBusca" placeholder="BUSCAR POR NOME OU OFÍCIO..." oninput="executarFiltro()">
+            <input type="text" id="campoBusca" placeholder="BUSCAR POR NOME, SABER OU OFÍCIO..." oninput="executarFiltro()">
         </div>
 
         <div class="filter-group">
-            <span class="label-filtro">Territórios (Cidades)</span>
+            <span class="label-filtro">Territórios de Atuação</span>
             <div id="filtros-cidade">
-                <button class="btn-filtro active" onclick="setCidade('Todas', this)">Todas</button>
+                <button class="btn-filtro active" onclick="setCidade('Todas', this)">Todas as Cidades</button>
             </div>
         </div>
 
         <div class="filter-group">
-            <span class="label-filtro">Saberes (Categorias)</span>
+            <span class="label-filtro">Saberes & Ofícios</span>
             <div id="filtros-categoria">
-                <button class="btn-filtro active" onclick="setCategoria('Todos', this)">Todos</button>
+                <button class="btn-filtro active" onclick="setCategoria('Todos', this)">Todos os Saberes</button>
             </div>
         </div>
     </div>
 
     <div id="grid-saberes" class="grid-quilombo"></div>
+
+    <footer>UNEGRO VALE DO PARAÍBA • 2026</footer>
 
     <script>
         const CONFIG = {
@@ -120,12 +190,12 @@
             const { data: registros } = await _supabase.from('unegro_servicos').select('*, unegro_categorias(nome), unegro_subcategorias(nome)');
             saberes = registros;
 
-            // 2. Monta Categorias dinâmicas do Banco
+            // 2. Monta Categorias dinâmicas
             const { data: categorias } = await _supabase.from('unegro_categorias').select('nome').order('ordem');
             const boxCat = document.getElementById('filtros-categoria');
             categorias.forEach(c => boxCat.innerHTML += `<button class="btn-filtro" onclick="setCategoria('${c.nome}', this)">${c.nome}</button>`);
 
-            // 3. Monta Cidades Dinâmicas (Agrupando quem já está cadastrado)
+            // 3. Monta Cidades Dinâmicas baseadas nos cadastros
             const cidadesUnicas = [...new Set(saberes.map(s => s.cidade))].filter(Boolean).sort();
             const boxCid = document.getElementById('filtros-cidade');
             cidadesUnicas.forEach(cid => boxCid.innerHTML += `<button class="btn-filtro" onclick="setCidade('${cid}', this)">${cid}</button>`);
@@ -150,7 +220,9 @@
         function executarFiltro() {
             const termo = document.getElementById('campoBusca').value.toLowerCase();
             const resultado = saberes.filter(s => {
-                const matchesBusca = s.filiado_nome.toLowerCase().includes(termo) || s.titulo_servico.toLowerCase().includes(termo);
+                const matchesBusca = s.filiado_nome.toLowerCase().includes(termo) || 
+                                     s.titulo_servico.toLowerCase().includes(termo) ||
+                                     s.descricao.toLowerCase().includes(termo);
                 const matchesCat = (categoriaAtiva === 'Todos') || (s.unegro_categorias?.nome === categoriaAtiva);
                 const matchesCid = (cidadeAtiva === 'Todas') || (s.cidade === cidadeAtiva);
                 return matchesBusca && matchesCat && matchesCid;
@@ -174,6 +246,7 @@
         }
 
         window.onload = init;
+        ScrollReveal().reveal('.card-oficio', { interval: 100, origin: 'bottom', distance: '20px' });
     </script>
 </body>
 </html>
