@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão | Quilombo Digital UNEGRO</title>
+    
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Variables and Reset */
+        :root { 
+            --laranja: #ff8c00; 
+            --preto: #050505; 
+            --card: #0f0f0f; 
+            --borda: #222;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background: var(--preto); color: #fff; font-family: 'Inter', sans-serif; 
+            padding-top: 100px; padding-bottom: 100px;
+        }
+
+        /* Navbar */
+        .nav-unegro { 
+            display: flex; justify-content: space-between; align-items: center; padding: 20px 50px; 
+            background: rgba(0,0,0,0.95); position: fixed; top: 0; width: 100%; z-index: 1000; border-bottom: 1px solid var(--borda);
+        }
+        .nav-logo { font-family: 'Syncopate', sans-serif; font-size: 14px; color: #fff; letter-spacing: 2px; }
+        .nav-logo span { color: var(--laranja); }
+        .btn-voltar { color: #888; text-decoration: none; font-size: 11px; text-transform: uppercase; font-weight: 700; transition: 0.3s; }
+        .btn-voltar:hover { color: var(--laranja); }
+
+        /* Main Container */
+        .admin-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 2fr; gap: 40px; }
+
+        /* Form Section */
+        .admin-box { background: var(--card); padding: 40px; border: 1px solid var(--borda); border-radius: 4px; }
+        .box-title { font-family: 'Syncopate', sans-serif; font-size: 18px; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 1px; color: var(--laranja); border-bottom: 1px solid var(--borda); padding-bottom: 15px; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #666; margin-bottom: 8px; font-weight: 700; }
+        .form-input, .form-select, .form-textarea { 
+            width: 100%; background: #000; border: 1px solid var(--borda); color: #fff; 
+            padding: 15px; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; transition: 0.3s;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--laranja); }
+        .form-textarea { resize: vertical; min-height: 100px; }
+
+        .btn-submit { 
+            width: 100%; background: var(--laranja); color: #000; border: none; padding: 15px; 
+            font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s; margin-top: 10px;
+        }
+        .btn-submit:hover { background: #fff; }
+        .btn-clear { width: 100%; background: transparent; border: 1px solid var(--borda); color: #666; padding: 15px; font-size: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        .btn-clear:hover { color: #fff; border-color: #fff; }
+
+        /* Data Table Section */
+        .table-responsive { overflow-x: auto; }
+        .admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
+        .admin-table th { background: #000; padding: 15px; color: var(--laranja); text-transform: uppercase; letter-spacing: 1px; font-size: 10px; border-bottom: 1px solid var(--borda); }
+        .admin-table td { padding: 15px; border-bottom: 1px solid var(--borda); color: #ccc; }
+        .admin-table tr:hover td { background: #111; }
+        
+        .action-btn { background: transparent; border: none; cursor: pointer; font-size: 11px; text-transform: uppercase; font-weight: 800; margin-right: 15px; transition: 0.3s; }
+        .btn-edit { color: #4facfe; }
+        .btn-edit:hover { color: #fff; }
+        .btn-delete { color: #ff4d4d; }
+        .btn-delete:hover { color: #fff; }
+
+        @media (max-width: 900px) {
+            .admin-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="nav-unegro">
+        <div class="nav-logo">GESTOR <span>QUILOMBO</span></div>
+        <a href="quilombo-digital.html" class="btn-voltar">Voltar ao Catálogo</a>
+    </nav>
+
+    <div class="admin-container">
+        
+        <!-- Form Area -->
+        <div class="admin-box">
+            <h2 class="box-title" id="formTitle">Novo Saber</h2>
+            <form id="formServico" onsubmit="handleFormSubmit(event)">
+                <input type="hidden" id="servicoId">
+
+                <div class="form-group">
+                    <label class="form-label">Nome do Filiado</label>
+                    <input type="text" id="filiadoNome" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Título do Trabalho / Ofício</label>
+                    <input type="text" id="tituloServico" class="form-input" placeholder="Ex: Desenvolvedor Web Sênior" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Território (Cidade)</label>
+                    <input type="text" id="cidade" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">WhatsApp (Apenas Números)</label>
+                    <input type="text" id="whatsapp" class="form-input" placeholder="5512999999999" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Categoria Principal</label>
+                    <select id="categoriaSelect" class="form-select" onchange="loadSubcategorias(this.value)" required>
+                        <option value="">Selecione...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Subcategoria</label>
+                    <select id="subcategoriaSelect" class="form-select" required>
+                        <option value="">Selecione a categoria primeiro...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Resumo do Serviço</label>
+                    <textarea id="descricao" class="form-textarea" required></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit" id="btnSalvar">Salvar Registro</button>
+                <button type="button" class="btn-clear" onclick="resetForm()">Limpar / Cancelar Edição</button>
+            </form>
+        </div>
+
+        <!-- Table Area -->
+        <div class="admin-box">
+            <h2 class="box-title">Registros Ativos</h2>
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Filiado</th>
+                            <th>Ofício</th>
+                            <th>Cidade</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Dynamic Data -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const CONFIG = {
+            URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
+            KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
+        };
+        const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
+
+        // Initialization
+        async function init() {
+            await loadCategorias();
+            await loadServicos();
+        }
+
+        // Load Main Categories for Select
+        async function loadCategorias() {
+            const { data, error } = await _supabase.from('unegro_categorias').select('*').order('nome');
+            if (error) { console.error('Error fetching categories:', error); return; }
+            
+            const select = document.getElementById('categoriaSelect');
+            select.innerHTML = '<option value="">Selecione...</option>';
+            data.forEach(cat => {
+                select.innerHTML += `<option value="${cat.id}">${cat.nome}</option>`;
+            });
+        }
+
+        // Load Subcategories based on Category selection
+        async function loadSubcategorias(categoriaId, preselectedId = null) {
+            const select = document.getElementById('subcategoriaSelect');
+            select.innerHTML = '<option value="">Carregando...</option>';
+
+            if (!categoriaId) {
+                select.innerHTML = '<option value="">Selecione a categoria primeiro...</option>';
+                return;
+            }
+
+            const { data, error } = await _supabase
+                .from('unegro_subcategorias')
+                .select('*')
+                .eq('categoria_id', categoriaId)
+                .order('nome');
+
+            if (error) { console.error('Error fetching subcategories:', error); return; }
+
+            select.innerHTML = '<option value="">Selecione a subcategoria...</option>';
+            data.forEach(sub => {
+                const isSelected = preselectedId == sub.id ? 'selected' : '';
+                select.innerHTML += `<option value="${sub.id}" ${isSelected}>${sub.nome}</option>`;
+            });
+        }
+
+        // Load all active services into the table
+        async function loadServicos() {
+            const { data, error } = await _supabase
+                .from('unegro_servicos')
+                .select('*, unegro_categorias(nome), unegro_subcategorias(nome)')
+                .order('created_at', { ascending: false });
+
+            if (error) { console.error('Error fetching services:', error); return; }
+
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(item => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${item.filiado_nome}</strong></td>
+                        <td>${item.titulo_servico}<br><span style="color:#666; font-size:10px;">${item.unegro_categorias?.nome}</span></td>
+                        <td>${item.cidade}</td>
+                        <td>
+                            <button class="action-btn btn-edit" onclick="editServico(${item.id})">Editar</button>
+                            <button class="action-btn btn-delete" onclick="deleteServico(${item.id})">Excluir</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Handle Insert / Update
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            const btn = document.getElementById('btnSalvar');
+            btn.innerText = 'Salvando...';
+
+            const payload = {
+                filiado_nome: document.getElementById('filiadoNome').value,
+                titulo_servico: document.getElementById('tituloServico').value,
+                cidade: document.getElementById('cidade').value,
+                whatsapp: document.getElementById('whatsapp').value,
+                categoria_id: document.getElementById('categoriaSelect').value,
+                subcategoria_id: document.getElementById('subcategoriaSelect').value,
+                descricao: document.getElementById('descricao').value
+            };
+
+            const id = document.getElementById('servicoId').value;
+            let result;
+
+            if (id) {
+                // Update existing record
+                result = await _supabase.from('unegro_servicos').update(payload).eq('id', id);
+            } else {
+                // Insert new record
+                result = await _supabase.from('unegro_servicos').insert([payload]);
+            }
+
+            if (result.error) {
+                alert('Erro ao salvar. Verifique o console.');
+                console.error(result.error);
+            } else {
+                resetForm();
+                loadServicos();
+            }
+            btn.innerText = 'Salvar Registro';
+        }
+
+        // Populate form for Editing
+        async function editServico(id) {
+            const { data, error } = await _supabase.from('unegro_servicos').select('*').eq('id', id).single();
+            if (error) { console.error(error); return; }
+
+            document.getElementById('formTitle').innerText = 'Editando Saber';
+            document.getElementById('servicoId').value = data.id;
+            document.getElementById('filiadoNome').value = data.filiado_nome;
+            document.getElementById('tituloServico').value = data.titulo_servico;
+            document.getElementById('cidade').value = data.cidade;
+            document.getElementById('whatsapp').value = data.whatsapp;
+            document.getElementById('descricao').value = data.descricao;
+
+            // Load category and trigger subcategory load with preselection
+            document.getElementById('categoriaSelect').value = data.categoria_id;
+            await loadSubcategorias(data.categoria_id, data.subcategoria_id);
+        }
+
+        // Delete operation
+        async function deleteServico(id) {
+            if(confirm('Tem certeza que deseja excluir este registro do Quilombo? Esta ação não pode ser desfeita.')) {
+                const { error } = await _supabase.from('unegro_servicos').delete().eq('id', id);
+                if (error) { alert('Erro ao excluir.'); console.error(error); }
+                else { loadServicos(); }
+            }
+        }
+
+        // Reset Form State
+        function resetForm() {
+            document.getElementById('formServico').reset();
+            document.getElementById('servicoId').value = '';
+            document.getElementById('formTitle').innerText = 'Novo Saber';
+            document.getElementById('subcategoriaSelect').innerHTML = '<option value="">Selecione a categoria primeiro...</option>';
+        }
+
+        // Run Initialization
+        window.onload = init;
+    </script>
+</body>
+</html>
