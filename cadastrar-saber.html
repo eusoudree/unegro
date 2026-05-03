@@ -58,10 +58,18 @@
         }
         .btn-submit:hover { background: #fff; }
         
-        /* Mensagem de Sucesso */
-        .msg-sucesso { display: none; text-align: center; padding: 40px; border: 1px solid var(--laranja); background: rgba(255, 140, 0, 0.05); margin-top: 20px; }
-        .msg-sucesso h3 { color: var(--laranja); margin-bottom: 15px; text-transform: uppercase; font-size: 20px; font-family: 'Cinzel', serif; letter-spacing: 1px; }
-        .msg-sucesso p { font-size: 14px; color: #ccc; line-height: 1.6; }
+        /* Modal Customizado (Alert) */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: var(--card); border: 1px solid var(--laranja); padding: 40px;
+            max-width: 400px; text-align: center; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        .modal-content h3 { color: var(--laranja); font-family: 'Cinzel', serif; margin-bottom: 15px; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; }
+        .modal-content p { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 30px; }
 
         /* Footer Oficial */
         footer { 
@@ -85,7 +93,7 @@
         </a>
         <div class="nav-links">
             <a href="index.html" class="link-hide">Início</a>
-            <a href="quilombo-digital.html" class="link-hide">Quilombo</a>
+            <a href="quilombo.html" class="link-hide">Quilombo</a>
             <a href="filiados.html" class="btn-acesso">Acesso Filiados</a>
         </div>
     </nav>
@@ -93,8 +101,7 @@
     <div class="container" id="formContainer">
         <h1 class="title">Integrar o Quilombo</h1>
         <p class="subtitle">
-            Para fortalecer nossa rede de <strong>Black Money</strong> e garantir a segurança do nosso ecossistema, 
-            todos os dados são cruzados com a base de filiados da UNEGRO. Após o envio, a coordenação valida o seu ofício antes dele ir pro ar.
+            Para fazer o <strong>Black Money</strong> circular de verdade e manter a nossa rede segura, a gente cruza os dados com a base da UNEGRO. Enviou o seu negócio ou serviço? A coordenação dá o confere e logo ele entra na vitrine.
         </p>
         
         <form id="formCadastro" onsubmit="submeterSaber(event)">
@@ -110,8 +117,8 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Título do Trabalho / Ofício</label>
-                <input type="text" id="tituloServico" class="form-input" placeholder="Ex: Eletricista Predial, Designer Gráfico..." required>
+                <label class="form-label">Nome do Negócio ou Serviço</label>
+                <input type="text" id="tituloServico" class="form-input" placeholder="Ex: Eletricista Predial, Agência de Design..." required>
             </div>
 
             <div class="form-group">
@@ -147,15 +154,18 @@
         </form>
     </div>
 
-    <div class="container msg-sucesso" id="msgSucesso">
-        <h3>Axé! Seu saber chegou na base.</h3>
-        <p>O cadastro tá na mão da coordenação. Assim que os dados baterem com a sua filiação, seu ofício entra na vitrine do Quilombo Digital pra girar a nossa economia.</p>
-        <button class="btn-submit" style="margin-top: 30px;" onclick="window.location.reload()">Cadastrar Novo Saber</button>
+    <!-- Estrutura do Modal Customizado -->
+    <div id="modalSucesso" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Axé!</h3>
+            <p>Seu cadastro foi realizado com sucesso. Em breve o seu serviço aparecerá no nosso Quilombo Digital.</p>
+            <button onclick="fecharModal()" class="btn-submit">Fechar e Voltar</button>
+        </div>
     </div>
 
     <footer>
         <span>UNEGRO VALE DO PARAÍBA • 2026</span>
-        <a href="https://www.dree.one/" target="_blank" class="credito-dree">Desenvolvido por Dree</a>
+        <a href="https://dree.one/" target="_blank" class="credito-dree">Tecnologia Dree.one</a>
     </footer>
 
     <script>
@@ -233,10 +243,17 @@
                 console.error(error);
                 btn.innerText = 'Enviar para Validação';
             } else {
-                document.getElementById('formContainer').style.display = 'none';
-                document.getElementById('msgSucesso').style.display = 'block';
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Sucesso: Mostra o modal e zera o form
+                document.getElementById('modalSucesso').style.display = 'flex';
+                document.getElementById('formCadastro').reset();
+                btn.innerText = 'Enviar para Validação';
             }
+        }
+
+        function fecharModal() {
+            document.getElementById('modalSucesso').style.display = 'none';
+            // Opcional: Redireciona o usuário para a página do Quilombo após fechar o modal
+            window.location.href = 'quilombo.html';
         }
 
         window.onload = init;
