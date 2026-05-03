@@ -1,95 +1,204 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa de Terreiros | UNEGRO Vale</title>
+    <title>Territórios de Axé | UNEGRO Vale do Paraíba</title>
     
-    <!-- Leaflet CSS (Mapa) -->
+    <!-- Leaflet CSS & JS (Mapa) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
+    <!-- ScrollReveal para manter o padrão de animação -->
+    <script src="https://unpkg.com/scrollreveal"></script>
+
     <style>
-        :root { --gold: #f1b434; --black: #050505; --gray: #111; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--black); color: white; }
-        
-        /* Layout */
-        .container-mapa { display: flex; height: 100vh; flex-direction: column; }
-        header { padding: 20px 40px; background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        h1 { color: var(--gold); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; margin: 0; }
+        :root {
+            --laranja-solid: #ff8c00;
+            --preto: #000000;
+            --cinza-card: #0d0d0d;
+            --texto: #ffffff;
+        }
 
-        /* O Mapa ocupando o resto da tela */
-        #map { flex-grow: 1; width: 100%; z-index: 1; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* Estilo do Popup do Mapa */
-        .leaflet-popup-content-wrapper { background: var(--gray); color: white; border: 1px solid var(--gold); border-radius: 8px; }
-        .leaflet-popup-tip { background: var(--gold); }
-        .popup-title { color: var(--gold); font-weight: 800; font-size: 16px; margin-bottom: 5px; }
-        .popup-info { font-size: 12px; line-height: 1.4; color: #ccc; }
-        .popup-link { display: inline-block; margin-top: 10px; color: var(--gold); text-decoration: none; font-weight: bold; border: 1px solid var(--gold); padding: 5px 10px; border-radius: 4px; font-size: 10px; }
+        body {
+            background-color: var(--preto);
+            color: var(--texto);
+            font-family: 'Inter', sans-serif;
+            /* Fundo idêntico à sua index */
+            background-image: linear-gradient(rgba(0,0,0,0.92), rgba(0,0,0,0.95)), 
+            url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 100 100"><g fill="%23222" fill-opacity="0.3"><path d="M50 20 L40 35 H60 L50 20 M50 80 L60 65 H40 L50 80 M20 50 L35 40 V60 L20 50 M80 50 L65 60 V40 L80 50"/></g></svg>');
+            background-attachment: fixed;
+        }
 
-        .btn-voltar { color: #666; text-decoration: none; font-size: 12px; font-weight: bold; transition: 0.3s; }
-        .btn-voltar:hover { color: var(--gold); }
+        /* Navbar Padrão UNEGRO */
+        .nav-unegro {
+            display: flex;
+            justify-content: flex-end; 
+            padding: 25px 50px;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,140,0,0.1);
+        }
+
+        .nav-links { display: flex; gap: 40px; align-items: center; }
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.4);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: color 0.4s ease;
+        }
+        .nav-links a:hover { color: var(--laranja-solid); }
+
+        /* Container do Mapa */
+        .container-mapeamento {
+            padding: 140px 20px 60px;
+            max-width: 1200px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .secao-titulo { 
+            color: var(--laranja-solid); 
+            text-transform: uppercase; 
+            letter-spacing: 5px; 
+            margin-bottom: 10px; 
+            font-size: 2.2rem; 
+            font-weight: 900; 
+        }
+
+        #map {
+            height: 650px;
+            width: 100%;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 140, 0, 0.2);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            z-index: 1;
+            margin-top: 30px;
+        }
+
+        /* Estilização Customizada dos Popups Leaflet */
+        .leaflet-popup-content-wrapper {
+            background: var(--cinza-card) !important;
+            color: #fff !important;
+            border: 1px solid var(--laranja-solid) !important;
+            border-radius: 12px !important;
+            padding: 10px;
+        }
+        .leaflet-popup-tip { background: var(--laranja-solid) !important; }
+
+        .popup-label { color: var(--laranja-solid); font-size: 9px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
+        .popup-title { font-size: 18px; font-weight: 900; margin: 5px 0; text-transform: uppercase; }
+        .popup-info { font-size: 12px; color: #ccc; margin-bottom: 10px; line-height: 1.4; }
+        .popup-btn {
+            display: block;
+            background: var(--laranja-solid);
+            color: #000;
+            text-align: center;
+            padding: 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 11px;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        .popup-btn:hover { background: #fff; }
+
+        footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; }
+
+        @media (max-width: 768px) {
+            .nav-unegro { justify-content: center; padding: 20px; }
+            #map { height: 450px; }
+            .secao-titulo { font-size: 1.5rem; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container-mapa">
-    <header>
-        <h1>Mapeamento de Comunidades Tradicionais e Terreiros</h1>
-        <a href="index.html" class="btn-voltar">← VOLTAR AO SITE</a>
-    </header>
+    <nav class="nav-unegro">
+        <div class="nav-links">
+            <a href="index.html">Início</a>
+            <a href="live.html">Live</a>
+            <a href="adm.html">Painel Administrativo</a>
+        </div>
+    </nav>
 
-    <div id="map"></div>
-</div>
+    <div class="container-mapeamento">
+        <h2 class="secao-titulo">Territórios de Axé</h2>
+        <p style="color: #666; letter-spacing: 3px; text-transform: uppercase; font-size: 10px;">
+            Mapeamento Ancestral • Vale do Paraíba
+        </p>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <div id="map"></div>
+    </div>
 
-<script>
-    const CONFIG = {
-        URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
-        KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
-    };
-    const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
+    <footer>UNEGRO VALE • 2026</footer>
 
-    // 1. Inicializa o mapa centralizado no Vale do Paraíba
-    const map = L.map('map').setView([-23.2237, -45.9009], 10); 
+    <script>
+        // 1. CONEXÃO SUPABASE
+        const CONFIG = {
+            URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
+            KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
+        };
+        const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
-    // 2. Adiciona o estilo Dark do Mapa (CartoDB Dark Matter)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; UNEGRO Vale do Paraíba'
-    }).addTo(map);
+        // 2. INICIALIZAÇÃO DO MAPA (FOCO NO VALE DO PARAÍBA)
+        const map = L.map('map', {
+            scrollWheelZoom: false // Evita zoom acidental ao rolar a página
+        }).setView([-23.18, -45.88], 9); 
 
-    // 3. Função para carregar terreiros do banco
-    async function carregarTerreiros() {
-        const { data, error } = await _supabase
-            .from('unegro_terreiros')
-            .select('*');
+        // Estilo Dark Matter (CartoDB)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; UNEGRO Vale do Paraíba'
+        }).addTo(map);
 
-        if (error) return console.error(error);
+        // 3. CARREGAR DADOS DO SUPABASE
+        async function carregarTerreiros() {
+            try {
+                const { data, error } = await _supabase
+                    .from('unegro_terreiros')
+                    .select('*');
 
-        data.forEach(terreiro => {
-            // Cria o marcador para cada terreiro
-            const marker = L.marker([terreiro.lat, terreiro.lng]).addTo(map);
+                if (error) throw error;
 
-            // Conteúdo do balãozinho (Popup)
-            const popupContent = `
-                <div class="popup-title">${terreiro.nome}</div>
-                <div class="popup-info">
-                    <strong>Zelador(a):</strong> ${terreiro.zelador}<br>
-                    <strong>Cidade:</strong> ${terreiro.cidade}<br>
-                    <strong>Endereço:</strong> ${terreiro.endereco}
-                </div>
-                ${terreiro.instagram_url ? `<a href="${terreiro.instagram_url}" target="_blank" class="popup-link">INSTAGRAM</a>` : ''}
-            `;
+                data.forEach(t => {
+                    // Marcador personalizado (opcional, aqui usa o padrão)
+                    const marker = L.marker([t.lat, t.lng]).addTo(map);
 
-            marker.bindPopup(popupContent);
-        });
-    }
+                    const content = `
+                        <div style="min-width: 200px;">
+                            <span class="popup-label">${t.cidade}</span>
+                            <div class="popup-title">${t.nome}</div>
+                            <div class="popup-info">
+                                <strong>Zelador(a):</strong> ${t.zelador}<br>
+                                <strong>Endereço:</strong> ${t.endereco}
+                            </div>
+                            ${t.instagram_url ? `<a href="${t.instagram_url}" target="_blank" class="popup-btn">Instagram</a>` : ''}
+                        </div>
+                    `;
+                    marker.bindPopup(content);
+                });
+            } catch (err) {
+                console.error("Erro ao carregar terreiros:", err.message);
+            }
+        }
 
-    window.onload = carregarTerreiros;
-</script>
+        // 4. EFEITOS DE ENTRADA
+        ScrollReveal().reveal('.container-mapeamento', { delay: 200, distance: '50px', origin: 'bottom', opacity: 0 });
 
+        window.onload = carregarTerreiros;
+    </script>
 </body>
 </html>
