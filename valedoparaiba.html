@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNEGRO | Vale do Paraíba - Território de Luta</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@300;400;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --laranja: #ff8c00; 
+            --preto: #050505; 
+            --card: #0a0a0a; 
+            --borda: #222;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background: var(--preto); color: #fff; font-family: 'Inter', sans-serif; 
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9));
+            overflow-x: hidden;
+        }
+
+        /* ATMOSFERA ANCESTRAL (FADE DAS FOTOS) */
+        #ancestral-overlay { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: #000; }
+        .spirit-face { 
+            position: absolute; width: 70vh; height: 70vh; background-size: cover; background-position: center; 
+            opacity: 0; filter: grayscale(100%) brightness(30%); transition: opacity 4s ease-in-out, transform 10s linear; 
+            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
+        }
+
+        nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--borda); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { font-family: 'Cinzel', serif; font-size: 18px; color: var(--laranja); text-decoration: none; }
+        .nav-links a { color: #fff; text-decoration: none; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-left: 30px; }
+
+        /* HERO & MANIFESTO */
+        .hero-vale { height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; }
+        .hero-vale h1 { font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 8vw, 5rem); text-transform: uppercase; background: linear-gradient(to bottom, #fff, #666); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .secao-manifesto { max-width: 900px; margin: -100px auto 100px; padding: 60px; background: var(--card); border: 1px solid var(--borda); position: relative; }
+        .secao-manifesto::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: var(--laranja); }
+        .titulo-secao { color: var(--laranja); font-family: 'Cinzel', serif; font-size: 24px; margin-bottom: 30px; text-transform: uppercase; text-align: center; }
+        .texto-luta { font-size: 1.1rem; line-height: 2; color: #ccc; text-align: justify; }
+
+        /* COUNTER DINÂMICO */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto 100px; padding: 0 20px; }
+        .stat-card { background: rgba(255,140,0,0.05); border: 1px solid var(--borda); padding: 40px; text-align: center; border-radius: 4px; transition: 0.3s; }
+        .stat-card:hover { border-color: var(--laranja); background: rgba(255,140,0,0.1); }
+        .stat-num { display: block; font-size: 48px; font-weight: 900; color: #fff; margin-bottom: 10px; }
+        .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--laranja); font-weight: 800; }
+
+        /* MOSAICO LIDERANÇAS */
+        .grid-liderancas { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto 100px; padding: 0 20px; }
+        .lider-card { position: relative; height: 400px; background: #111; overflow: hidden; border: 1px solid var(--borda); filter: grayscale(1); transition: 0.5s; }
+        .lider-card:hover { filter: grayscale(0); border-color: var(--laranja); }
+        .lider-img { width: 100%; height: 100%; background-size: cover; background-position: center; transition: 0.8s; }
+        .lider-info { position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px; background: linear-gradient(transparent, #000); }
+        .lider-info h3 { font-size: 18px; text-transform: uppercase; margin-bottom: 5px; }
+        .lider-info p { font-size: 10px; text-transform: uppercase; color: var(--laranja); letter-spacing: 1px; }
+
+        footer { text-align: center; padding: 60px; border-top: 1px solid var(--borda); font-size: 11px; letter-spacing: 2px; color: #444; }
+        .credito-dree { color: var(--laranja); text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="ancestral-overlay"></div>
+
+    <nav>
+        <a href="index.html" class="nav-logo">UNEGRO <span>SP</span></a>
+        <div class="nav-links">
+            <a href="index.html">Início</a>
+            <a href="unegro-vale.html">O Vale</a>
+            <a href="quilombo.html">Quilombo</a>
+            <a href="terreiros.html">Terreiros</a>
+        </div>
+    </nav>
+
+    <section class="hero-vale">
+        <p style="color: var(--laranja); font-weight: 900; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 20px;">Território Ancestral</p>
+        <h1>Vale do Paraíba</h1>
+    </section>
+
+    <section class="secao-manifesto">
+        <h2 class="titulo-secao">A Importância da Nossa Presença</h2>
+        <div class="texto-luta">
+            <p>O Vale do Paraíba é o coração de uma ferida histórica que a UNEGRO se dedica a curar através da organização e da luta. Esta região, que outrora foi o epicentro da economia cafeeira sustentada pelo sangue e suor dos nossos antepassados, hoje é palco de uma nova resistência. Nossa presença aqui é o grito de liberdade que ecoa do Vale do Paraíba para todo o estado. Valorizar a luta no Vale é reconhecer que a emancipação negra passa pelo fortalecimento dos nossos terreiros, pela circulação do Black Money em nossos quilombos digitais e pela formação de lideranças que não se curvam. Aqui, transformamos a herança de dor em combustível para a construção de um futuro onde o povo preto detém o poder sobre sua própria narrativa.</p>
+        </div>
+    </section>
+
+    <!-- COUNTER DINÂMICO -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-num" id="count-liderancas">0</span>
+            <span class="stat-label">Lideranças Ativas</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-num" id="count-terreiros">0</span>
+            <span class="stat-label">Terreiros Mapeados</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-num" id="count-saberes">0</span>
+            <span class="stat-label">Saberes no Quilombo</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-num" id="count-cidades">0</span>
+            <span class="stat-label">Cidades com Presença</span>
+        </div>
+    </div>
+
+    <h2 class="titulo-secao">Lideranças do Vale</h2>
+    <div class="grid-liderancas" id="liderancas-container">
+        <!-- Carregado via Supabase -->
+    </div>
+
+    <footer>
+        UNEGRO SP • VALE DO PARAÍBA • 2026<br><br>
+        <a href="https://dree.one" target="_blank" class="credito-dree">Tecnologia Dree.one</a>
+    </footer>
+
+    <script>
+        const CONFIG = {
+            URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
+            KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
+        };
+        const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
+
+        async function init() {
+            carregarStats();
+            carregarLiderancas();
+            iniciarAtmosfera();
+        }
+
+        async function carregarStats() {
+            // Count de Lideranças (Tipo VALE)
+            const { count: cLid } = await _supabase.from('liderancas_unegro').select('*', { count: 'exact', head: true }).eq('tipo', 'VALE');
+            document.getElementById('count-liderancas').innerText = cLid || 0;
+
+            // Count de Terreiros
+            const { count: cTer } = await _supabase.from('unegro_terreiros').select('*', { count: 'exact', head: true });
+            document.getElementById('count-terreiros').innerText = cTer || 0;
+
+            // Count de Saberes Aprovados
+            const { count: cSab } = await _supabase.from('unegro_servicos').select('*', { count: 'exact', head: true }).eq('aprovado', true);
+            document.getElementById('count-saberes').innerText = cSab || 0;
+
+            // Cidades distintas na base de filiados do Vale
+            const { data: cidades } = await _supabase.from('unegro_filiados').select('cidade');
+            const uniqueCidades = [...new Set(cidades.map(i => i.cidade))].length;
+            document.getElementById('count-cidades').innerText = uniqueCidades || 0;
+        }
+
+        async function carregarLiderancas() {
+            const { data } = await _supabase.from('liderancas_unegro').select('*').eq('tipo', 'VALE').order('ordem');
+            const container = document.getElementById('liderancas-container');
+            
+            if (data) {
+                container.innerHTML = data.map(l => `
+                    <div class="lider-card">
+                        <div class="lider-img" style="background-image: url('${l.foto_url}')"></div>
+                        <div class="lider-info">
+                            <h3>${l.nome}</h3>
+                            <p>${l.cargo || 'Liderança Vale'} • ${l.cidade}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function iniciarAtmosfera() {
+            const overlay = document.getElementById('ancestral-overlay');
+            const { data: fotos } = await _supabase.from('liderancas_unegro').select('foto_url');
+            
+            const lista = fotos ? fotos.map(f => f.foto_url) : [];
+            let i = 0;
+
+            function manifestar() {
+                const antigas = document.querySelectorAll('.spirit-face');
+                antigas.forEach(a => { a.style.opacity = '0'; setTimeout(() => a.remove(), 4000); });
+
+                const face = document.createElement('div');
+                face.className = 'spirit-face';
+                face.style.backgroundImage = `url('${lista[i]}')`;
+                face.style.left = Math.random() * 30 + (Math.random() > 0.5 ? 60 : 0) + '%';
+                face.style.top = Math.random() * 40 + '%';
+                overlay.appendChild(face);
+
+                setTimeout(() => { face.style.opacity = '0.4'; face.style.transform = 'scale(1.1)'; }, 100);
+                i = (i + 1) % lista.length;
+            }
+
+            if (lista.length > 0) {
+                manifestar();
+                setInterval(manifestar, 8000);
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
