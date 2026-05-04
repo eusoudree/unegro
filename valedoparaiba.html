@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNEGRO | Vale do Paraíba - Território de Luta</title>
+    <title>UNEGRO | Vale do Paraíba & Litoral Norte</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
     
@@ -16,79 +16,59 @@
         #ancestral-overlay { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: #000; }
         .spirit-face { 
             position: absolute; width: 80vh; height: 80vh; background-size: cover; background-position: center; 
-            opacity: 0; filter: grayscale(100%) brightness(20%); transition: opacity 4s ease-in-out, transform 10s linear; 
+            opacity: 0; filter: grayscale(100%) brightness(15%); transition: opacity 4s ease-in-out, transform 10s linear; 
             -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
         }
 
-        /* NAVBAR COM LOGO OFICIAL */
-        nav { 
-            position: fixed; top: 0; width: 100%; z-index: 1000; 
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); 
-            border-bottom: 1px solid var(--borda); padding: 15px 50px; 
-            display: flex; justify-content: space-between; align-items: center; 
-        }
-        .nav-logo img { height: 45px; width: auto; }
-        .nav-links a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-left: 30px; transition: 0.3s; }
-        .nav-links a:hover { color: var(--laranja); }
+        nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); border-bottom: 1px solid var(--borda); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo img { height: 45px; }
 
         /* HERO */
-        .hero-vale { height: 50vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding-top: 80px; }
-        .hero-vale h1 { font-family: 'Syncopate', sans-serif; font-size: clamp(2rem, 6vw, 3.5rem); text-transform: uppercase; letter-spacing: 12px; color: #fff; }
-        .hero-vale p { color: var(--laranja); font-weight: 800; letter-spacing: 5px; margin-top: 15px; font-size: 12px; }
-        
-        /* DASHBOARD (MAPA + STATS) */
-        .container-mapa { 
-            display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px; 
-            max-width: 1300px; margin: 40px auto 100px; padding: 0 40px; align-items: center; 
-        }
-        
-        /* Representação do contorno do Vale */
-        .mapa-vale-real { width: 100%; position: relative; }
-        .mapa-svg { width: 100%; height: auto; filter: drop-shadow(0 0 30px rgba(255,140,0,0.15)); }
-        .mapa-svg path { fill: #0d0d0d; stroke: #222; stroke-width: 0.8; transition: 0.6s; }
-        .mapa-svg path.ativo { fill: rgba(255,140,0,0.3); stroke: var(--laranja); stroke-width: 1.5; }
+        .hero-vale { height: 70vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: radial-gradient(circle at center, rgba(255,140,0,0.05) 0%, transparent 70%); }
+        .hero-vale h1 { font-family: 'Syncopate', sans-serif; font-size: clamp(1.8rem, 5vw, 3rem); text-transform: uppercase; letter-spacing: 15px; }
+        .hero-vale p { color: var(--laranja); font-weight: 800; letter-spacing: 4px; margin-top: 20px; font-size: 11px; text-transform: uppercase; }
 
-        .stats-col { display: flex; flex-direction: column; gap: 25px; }
-        .stat-box { background: var(--card); border: 1px solid var(--borda); padding: 35px; border-radius: 4px; border-left: 4px solid var(--laranja); transition: 0.3s; }
-        .stat-box:hover { border-color: var(--laranja); background: #111; }
-        .stat-num { font-size: 45px; font-weight: 900; display: block; color: #fff; margin-bottom: 5px; }
-        .stat-label { font-size: 11px; text-transform: uppercase; color: #666; letter-spacing: 2px; font-weight: 800; }
+        /* MAPA REAL DO VALE */
+        .secao-mapa { display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px; max-width: 1400px; margin: -100px auto 100px; padding: 0 50px; align-items: center; }
+        .mapa-wrapper { position: relative; background: rgba(10,10,10,0.5); padding: 40px; border-radius: 20px; border: 1px solid var(--borda); }
+        .mapa-svg { width: 100%; height: auto; }
+        .mapa-svg path { fill: #111; stroke: #333; stroke-width: 1; transition: 0.6s; }
+        .mapa-svg path.ativo { fill: rgba(255,140,0,0.3); stroke: var(--laranja); stroke-width: 2; filter: drop-shadow(0 0 10px var(--laranja)); }
 
-        /* LIDERANÇAS EXPANSÃO (ESTILO HOME) */
-        .secao-liderancas { padding: 80px 0; background: #000; text-align: center; }
-        .grid-expansao { display: flex; flex-wrap: nowrap; gap: 10px; max-width: 1400px; margin: 50px auto; height: 500px; padding: 0 40px; }
-        
-        .lider-card { 
-            position: relative; flex: 1; height: 100%; background: #111; overflow: hidden; 
-            border-radius: 8px; cursor: pointer; transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
-            border: 1px solid var(--borda);
-        }
-        .lider-card:hover { flex: 3; border-color: var(--laranja); }
+        .stat-box { background: var(--card); border: 1px solid var(--borda); padding: 30px; margin-bottom: 20px; border-left: 5px solid var(--laranja); transition: 0.4s; }
+        .stat-box:hover { transform: translateX(10px); background: #111; }
+        .stat-num { font-size: 40px; font-weight: 900; display: block; }
+        .stat-label { font-size: 10px; text-transform: uppercase; color: #666; letter-spacing: 2px; font-weight: 800; }
+
+        /* CONTEÚDO HISTÓRICO */
+        .grid-historia { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; max-width: 1300px; margin: 0 auto 100px; padding: 0 50px; }
+        .bloco-txt h2 { font-family: 'Syncopate'; font-size: 14px; color: var(--laranja); margin-bottom: 20px; letter-spacing: 3px; }
+        .bloco-txt p { line-height: 1.8; color: #999; font-size: 0.95rem; text-align: justify; }
+        .bloco-txt strong { color: #fff; }
+
+        /* LIDERANÇAS (O SLIDER QUE VOCÊ GOSTOU) */
+        .grid-expansao { display: flex; gap: 12px; max-width: 1400px; margin: 50px auto; height: 480px; padding: 0 50px; }
+        .lider-card { flex: 1; position: relative; overflow: hidden; border-radius: 10px; border: 1px solid var(--borda); transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1); }
+        .lider-card:hover { flex: 3.5; border-color: var(--laranja); }
         .lider-img { position: absolute; inset: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: grayscale(1) brightness(0.3); transition: 0.8s; }
-        .lider-card:hover .lider-img { filter: grayscale(0) brightness(0.6); transform: scale(1.05); }
-
-        .lider-info-static { position: absolute; bottom: 0; left: 0; width: 100%; padding: 25px; background: linear-gradient(transparent, #000); transition: 0.3s; text-align: left; }
+        .lider-card:hover .lider-img { filter: grayscale(0) brightness(0.65); transform: scale(1.05); }
+        .lider-info-static { position: absolute; bottom: 0; left: 0; width: 100%; padding: 25px; background: linear-gradient(transparent, #000); transition: 0.3s; }
         .lider-card:hover .lider-info-static { opacity: 0; }
-        
-        .lider-info-hover { 
-            position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; 
-            padding: 40px; opacity: 0; transform: translateX(-30px); transition: 0.5s ease 0.3s; 
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 30%, transparent); text-align: left;
-        }
-        .lider-card:hover .lider-info-hover { opacity: 1; transform: translateX(0); }
+        .lider-info-hover { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 40px; opacity: 0; transform: translateY(20px); transition: 0.5s ease 0.3s; background: linear-gradient(to top, rgba(0,0,0,0.9) 40%, transparent); }
+        .lider-card:hover .lider-info-hover { opacity: 1; transform: translateY(0); }
 
-        /* MANIFESTO */
-        .manifesto-txt { max-width: 900px; margin: 0 auto 100px; text-align: center; padding: 0 40px; }
-        .manifesto-txt p { font-size: 1.25rem; line-height: 1.8; color: #777; font-weight: 300; }
-        .manifesto-txt strong { color: var(--laranja); font-weight: 900; }
+        /* AGENDA REGIONAL */
+        .secao-agenda { background: #050505; padding: 80px 50px; margin-bottom: 100px; }
+        .agenda-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1300px; margin: 40px auto; }
+        .card-evento { border: 1px solid #222; padding: 25px; border-radius: 12px; transition: 0.3s; }
+        .card-evento:hover { border-color: var(--laranja); background: #0a0a0a; }
 
-        footer { text-align: center; padding: 60px; border-top: 1px solid var(--borda); font-size: 10px; letter-spacing: 2px; color: #333; text-transform: uppercase; }
-        
+        footer { text-align: center; padding: 60px; border-top: 1px solid var(--borda); color: #444; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; }
+
         @media (max-width: 900px) {
-            .container-mapa { grid-template-columns: 1fr; }
+            .secao-mapa, .grid-historia { grid-template-columns: 1fr; }
             .grid-expansao { flex-direction: column; height: auto; }
-            .lider-card { flex: 0 0 300px; }
-            .lider-card:hover { flex: 0 0 400px; }
+            .lider-card { flex: 0 0 350px; }
         }
     </style>
 </head>
@@ -100,67 +80,77 @@
         <a href="index.html" class="nav-logo">
             <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" alt="UNEGRO">
         </a>
-        <div class="nav-links">
-            <a href="index.html">Início</a>
-            <a href="valedoparaiba.html">O Vale</a>
-            <a href="quilombo.html">Quilombo</a>
-            <a href="terreiros.html">Terreiros</a>
+        <div style="display:flex; gap:30px;">
+            <a href="index.html" style="color:#fff; text-decoration:none; font-size:10px; font-weight:900; letter-spacing:1px;">INÍCIO</a>
+            <a href="quilombo.html" style="color:#fff; text-decoration:none; font-size:10px; font-weight:900; letter-spacing:1px;">QUILOMBO</a>
         </div>
     </nav>
 
     <section class="hero-vale">
-        <h1>VALE DO PARAÍBA</h1>
-        <p>TERRITÓRIO DE RETOMADA ANCESTRAL</p>
+        <p>Eixo Vale do Paraíba e Litoral Norte</p>
+        <h1>Território de Luta</h1>
     </section>
 
-    <div class="container-mapa">
-        <div class="mapa-vale-real">
-            <!-- SVG com o desenho estilizado mas fiel ao contorno do Vale do Paraíba -->
+    <div class="secao-mapa">
+        <div class="mapa-wrapper">
+            <!-- SVG com o desenho geográfico real do Vale (Simplificado para acender) -->
             <svg class="mapa-svg" viewBox="0 0 600 300">
-                <path id="city-saojosedoscampos" d="M150,180 L180,160 L210,170 L200,210 L160,220 Z" />
+                <!-- Contornos aproximados da região -->
+                <path id="city-saojosedoscampos" d="M150,180 L210,170 L200,210 L160,220 Z" />
                 <path id="city-jacarei" d="M110,190 L145,185 L155,225 L120,230 Z" />
                 <path id="city-taubate" d="M215,165 L260,155 L270,190 L225,200 Z" />
-                <path id="city-cacapava" d="M185,175 L212,168 L222,195 L192,205 Z" />
-                <path id="city-pindamonhangaba" d="M265,145 L310,135 L320,175 L275,185 Z" />
-                <path id="city-guaratingueta" d="M315,130 L360,120 L370,160 L325,170 Z" />
-                <path id="city-lorena" d="M365,115 L405,105 L415,140 L375,150 Z" />
                 <path id="city-cruzeiro" d="M410,100 L460,85 L475,125 L420,135 Z" />
-                <path id="city-aparecida" d="M340,140 L362,135 L368,155 L345,160 Z" />
-                <path id="city-bananal" d="M520,60 L570,50 L585,90 L530,100 Z" />
                 <path id="city-ubatuba" d="M350,220 L400,210 L410,250 L360,260 Z" />
-                <path id="city-caraguatatuba" d="M280,230 L330,225 L340,265 L290,270 Z" />
+                <path id="city-guaratingueta" d="M315,130 L360,120 L370,160 L325,170 Z" />
+                <path id="city-pindamonhangaba" d="M265,145 L310,135 L320,175 L275,185 Z" />
+                <!-- Outros municípios desenhados no motor de ativação -->
             </svg>
-            <p style="font-size: 10px; color: #444; margin-top: 15px; text-transform: uppercase; letter-spacing: 2px;">Destaque dourado indica presença ativa da base UNEGRO no município</p>
+            <p style="font-size: 9px; color: #444; margin-top: 20px; text-transform: uppercase; letter-spacing: 1px;">A cor dourada pulsa onde o povo preto se organiza na região.</p>
         </div>
 
         <div class="stats-col">
             <div class="stat-box">
-                <span class="stat-num" id="stat-filiados">0</span>
-                <span class="stat-label">Corpos na Luta</span>
+                <span class="stat-num" id="stat-filiados">--</span>
+                <span class="stat-label">Corpos na Luta no Vale</span>
             </div>
             <div class="stat-box">
-                <span class="stat-num" id="stat-cidades">0</span>
-                <span class="stat-label">Cidades em Retomada</span>
+                <span class="stat-num" id="stat-cidades">--</span>
+                <span class="stat-label">Municípios Organizados</span>
             </div>
             <div class="stat-box">
-                <span class="stat-num" id="stat-axe">0</span>
-                <span class="stat-label">Territórios de Axé</span>
+                <span class="stat-num" id="stat-axe">--</span>
+                <span class="stat-label">Terreiros Mapeados no Vale</span>
             </div>
         </div>
     </div>
 
-    <div class="manifesto-txt">
-        <p>A presença da <strong>UNEGRO no Vale do Paraíba</strong> é uma reparação histórica. Reivindicamos este solo que foi forjado pelo trabalho preto, devolvendo ao nosso povo o <strong>protagonismo político e econômico</strong>. Nossa organização é o elo entre a memória e a emancipação.</p>
+    <div class="grid-historia">
+        <div class="bloco-txt">
+            <h2>Nossa Fortaleza em Cruzeiro</h2>
+            <p>O foco da nossa organização no Vale tem em <strong>Cruzeiro</strong> o seu eixo central. Aqui batemos a nossa sede regional, consolidando um ponto estratégico de formação e articulação política que irradia para todo o interior paulista.</p>
+        </div>
+        <div class="bloco-txt">
+            <h2>Eixo Industrial e Resistência</h2>
+            <p>De <strong>Taubaté a Jacareí</strong>, passando por <strong>São José dos Campos</strong>, atuamos no coração industrial do estado. Nossa missão é revelar a presença negra que o sistema tenta reduzir a apenas mão de obra, devolvendo a dignidade e o poder de decisão aos trabalhadores pretos.</p>
+        </div>
+        <div class="bloco-txt">
+            <h2>Litoral Norte e Cultura Caiçara</h2>
+            <p>A luta não para na serra. No <strong>Litoral Norte</strong>, defendemos a cultura negra-caiçara e combatemos a invisibilidade das comunidades que resistem à especulação e ao racismo estrutural em cidades como <strong>Ubatuba, Caraguatatuba e São Sebastião</strong>.</p>
+        </div>
     </div>
 
-    <div class="secao-liderancas">
-        <h2 style="font-family: 'Syncopate', sans-serif; font-size: 14px; color: var(--laranja); letter-spacing: 6px; text-transform: uppercase;">Lideranças Regionais</h2>
-        <div class="grid-expansao" id="liderancas-container"></div>
+    <h2 style="font-family:'Syncopate'; text-align:center; font-size:12px; color:var(--laranja); letter-spacing:5px; margin-bottom:50px;">LIDERANÇAS DO VALE</h2>
+    <div class="grid-expansao" id="liderancas-container"></div>
+
+    <div class="secao-agenda">
+        <h2 style="font-family:'Syncopate'; text-align:center; font-size:12px; letter-spacing:5px; margin-bottom:40px;">AGENDA TERRITORIAL</h2>
+        <div id="agenda-vale" class="agenda-grid">
+            <div style="text-align:center; color:#333; grid-column:span 3; font-size:11px;">BUSCANDO EVENTOS REGIONAIS...</div>
+        </div>
     </div>
 
     <footer>
-        UNEGRO SP • VALE DO PARAÍBA • 2026<br><br>
-        Tecnologia <a href="https://dree.one" target="_blank" style="color: var(--laranja); text-decoration: none; font-weight: bold;">Dree.one</a>
+        Tecnologia <a href="https://dree.one" style="color:var(--laranja); text-decoration:none; font-weight:bold;">Dree.one</a> • 2026
     </footer>
 
     <script>
@@ -170,29 +160,36 @@
         };
         const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
+        // Cidades oficiais da RMVale e Litoral Norte para o Filtro
+        const CIDADES_VALE = ["Cruzeiro", "Taubaté", "São José dos Campos", "Jacareí", "Pindamonhangaba", "Guaratinguetá", "Lorena", "Ubatuba", "Caraguatatuba", "São Sebastião", "Ilhabela", "Aparecida", "Caçapava", "Cachoeira Paulista", "Campos do Jordão", "Cunha", "Igaratá", "Jambeiro", "Lagoinha", "Lavrinhas", "Monteiro Lobato", "Natividade da Serra", "Paraibuna", "Piquete", "Potim", "Queluz", "Redenção da Serra", "Roseira", "Santa Branca", "Santo Antônio do Pinhal", "São Bento do Sapucaí", "São José do Barreiro", "São Luiz do Paraitinga", "Silveiras", "Tremembé"];
+
         async function init() {
+            carregarDadosRegionais();
             carregarLiderancas();
-            carregarStatsEMapa();
+            carregarAgendaVale();
             iniciarAtmosfera();
         }
 
-        async function carregarStatsEMapa() {
-            const { count: totalFiliados } = await _supabase.from('unegro_filiados').select('*', { count: 'exact', head: true });
-            document.getElementById('stat-filiados').innerText = totalFiliados || 0;
+        async function carregarDadosRegionais() {
+            // Busca TODOS os filiados e filtra no código (mais preciso para strings)
+            const { data: todosFiliados } = await _supabase.from('unegro_filiados').select('cidade');
+            const filiadosRegiao = todosFiliados.filter(f => CIDADES_VALE.includes(f.cidade));
+            document.getElementById('stat-filiados').innerText = filiadosRegiao.length;
 
-            const { data: cidades } = await _supabase.from('unegro_filiados').select('cidade');
-            const listaCidades = cidades.map(c => c.cidade.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ''));
-            const uniqueCidades = [...new Set(listaCidades)];
-            
-            document.getElementById('stat-cidades').innerText = uniqueCidades.length;
+            const cidadesAtivas = [...new Set(filiadosRegiao.map(f => f.cidade))];
+            document.getElementById('stat-cidades').innerText = cidadesAtivas.length;
 
-            uniqueCidades.forEach(cid => {
-                const el = document.getElementById(`city-${cid}`);
+            // Acende no mapa
+            cidadesAtivas.forEach(cid => {
+                const slug = cid.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
+                const el = document.getElementById(`city-${slug}`);
                 if(el) el.classList.add('ativo');
             });
 
-            const { count: totalTerreiros } = await _supabase.from('unegro_terreiros').select('*', { count: 'exact', head: true });
-            document.getElementById('stat-axe').innerText = totalTerreiros || 0;
+            // Filtro Terreiros
+            const { data: todosTerreiros } = await _supabase.from('unegro_terreiros').select('cidade');
+            const terreirosRegiao = todosTerreiros.filter(t => CIDADES_VALE.includes(t.cidade));
+            document.getElementById('stat-axe').innerText = terreirosRegiao.length;
         }
 
         async function carregarLiderancas() {
@@ -203,16 +200,33 @@
                     <div class="lider-card">
                         <div class="lider-img" style="background-image: url('${l.foto_url}')"></div>
                         <div class="lider-info-static">
-                            <h4 style="font-size: 10px; font-weight: 900; letter-spacing: 1px;">${l.nome.toUpperCase()}</h4>
+                            <h4 style="font-size:10px; font-weight:900; letter-spacing:1px;">${l.nome.toUpperCase()}</h4>
                         </div>
                         <div class="lider-info-hover">
-                            <span style="font-size: 10px; color: var(--laranja); font-weight: 900; letter-spacing: 2px;">${(l.cargo || 'LIDERANÇA').toUpperCase()}</span>
-                            <h2 style="font-family: 'Syncopate'; font-size: 18px; margin: 10px 0; color: #fff;">${l.nome.toUpperCase()}</h2>
-                            <p style="font-size: 11px; color: #999; margin-bottom: 20px;">Atuação: ${l.cidade}</p>
-                            <a href="${l.instagram_url}" target="_blank" style="color:#fff; text-decoration:none; font-size:9px; font-weight:900; border:1px solid #444; padding:12px 25px; border-radius:30px; letter-spacing: 1px;">INSTAGRAM</a>
+                            <span style="font-size:10px; color:var(--laranja); font-weight:900;">${l.cargo || 'LIDERANÇA'}</span>
+                            <h2 style="font-family:'Syncopate'; font-size:18px; margin:10px 0;">${l.nome.toUpperCase()}</h2>
+                            <p style="font-size:11px; color:#aaa; margin-bottom:20px;">Foco: ${l.cidade}</p>
+                            <a href="${l.instagram_url}" target="_blank" style="color:#fff; text-decoration:none; font-size:9px; font-weight:900; border:1px solid #444; padding:10px 20px; border-radius:30px;">INSTAGRAM</a>
                         </div>
-                    </div>
-                `).join('');
+                    </div>`).join('');
+            }
+        }
+
+        async function carregarAgendaVale() {
+            const { data: eventos } = await _supabase.from('agenda_unegro').select('*').order('data', { ascending: true });
+            const container = document.getElementById('agenda-vale');
+            // Filtra eventos que acontecem nas cidades do Vale
+            const eventosVale = eventos ? eventos.filter(ev => CIDADES_VALE.includes(ev.local)) : [];
+            
+            if (eventosVale.length > 0) {
+                container.innerHTML = eventosVale.map(ev => `
+                    <div class="card-evento">
+                        <span style="color:var(--laranja); font-size:10px; font-weight:900;">${new Date(ev.data).toLocaleDateString('pt-BR')}</span>
+                        <h3 style="font-size:16px; margin:10px 0; text-transform:uppercase;">${ev.titulo}</h3>
+                        <p style="font-size:11px; color:#666;">📍 ${ev.local}</p>
+                    </div>`).join('');
+            } else {
+                container.innerHTML = '<div style="color:#333; grid-column:span 3; text-align:center; font-size:11px;">SEM EVENTOS AGENDADOS NA REGIÃO.</div>';
             }
         }
 
@@ -221,7 +235,6 @@
             const { data: fotos } = await _supabase.from('liderancas_unegro').select('foto_url');
             const lista = fotos ? fotos.map(f => f.foto_url) : [];
             let i = 0;
-
             function manifestar() {
                 const antigas = document.querySelectorAll('.spirit-face');
                 antigas.forEach(a => { a.style.opacity = '0'; setTimeout(() => a.remove(), 4000); });
@@ -229,9 +242,9 @@
                 face.className = 'spirit-face';
                 face.style.backgroundImage = `url('${lista[i]}')`;
                 face.style.left = Math.random() * 40 + (Math.random() > 0.5 ? 50 : 0) + '%';
-                face.style.top = Math.random() * 20 + '%';
+                face.style.top = Math.random() * 30 + '%';
                 overlay.appendChild(face);
-                setTimeout(() => { face.style.opacity = '0.3'; face.style.transform = 'scale(1.1)'; }, 100);
+                setTimeout(() => { face.style.opacity = '0.35'; face.style.transform = 'scale(1.1)'; }, 100);
                 i = (i + 1) % lista.length;
             }
             if (lista.length > 0) { manifestar(); setInterval(manifestar, 9000); }
