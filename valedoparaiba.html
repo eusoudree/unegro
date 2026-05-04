@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNEGRO | Vale do Paraíba & Litoral Norte</title>
+    <title>RMVALE & LITORAL | UNEGRO SP</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        :root { --laranja: #ff8c00; --preto: #000; --card: #0a0a0a; --borda: #1a1a1a; }
+        :root { --laranja: #ff8c00; --preto: #000; --card: rgba(10, 10, 10, 0.9); --borda: #1a1a1a; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: var(--preto); color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
 
-        /* Fundo Ancestral */
+        /* FUNDO SPIRIT FACE */
         #ancestral-overlay { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: #000; }
         .spirit-face { 
             position: absolute; width: 80vh; height: 80vh; background-size: cover; background-position: center; 
@@ -20,70 +20,64 @@
             -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
         }
 
-        nav { 
-            position: fixed; top: 0; width: 100%; z-index: 1000; 
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); 
-            border-bottom: 1px solid var(--borda); padding: 15px 50px; 
-            display: flex; justify-content: space-between; align-items: center; 
-        }
+        /* NAV */
+        nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0,0,0,0.95); backdrop-filter: blur(15px); border-bottom: 1px solid var(--borda); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; }
         .nav-logo img { height: 40px; }
 
-        .hero-territorio { height: 40vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding-top: 100px; }
-        .hero-territorio h1 { font-family: 'Syncopate', sans-serif; font-size: clamp(1.5rem, 6vw, 3.5rem); text-transform: uppercase; letter-spacing: 15px; }
-
-        /* Mapa de Calor dinâmico sobre imagem real */
-        .area-mapa {
-            width: 100%; max-width: 1400px; margin: 0 auto 100px; padding: 0 50px;
-            display: grid; grid-template-columns: 1.8fr 1fr; gap: 40px; align-items: center;
+        /* SEÇÃO MAPA FULL WIDTH */
+        .secao-territorio-full { 
+            position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%); overflow: hidden;
         }
 
-        .mapa-interativo {
-            position: relative; width: 100%; height: 500px;
-            background: url('https://upload.wikimedia.org/wikipedia/commons/e/e4/Sao_Paulo_Municip_Vale_do_Paraiba_Paulista.svg') no-repeat center;
-            background-size: contain; filter: brightness(0.3) sepia(1) hue-rotate(-50deg) saturate(3);
-        }
+        .mapa-interativo-full { position: absolute; inset: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; opacity: 0.4; }
+        .mapa-svg { width: 90%; height: 85%; filter: drop-shadow(0 0 40px rgba(255,140,0,0.1)); }
+        .mapa-svg path { fill: #080808; stroke: #222; stroke-width: 0.5; transition: 0.6s; }
+        .mapa-svg path.ativo { fill: rgba(255,140,0,0.1); stroke: var(--laranja); stroke-width: 1.2; }
 
-        .ponto-luta {
-            position: absolute; width: 12px; height: 12px; background: var(--laranja); border-radius: 50%;
-            box-shadow: 0 0 20px var(--laranja); transform: translate(-50%, -50%); display: none;
-        }
-        .ponto-luta::after {
-            content: ''; position: absolute; inset: -100%; border: 2px solid var(--laranja); border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+        /* PULSOS DINÂMICOS */
+        .ponto-pulso { position: absolute; width: 10px; height: 10px; background: var(--laranja); border-radius: 50%; box-shadow: 0 0 15px var(--laranja); transform: translate(-50%, -50%); display: none; z-index: 10; }
+        .ponto-pulso::after { content: ''; position: absolute; inset: -150%; border: 1px solid var(--laranja); border-radius: 50%; animation: pulse-ring 2s infinite; }
+        @keyframes pulse-ring { 0% { transform: scale(0.4); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
 
-        .stats-col { display: flex; flex-direction: column; gap: 20px; }
-        .stat-card { background: var(--card); border: 1px solid var(--borda); padding: 30px; border-left: 4px solid var(--laranja); }
-        .stat-num { font-size: 48px; font-weight: 900; display: block; }
-        .stat-label { font-size: 10px; text-transform: uppercase; color: #666; letter-spacing: 2px; font-weight: 800; }
+        /* INFO OVERLAY */
+        .header-floating { position: absolute; top: 120px; text-align: center; z-index: 5; pointer-events: none; }
+        .header-floating h1 { font-family: 'Syncopate'; font-size: clamp(1.8rem, 5vw, 3.5rem); letter-spacing: 15px; margin-bottom: 10px; }
+        .header-floating p { color: var(--laranja); font-weight: 800; letter-spacing: 5px; font-size: 10px; text-transform: uppercase; }
 
-        /* Historia do Vale */
-        .secao-historia { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 50px; max-width: 1300px; margin: 0 auto 120px; padding: 0 50px; }
-        .card-txt h2 { font-family: 'Syncopate'; font-size: 12px; color: var(--laranja); margin-bottom: 25px; letter-spacing: 4px; }
-        .card-txt p { line-height: 2; color: #999; font-size: 1rem; text-align: justify; }
+        .stats-floating { position: absolute; right: 50px; bottom: 80px; display: flex; flex-direction: column; gap: 15px; z-index: 5; }
+        .stat-card { background: var(--card); border: 1px solid var(--borda); padding: 30px; border-left: 4px solid var(--laranja); backdrop-filter: blur(10px); min-width: 280px; }
+        .stat-num { font-size: 40px; font-weight: 900; display: block; margin-bottom: 5px; }
+        .stat-label { font-size: 9px; text-transform: uppercase; color: #666; letter-spacing: 2px; font-weight: 800; }
 
-        /* Slider Lideranças (Estilo Index) */
-        .secao-liderancas { padding: 80px 0; background: #050505; }
-        .slider-flex { display: flex; gap: 10px; max-width: 1500px; margin: 40px auto; height: 550px; padding: 0 50px; }
-        .lider-item { flex: 1; position: relative; overflow: hidden; border-radius: 4px; transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1); border: 1px solid #222; }
+        /* CONTEÚDO HISTÓRICO */
+        .secao-historia { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 40px; max-width: 1400px; margin: 100px auto; padding: 0 50px; }
+        .bloco-info h2 { font-family: 'Syncopate'; font-size: 13px; color: var(--laranja); margin-bottom: 25px; letter-spacing: 3px; }
+        .bloco-info p { color: #888; line-height: 2; text-align: justify; }
+
+        /* SLIDER LIDERANÇAS */
+        .secao-liderancas { padding-bottom: 100px; }
+        .slider-wrapper { display: flex; gap: 10px; max-width: 1500px; margin: 0 auto; height: 500px; padding: 0 50px; }
+        .lider-item { flex: 1; position: relative; overflow: hidden; border-radius: 4px; transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1); border: 1px solid #111; cursor: pointer; }
         .lider-item:hover { flex: 4; border-color: var(--laranja); }
         .lider-img { position: absolute; inset: 0; background-size: cover; background-position: center; filter: grayscale(1) brightness(0.2); transition: 1s; }
-        .lider-item:hover .lider-img { filter: grayscale(0) brightness(0.65); transform: scale(1.05); }
-        .lider-info { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px; opacity: 0; transform: translateY(30px); transition: 0.5s 0.3s; background: linear-gradient(to top, #000 50%, transparent); }
-        .lider-item:hover .lider-info { opacity: 1; transform: translateY(0); }
+        .lider-item:hover .lider-img { filter: grayscale(0) brightness(0.7); }
+        .lider-txt { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px; opacity: 0; transform: translateY(20px); transition: 0.5s 0.2s; background: linear-gradient(transparent, #000 80%); }
+        .lider-item:hover .lider-txt { opacity: 1; transform: translateY(0); }
 
-        footer { text-align: center; padding: 80px; border-top: 1px solid var(--borda); color: #333; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; }
-
+        footer { text-align: center; padding: 60px; border-top: 1px solid var(--borda); color: #333; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; }
+        
         @media (max-width: 1000px) {
-            .area-mapa { grid-template-columns: 1fr; }
-            .slider-flex { flex-direction: column; height: auto; }
-            .lider-item { flex: 0 0 400px; }
+            .stats-floating { position: relative; right: 0; bottom: 0; padding: 20px; align-items: center; width: 100%; }
+            .secao-territorio-full { height: auto; padding-top: 150px; }
+            .mapa-interativo-full { position: relative; height: 400px; }
+            .slider-wrapper { flex-direction: column; height: auto; }
+            .lider-item { flex: 0 0 350px; }
         }
     </style>
 </head>
 <body>
     <div id="ancestral-overlay"></div>
+    
     <nav>
         <a href="index.html" class="nav-logo">
             <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" alt="UNEGRO">
@@ -94,52 +88,80 @@
         </div>
     </nav>
 
-    <header class="hero-territorio">
-        <h1>RMVALE & LITORAL</h1>
-        <p style="color:var(--laranja); letter-spacing:10px; font-weight:900; margin-top:15px;">TERRITÓRIO DE RETOMADA</p>
-    </header>
+    <section class="secao-territorio-full">
+        <div class="header-floating">
+            <h1>RMVALE & LITORAL</h1>
+            <p>Território de Retomada Ancestral</p>
+        </div>
 
-    <div class="area-mapa">
-        <div class="mapa-interativo" id="mapa-alvos">
-             <!-- Pontos injetados conforme cidades dos filiados -->
-             <div class="ponto-luta" id="p-cruzeiro" style="top: 25%; left: 78%;"></div>
-             <div class="ponto-luta" id="p-taubate" style="top: 48%; left: 45%;"></div>
-             <div class="ponto-luta" id="p-saojosedoscampos" style="top: 55%; left: 32%;"></div>
-             <div class="ponto-luta" id="p-jacarei" style="top: 60%; left: 25%;"></div>
-             <div class="ponto-luta" id="p-ubatuba" style="top: 70%; left: 65%;"></div>
-             <div class="ponto-luta" id="p-caraguatatuba" style="top: 80%; left: 55%;"></div>
-             <div class="ponto-luta" id="p-guaratingueta" style="top: 40%; left: 60%;"></div>
-             <div class="ponto-luta" id="p-pindamonhangaba" style="top: 45%; left: 52%;"></div>
-             <div class="ponto-luta" id="p-lorena" style="top: 35%; left: 68%;"></div>
+        <div class="mapa-interativo-full" id="mapa-alvos">
+             <!-- VETOR GEOGRÁFICO SIMPLIFICADO RMVALE -->
+             <svg class="mapa-svg" viewBox="0 0 800 500">
+                <!-- SJC --> <path id="svg-saojosedoscampos" d="M250,300 L300,280 L330,310 L310,350 L260,340 Z" />
+                <!-- Taubaté --> <path id="svg-taubate" d="M340,280 L400,265 L415,310 L350,325 Z" />
+                <!-- Jacareí --> <path id="svg-jacarei" d="M190,320 L240,310 L250,355 L200,365 Z" />
+                <!-- Cruzeiro --> <path id="svg-cruzeiro" d="M580,180 L650,155 L670,210 L600,230 Z" />
+                <!-- Pinda --> <path id="svg-pindamonhangaba" d="M400,240 L470,225 L485,280 L410,295 Z" />
+                <!-- Guará --> <path id="svg-guaratingueta" d="M475,215 L540,200 L555,255 L490,270 Z" />
+                <!-- Lorena --> <path id="svg-lorena" d="M545,190 L600,175 L615,225 L560,240 Z" />
+                <!-- Ubatuba --> <path id="svg-ubatuba" d="M520,330 L600,310 L630,380 L540,400 Z" />
+                <!-- Caraguá --> <path id="svg-caraguatatuba" d="M430,350 L510,335 L525,410 L440,425 Z" />
+                <!-- São Sebastião --> <path id="svg-saosebastiao" d="M380,410 L435,395 L445,460 L390,470 Z" />
+                <!-- Caçapava --> <path id="svg-cacapava" d="M305,295 L335,285 L345,315 L315,325 Z" />
+             </svg>
+
+             <!-- PULSOS (IDs batem com as cidades da base) -->
+             <div class="ponto-pulso" id="p-saojosedoscampos" style="top: 65%; left: 35%;"></div>
+             <div class="ponto-pulso" id="p-taubate" style="top: 58%; left: 47%;"></div>
+             <div class="ponto-pulso" id="p-jacarei" style="top: 68%; left: 28%;"></div>
+             <div class="ponto-pulso" id="p-cruzeiro" style="top: 38%; left: 80%;"></div>
+             <div class="ponto-pulso" id="p-pindamonhangaba" style="top: 52%; left: 55%;"></div>
+             <div class="ponto-pulso" id="p-guaratingueta" style="top: 48%; left: 64%;"></div>
+             <div class="ponto-pulso" id="p-lorena" style="top: 43%; left: 73%;"></div>
+             <div class="ponto-pulso" id="p-ubatuba" style="top: 75%; left: 72%;"></div>
+             <div class="ponto-pulso" id="p-caraguatatuba" style="top: 80%; left: 58%;"></div>
+             <div class="ponto-pulso" id="p-saosebastiao" style="top: 88%; left: 48%;"></div>
+             <div class="ponto-pulso" id="p-cacapava" style="top: 60%; left: 41%;"></div>
+             <div class="ponto-pulso" id="p-aparecida" style="top: 50%; left: 61%;"></div>
         </div>
-        <div class="stats-col">
-            <div class="stat-card"><span class="stat-num" id="stat-filiados">0</span><label class="stat-label">Corpos na Luta (Regional)</label></div>
-            <div class="stat-card"><span class="stat-num" id="stat-cidades">0</span><label class="stat-label">Cidades em Retomada</label></div>
-            <div class="stat-card"><span class="stat-num" id="stat-axe">0</span><label class="stat-label">Terreiros Mapeados</label></div>
+
+        <div class="stats-floating">
+            <div class="stat-card">
+                <span class="stat-num" id="stat-filiados">0</span>
+                <label class="stat-label">Corpos na Luta no Vale</label>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="stat-cidades">0</span>
+                <label class="stat-label">Municípios Organizados</label>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="stat-axe">0</span>
+                <label class="stat-label">Territórios de Axé</label>
+            </div>
         </div>
-    </div>
+    </section>
 
     <div class="secao-historia">
-        <div class="card-txt">
-            <h2>Sede em Cruzeiro</h2>
-            <p>O foco estratégico da nossa organização reside em <strong>Cruzeiro</strong>, nossa sede regional. Daqui, articulamos o combate à invisibilidade do povo preto no interior, transformando a região em um pólo de formação política contínua.</p>
+        <div class="bloco-info">
+            <h2>Eixo Central e Sede</h2>
+            <p>A <strong>UNEGRO Vale do Paraíba</strong> finca sua bandeira em <strong>Cruzeiro</strong>, nossa sede regional estratégica. Daqui, irradiamos a luta contra o racismo estrutural que se camufla no interior, articulando formação e resistência política.</p>
         </div>
-        <div class="card-txt">
-            <h2>Resistência Industrial</h2>
-            <p>No corredor industrial que liga <strong>Taubaté, Jacareí e SJC</strong>, a UNEGRO revela a força do trabalho negro. Atuamos para que o desenvolvimento econômico não apague a identidade de quem sustenta as engrenagens do Vale.</p>
+        <div class="bloco-info">
+            <h2>Voz na Indústria</h2>
+            <p>No corredor industrial de <strong>SJC, Taubaté e Jacareí</strong>, revelamos o suor negro que move a economia paulista. Nossa organização é o escudo do trabalhador preto contra a invisibilidade industrial.</p>
         </div>
-        <div class="card-txt">
-            <h2>Litoral Norte e Ancestralidade</h2>
-            <p>Nossa expansão para o <strong>Litoral Norte</strong> é um pacto com a cultura caiçara e os territórios de Axé. Defendemos a orla paulista contra o racismo territorial e a especulação que tenta nos afastar das nossas raízes.</p>
+        <div class="bloco-info">
+            <h2>Mar e Ancestralidade</h2>
+            <p>No <strong>Litoral Norte</strong>, defendemos o território caiçara e o povo do mar. A <strong>UNEGRO Litoral</strong> é a força que protege nossas raízes e nossos terreiros contra a especulação que tenta nos apagar.</p>
         </div>
     </div>
 
     <div class="secao-liderancas">
-        <h2 style="font-family:'Syncopate'; text-align:center; font-size:12px; color:var(--laranja); letter-spacing:10px; margin-bottom:60px;">LIDERANÇAS DA REGIONAL</h2>
-        <div class="slider-flex" id="liderancas-render"></div>
+        <h2 style="font-family:'Syncopate'; text-align:center; font-size:12px; color:var(--laranja); letter-spacing:10px; margin-bottom:60px;">LIDERANÇAS REGIONAIS</h2>
+        <div class="slider-wrapper" id="liderancas-render"></div>
     </div>
 
-    <footer>Tecnologia <a href="https://dree.one" style="color:var(--laranja); text-decoration:none;">Dree.one</a> • UNEGRO 2026</footer>
+    <footer>RMVALE & LITORAL NORTE • Tecnologia Dree.one • 2026</footer>
 
     <script>
         const CONFIG = {
@@ -147,7 +169,7 @@
             KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
         };
         const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
-        const CIDADES_VALE = ["Cruzeiro", "Taubaté", "São José dos Campos", "Jacareí", "Pindamonhangaba", "Guaratinguetá", "Lorena", "Ubatuba", "Caraguatatuba", "São Sebastião", "Ilhabela", "Aparecida", "Caçapava", "Cachoeira Paulista", "Campos do Jordão", "Cunha", "Igaratá", "Jambeiro", "Lagoinha", "Lavrinhas", "Monteiro Lobato", "Natividade da Serra", "Paraibuna", "Piquete", "Potim", "Queluz", "Redenção da Serra", "Roseira", "Santa Branca", "Santo Antônio do Pinhal", "São Bento do Sapucaí", "São José do Barreiro", "São Luiz do Paraitinga", "Silveiras", "Tremembé"];
+        const CIDADES_VALE = ["Cruzeiro", "Taubate", "Sao Jose dos Campos", "Jacarei", "Pindamonhangaba", "Guaratingueta", "Lorena", "Ubatuba", "Caraguatatuba", "Sao Sebastiao", "Ilhabela", "Aparecida", "Cacapava", "Cachoeira Paulista", "Campos do Jordao", "Cunha", "Igarata", "Jambeiro", "Lagoinha", "Lavrinhas", "Monteiro Lobato", "Natividade da Serra", "Paraibuna", "Piquete", "Potim", "Queluz", "Redencao da Serra", "Roseira", "Santa Branca", "Santo Antonio do Pinhal", "Sao Bento do Sapucaí", "Sao Jose do Barreiro", "Sao Luiz do Paraitinga", "Silveiras", "Tremembé"];
 
         async function init() {
             carregarStats();
@@ -157,20 +179,28 @@
 
         async function carregarStats() {
             const { data: filiados } = await _supabase.from('unegro_filiados').select('cidade');
-            const regionais = filiados ? filiados.filter(f => CIDADES_VALE.includes(f.cidade)) : [];
+            
+            // Filtro preciso ignorando acentos e espaços
+            const normalizar = (t) => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
+            const cidadesValeNormal = CIDADES_VALE.map(c => normalizar(c));
+
+            const regionais = filiados ? filiados.filter(f => cidadesValeNormal.includes(normalizar(f.cidade))) : [];
             document.getElementById('stat-filiados').innerText = regionais.length;
 
-            const cidadesAtivas = [...new Set(regionais.map(f => f.cidade))];
+            const cidadesAtivas = [...new Set(regionais.map(f => normalizar(f.cidade)))];
             document.getElementById('stat-cidades').innerText = cidadesAtivas.length;
 
-            cidadesAtivas.forEach(cid => {
-                const slug = cid.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
+            // Ativa Pulsos e Path do SVG
+            cidadesAtivas.forEach(slug => {
                 const ponto = document.getElementById(`p-${slug}`);
                 if (ponto) ponto.style.display = 'block';
+                
+                const path = document.getElementById(`svg-${slug}`);
+                if (path) path.classList.add('ativo');
             });
 
             const { data: terreiros } = await _supabase.from('unegro_terreiros').select('cidade');
-            const axeReg = terreiros ? terreiros.filter(t => CIDADES_VALE.includes(t.cidade)) : [];
+            const axeReg = terreiros ? terreiros.filter(t => cidadesValeNormal.includes(normalizar(t.cidade))) : [];
             document.getElementById('stat-axe').innerText = axeReg.length;
         }
 
@@ -180,10 +210,10 @@
                 document.getElementById('liderancas-render').innerHTML = data.map(l => `
                     <div class="lider-item">
                         <div class="lider-img" style="background-image: url('${l.foto_url}')"></div>
-                        <div class="lider-info">
+                        <div class="lider-txt">
                             <span style="font-size:10px; color:var(--laranja); font-weight:900;">${(l.cargo || 'LIDERANÇA').toUpperCase()}</span>
-                            <h2 style="font-family:'Syncopate'; font-size:22px; margin: 10px 0; color:#fff;">${l.nome.toUpperCase()}</h2>
-                            <p style="font-size:12px; color:#aaa; margin-bottom:20px;">Território: ${l.cidade}</p>
+                            <h2 style="font-family:'Syncopate'; font-size:20px; color:#fff; margin:10px 0;">${l.nome.toUpperCase()}</h2>
+                            <p style="font-size:11px; color:#aaa; margin-bottom:20px;">Cidade: ${l.cidade}</p>
                             <a href="${l.instagram_url}" target="_blank" style="color:#fff; text-decoration:none; font-size:9px; font-weight:900; border:1px solid #444; padding:12px 25px; border-radius:30px;">INSTAGRAM</a>
                         </div>
                     </div>`).join('');
@@ -202,7 +232,7 @@
                 const face = document.createElement('div');
                 face.className = 'spirit-face';
                 face.style.backgroundImage = `url('${lista[i]}')`;
-                face.style.left = Math.random() * 50 + '%'; face.style.top = '15%';
+                face.style.left = Math.random() * 50 + '%'; 
                 overlay.appendChild(face);
                 setTimeout(() => face.style.opacity = '0.3', 100);
                 i = (i + 1) % lista.length;
