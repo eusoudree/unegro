@@ -37,13 +37,13 @@
         /* Login Container */
         #loginContainer { max-width: 400px; margin: 60px auto; background: var(--card); padding: 40px; border: 1px solid var(--borda); border-radius: 4px; text-align: center; display: none; }
         
-        /* Admin Container (Agora ocupa a tela toda com a tabela) */
+        /* Admin Container */
         .admin-container { max-width: 1400px; margin: 0 auto; padding: 0 20px; display: none; flex-direction: column; gap: 40px; }
 
         .admin-box { background: var(--card); padding: 40px; border: 1px solid var(--borda); border-radius: 4px; width: 100%; }
         .box-title { font-family: 'Syncopate', sans-serif; font-size: 18px; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 1px; color: var(--laranja); border-bottom: 1px solid var(--borda); padding-bottom: 15px; }
         
-        /* Modal de Edição */
+        /* Edit Modal */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center;
@@ -95,7 +95,7 @@
         </div>
     </nav>
 
-    <!-- Tela de Login Integrada -->
+    <!-- Integrated Login Screen -->
     <div id="loginContainer">
         <h2 class="box-title" style="border:none; padding:0; margin-bottom: 25px;">Acesso Restrito</h2>
         <form onsubmit="fazerLogin(event)">
@@ -111,7 +111,7 @@
         </form>
     </div>
 
-    <!-- Painel de Gestão (Apenas a Tabela) -->
+    <!-- Management Panel -->
     <div class="admin-container" id="adminContainer">
         <div class="admin-box">
             <h2 class="box-title">Controle de Saberes e Ofícios</h2>
@@ -126,14 +126,14 @@
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        <!-- Dados Dinâmicos -->
+                        <!-- Dynamic Data -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Edição -->
+    <!-- Edit Modal -->
     <div id="modalEdicao" class="modal-overlay">
         <div class="modal-content">
             <h2 class="box-title">Corrigir Dados</h2>
@@ -194,7 +194,7 @@
         };
         const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
-        // LOGIN E AUTENTICAÇÃO
+        // LOGIN AND AUTHENTICATION
         async function fazerLogin(event) {
             event.preventDefault();
             const u = document.getElementById('loginUsuario').value;
@@ -243,14 +243,14 @@
             checkAuth();
         }
 
-        // INIT GERAL
+        // GENERAL INIT
         async function initDashboard() {
             await loadCidadesSP();
             await loadCategorias();
             await loadServicos();
         }
 
-        // CARREGAMENTOS P/ O MODAL
+        // LOADINGS FOR THE MODAL
         async function loadCidadesSP() {
             try {
                 const response = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/SP/municipios');
@@ -295,12 +295,12 @@
             });
         }
 
-        // TABELA DE GESTÃO (Aprova, Edita, Exclui)
+        // MANAGEMENT TABLE (Approve, Edit, Delete)
         async function loadServicos() {
             const { data, error } = await _supabase
                 .from('unegro_servicos')
                 .select('*, unegro_categorias(nome), unegro_subcategorias(nome)')
-                .order('aprovado', { ascending: true }) // Pendentes no topo
+                .order('aprovado', { ascending: true }) 
                 .order('created_at', { ascending: false });
 
             if (error) { console.error('Erro nos serviços:', error); return; }
@@ -337,19 +337,31 @@
         async function toggleStatus(id, statusAtual) {
             const novoStatus = !statusAtual; 
             const { error } = await _supabase.from('unegro_servicos').update({ aprovado: novoStatus }).eq('id', id);
-            if (error) alert('Erro ao atualizar aprovação.');
-            else loadServicos();
+            
+            // Log full error for precise diagnostics
+            if (error) {
+                alert(`Erro ao atualizar aprovação: ${error.message}`);
+                console.error(error);
+            } else {
+                loadServicos();
+            }
         }
 
         async function deleteServico(id) {
             if(confirm('Tem certeza que deseja excluir este registro do Quilombo?')) {
                 const { error } = await _supabase.from('unegro_servicos').delete().eq('id', id);
-                if (error) alert('Erro ao excluir.');
-                else loadServicos();
+                
+                // Log full error for precise diagnostics
+                if (error) {
+                    alert(`Erro ao excluir: ${error.message}`);
+                    console.error(error);
+                } else {
+                    loadServicos();
+                }
             }
         }
 
-        // LÓGICA DE EDIÇÃO (MODAL)
+        // EDIT LOGIC (MODAL)
         async function abrirModalEdicao(id) {
             const { data, error } = await _supabase.from('unegro_servicos').select('*').eq('id', id).single();
             if (error) { console.error(error); return; }
@@ -389,11 +401,12 @@
 
             const id = document.getElementById('servicoId').value;
             
-            // Só faz UPDATE (não faz insert)
+            // Only performs UPDATE
             const { error } = await _supabase.from('unegro_servicos').update(payload).eq('id', id);
 
             if (error) {
-                alert('Erro ao salvar. Verifique o banco.');
+                // Log full error for precise diagnostics
+                alert(`Erro ao salvar. Verifique o banco: ${error.message}`);
                 console.error(error);
             } else {
                 fecharModalEdicao();
