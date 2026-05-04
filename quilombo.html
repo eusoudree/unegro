@@ -110,22 +110,38 @@
             color: #fff;
         }
 
+
+nav {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,140,0,0.2); padding: 15px 0;
+        }
+        
+        .nav-unegro { display: flex; justify-content: flex-end; padding: 25px 50px; background: transparent; }
+        .nav-links { display: flex; gap: 40px; align-items: center; }
+        .nav-links a, .dropbtn {
+            color: rgba(255, 255, 255, 0.4); text-decoration: none; font-size: 11px;
+            font-weight: 500; text-transform: uppercase; letter-spacing: 2px;
+            background: none; border: none; cursor: pointer; transition: color 0.4s ease;
+        }
+        .nav-links a:hover, .dropdown:hover .dropbtn { color: #f1b434; }
+        
         
     </style>
 </head>
 <body>
 
-    <nav class="nav-unegro">
-        <a href="index.html" class="nav-logo">
-            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" alt="Logo UNEGRO">
-        </a>
-        <div class="nav-links">
-            <a href="index.html">Início</a>
-            <a href="filiados.html" class="btn-acesso">Acesso Filiados</a>
-            <a href="https://instagram.com/unegrovale" target="_blank">Instagram</a>
-        </div>
-    </nav>
+  <nav class="nav-unegro">
+    <div class="nav-links">
+        <a href="index.html">Início</a>
+        <a href="quilombo.html">Quilombo Digital</a>
+        <a href="terreiros.html">Terreiros</a>
 
+    
+
+        <a href="portal.html">Área do Filiado</a>
+    </div>
+</nav>
     <div class="quilombo-intro">
         <span class="black-money-tag">Rede de Prosperidade Compartilhada</span>
         <h1>Territórios de AXÉ</h1>
