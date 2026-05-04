@@ -5,62 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNEGRO | Vale do Paraíba - Território de Luta</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@300;400;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        :root { 
-            --laranja: #ff8c00; 
-            --preto: #050505; 
-            --card: #0a0a0a; 
-            --borda: #222;
-        }
+        :root { --laranja: #ff8c00; --preto: #000; --card: #0a0a0a; --borda: #1a1a1a; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            background: var(--preto); color: #fff; font-family: 'Inter', sans-serif; 
-            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9));
-            overflow-x: hidden;
-        }
+        body { background: var(--preto); color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
 
-        /* ATMOSFERA ANCESTRAL (FADE DAS FOTOS) */
+        /* BACKGROUND SPIRIT FACES */
         #ancestral-overlay { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: #000; }
         .spirit-face { 
-            position: absolute; width: 70vh; height: 70vh; background-size: cover; background-position: center; 
-            opacity: 0; filter: grayscale(100%) brightness(30%); transition: opacity 4s ease-in-out, transform 10s linear; 
+            position: absolute; width: 80vh; height: 80vh; background-size: cover; background-position: center; 
+            opacity: 0; filter: grayscale(100%) brightness(20%); transition: opacity 4s ease-in-out, transform 10s linear; 
             -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
         }
 
         nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--borda); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; }
-        .nav-logo { font-family: 'Cinzel', serif; font-size: 18px; color: var(--laranja); text-decoration: none; }
-        .nav-links a { color: #fff; text-decoration: none; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-left: 30px; }
+        .nav-logo { font-family: 'Syncopate', sans-serif; font-size: 14px; color: var(--laranja); text-decoration: none; letter-spacing: 2px; }
+        .nav-links a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-left: 30px; transition: 0.3s; }
+        .nav-links a:hover { color: var(--laranja); }
 
-        /* HERO & MANIFESTO */
-        .hero-vale { height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; }
-        .hero-vale h1 { font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 8vw, 5rem); text-transform: uppercase; background: linear-gradient(to bottom, #fff, #666); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        /* HERO DINÂMICO */
+        .hero-vale { height: 60vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .hero-vale h1 { font-family: 'Syncopate', sans-serif; font-size: clamp(2rem, 6vw, 4rem); text-transform: uppercase; letter-spacing: 10px; color: #fff; }
         
-        .secao-manifesto { max-width: 900px; margin: -100px auto 100px; padding: 60px; background: var(--card); border: 1px solid var(--borda); position: relative; }
-        .secao-manifesto::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: var(--laranja); }
-        .titulo-secao { color: var(--laranja); font-family: 'Cinzel', serif; font-size: 24px; margin-bottom: 30px; text-transform: uppercase; text-align: center; }
-        .texto-luta { font-size: 1.1rem; line-height: 2; color: #ccc; text-align: justify; }
+        /* SEÇÃO MAPA & STATS */
+        .container-mapa { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; max-width: 1300px; margin: 0 auto 100px; padding: 0 40px; align-items: center; }
+        .mapa-svg { width: 100%; height: auto; filter: drop-shadow(0 0 20px rgba(255,140,0,0.1)); }
+        .mapa-svg path { fill: #111; stroke: #222; stroke-width: 1; transition: 0.5s; }
+        .mapa-svg .ativo { fill: rgba(255,140,0,0.2); stroke: var(--laranja); stroke-width: 2; }
+        .mapa-svg .highlight { fill: var(--laranja); }
 
-        /* COUNTER DINÂMICO */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto 100px; padding: 0 20px; }
-        .stat-card { background: rgba(255,140,0,0.05); border: 1px solid var(--borda); padding: 40px; text-align: center; border-radius: 4px; transition: 0.3s; }
-        .stat-card:hover { border-color: var(--laranja); background: rgba(255,140,0,0.1); }
-        .stat-num { display: block; font-size: 48px; font-weight: 900; color: #fff; margin-bottom: 10px; }
-        .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--laranja); font-weight: 800; }
+        .stats-col { display: flex; flex-direction: column; gap: 20px; }
+        .stat-box { background: var(--card); border: 1px solid var(--borda); padding: 30px; border-radius: 8px; position: relative; }
+        .stat-box::after { content: ''; position: absolute; left: 0; top: 20%; height: 60%; width: 3px; background: var(--laranja); }
+        .stat-num { font-size: 40px; font-weight: 900; display: block; }
+        .stat-label { font-size: 10px; text-transform: uppercase; color: #666; letter-spacing: 2px; font-weight: 800; }
 
-        /* MOSAICO LIDERANÇAS */
-        .grid-liderancas { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto 100px; padding: 0 20px; }
-        .lider-card { position: relative; height: 400px; background: #111; overflow: hidden; border: 1px solid var(--borda); filter: grayscale(1); transition: 0.5s; }
-        .lider-card:hover { filter: grayscale(0); border-color: var(--laranja); }
-        .lider-img { width: 100%; height: 100%; background-size: cover; background-position: center; transition: 0.8s; }
-        .lider-info { position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px; background: linear-gradient(transparent, #000); }
-        .lider-info h3 { font-size: 18px; text-transform: uppercase; margin-bottom: 5px; }
-        .lider-info p { font-size: 10px; text-transform: uppercase; color: var(--laranja); letter-spacing: 1px; }
+        /* LIDERANÇAS - EFEITO SLIDER EXPANSÃO */
+        .secao-liderancas { padding: 80px 40px; background: #000; }
+        .grid-expansao { display: flex; flex-wrap: nowrap; gap: 10px; max-width: 1400px; margin: 40px auto; height: 500px; }
+        
+        .lider-card { 
+            position: relative; flex: 0 0 150px; height: 100%; background: #111; overflow: hidden; 
+            border-radius: 8px; cursor: pointer; transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            border: 1px solid var(--borda);
+        }
+        .lider-card:hover { flex: 0 0 450px; border-color: var(--laranja); }
+        .lider-img { position: absolute; inset: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: grayscale(1) brightness(0.4); transition: 0.8s; }
+        .lider-card:hover .lider-img { filter: grayscale(0) brightness(0.6); transform: scale(1.05); }
 
-        footer { text-align: center; padding: 60px; border-top: 1px solid var(--borda); font-size: 11px; letter-spacing: 2px; color: #444; }
-        .credito-dree { color: var(--laranja); text-decoration: none; font-weight: bold; }
+        .lider-info-static { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; background: linear-gradient(transparent, #000); transition: 0.3s; }
+        .lider-card:hover .lider-info-static { opacity: 0; }
+        .lider-info-hover { 
+            position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; 
+            padding: 40px; opacity: 0; transform: translateX(-20px); transition: 0.5s ease 0.2s; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+        }
+        .lider-card:hover .lider-info-hover { opacity: 1; transform: translateX(0); }
+
+        /* TEXTO MANIFESTO FLUIDO */
+        .manifesto-fluido { max-width: 800px; margin: 0 auto 100px; text-align: center; padding: 0 20px; }
+        .manifesto-fluido p { font-size: 1.2rem; line-height: 1.8; color: #888; }
+        .manifesto-fluido strong { color: var(--laranja); font-weight: 900; }
+
+        footer { text-align: center; padding: 60px; border-top: 1px solid var(--borda); font-size: 10px; letter-spacing: 2px; color: #333; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -71,52 +79,62 @@
         <a href="index.html" class="nav-logo">UNEGRO <span>SP</span></a>
         <div class="nav-links">
             <a href="index.html">Início</a>
-            <a href="unegro-vale.html">O Vale</a>
+            <a href="valedoparaiba.html">O Vale</a>
             <a href="quilombo.html">Quilombo</a>
             <a href="terreiros.html">Terreiros</a>
         </div>
     </nav>
 
     <section class="hero-vale">
-        <p style="color: var(--laranja); font-weight: 900; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 20px;">Território Ancestral</p>
-        <h1>Vale do Paraíba</h1>
+        <h1>VALE DO PARAÍBA</h1>
+        <p style="color: var(--laranja); font-weight: 800; letter-spacing: 5px; margin-top: 20px;">TERRITÓRIO DE RETOMADA</p>
     </section>
 
-    <section class="secao-manifesto">
-        <h2 class="titulo-secao">A Importância da Nossa Presença</h2>
-        <div class="texto-luta">
-            <p>O Vale do Paraíba é o coração de uma ferida histórica que a UNEGRO se dedica a curar através da organização e da luta. Esta região, que outrora foi o epicentro da economia cafeeira sustentada pelo sangue e suor dos nossos antepassados, hoje é palco de uma nova resistência. Nossa presença aqui é o grito de liberdade que ecoa do Vale do Paraíba para todo o estado. Valorizar a luta no Vale é reconhecer que a emancipação negra passa pelo fortalecimento dos nossos terreiros, pela circulação do Black Money em nossos quilombos digitais e pela formação de lideranças que não se curvam. Aqui, transformamos a herança de dor em combustível para a construção de um futuro onde o povo preto detém o poder sobre sua própria narrativa.</p>
+    <div class="container-mapa">
+        <!-- Mapa Simplificado do Vale -->
+        <div id="mapa-container">
+            <svg class="mapa-svg" viewBox="0 0 400 200">
+                <!-- Representação das sub-regiões do Vale -->
+                <path id="city-cruzeiro" d="M300,50 L340,40 L350,70 L310,80 Z" />
+                <path id="city-sjc" d="M100,100 L150,90 L160,130 L110,140 Z" />
+                <path id="city-taubate" d="M165,95 L210,85 L220,120 L175,130 Z" />
+                <path id="city-jacarei" d="M70,110 L105,105 L115,145 L80,150 Z" />
+                <path id="city-lorena" d="M260,60 L295,55 L305,85 L270,90 Z" />
+                <path id="city-cacapava" d="M140,100 L170,95 L180,120 L150,125 Z" />
+                <path id="city-guara" d="M225,70 L265,65 L275,100 L235,105 Z" />
+                <path id="city-pinda" d="M190,80 L230,75 L240,110 L200,115 Z" />
+            </svg>
+            <p style="font-size: 9px; color: #444; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px;">Destaque dourado indica presença ativa da base UNEGRO</p>
         </div>
-    </section>
 
-    <!-- COUNTER DINÂMICO -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <span class="stat-num" id="count-liderancas">0</span>
-            <span class="stat-label">Lideranças Ativas</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-num" id="count-terreiros">0</span>
-            <span class="stat-label">Terreiros Mapeados</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-num" id="count-saberes">0</span>
-            <span class="stat-label">Saberes no Quilombo</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-num" id="count-cidades">0</span>
-            <span class="stat-label">Cidades com Presença</span>
+        <div class="stats-col">
+            <div class="stat-box">
+                <span class="stat-num" id="stat-filiados">0</span>
+                <span class="stat-label">Corpos na Luta (Filiados)</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-num" id="stat-cidades">0</span>
+                <span class="stat-label">Cidades em Retomada</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-num" id="stat-axe">0</span>
+                <span class="stat-label">Territórios de Axé</span>
+            </div>
         </div>
     </div>
 
-    <h2 class="titulo-secao">Lideranças do Vale</h2>
-    <div class="grid-liderancas" id="liderancas-container">
-        <!-- Carregado via Supabase -->
+    <div class="manifesto-fluido">
+        <p>O <strong>Vale do Paraíba</strong> não é apenas uma coordenada geográfica. É um campo de batalha histórico onde a UNEGRO finca o pé para <strong>reivindicar o protagonismo</strong> da nossa gente. Aqui, onde o café tentou apagar nossa voz, nossa organização devolve o poder aos nossos. Do fundo do terreiro ao topo do quilombo digital, o Vale pulsa <strong>resistência preta</strong>.</p>
+    </div>
+
+    <h2 style="font-family: 'Syncopate', sans-serif; text-align: center; font-size: 14px; color: var(--laranja); letter-spacing: 5px; margin-bottom: 40px;">LIDERANÇAS REGIONAIS</h2>
+    
+    <div class="grid-expansao" id="liderancas-container">
+        <!-- Carregado via JS -->
     </div>
 
     <footer>
-        UNEGRO SP • VALE DO PARAÍBA • 2026<br><br>
-        <a href="https://dree.one" target="_blank" class="credito-dree">Tecnologia Dree.one</a>
+        Tecnologia <a href="https://dree.one" target="_blank" style="color: var(--laranja); text-decoration: none; font-weight: bold;">Dree.one</a>
     </footer>
 
     <script>
@@ -127,28 +145,32 @@
         const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
         async function init() {
-            carregarStats();
             carregarLiderancas();
+            carregarStatsEMapa();
             iniciarAtmosfera();
         }
 
-        async function carregarStats() {
-            // Count de Lideranças (Tipo VALE)
-            const { count: cLid } = await _supabase.from('liderancas_unegro').select('*', { count: 'exact', head: true }).eq('tipo', 'VALE');
-            document.getElementById('count-liderancas').innerText = cLid || 0;
+        async function carregarStatsEMapa() {
+            // Conta filiados
+            const { count: totalFiliados } = await _supabase.from('unegro_filiados').select('*', { count: 'exact', head: true });
+            document.getElementById('stat-filiados').innerText = totalFiliados || 0;
 
-            // Count de Terreiros
-            const { count: cTer } = await _supabase.from('unegro_terreiros').select('*', { count: 'exact', head: true });
-            document.getElementById('count-terreiros').innerText = cTer || 0;
-
-            // Count de Saberes Aprovados
-            const { count: cSab } = await _supabase.from('unegro_servicos').select('*', { count: 'exact', head: true }).eq('aprovado', true);
-            document.getElementById('count-saberes').innerText = cSab || 0;
-
-            // Cidades distintas na base de filiados do Vale
+            // Busca cidades dos filiados
             const { data: cidades } = await _supabase.from('unegro_filiados').select('cidade');
-            const uniqueCidades = [...new Set(cidades.map(i => i.cidade))].length;
-            document.getElementById('count-cidades').innerText = uniqueCidades || 0;
+            const listaCidades = cidades.map(c => c.cidade.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+            const uniqueCidades = [...new Set(listaCidades)];
+            
+            document.getElementById('stat-cidades').innerText = uniqueCidades.length;
+
+            // Destaque no Mapa
+            uniqueCidades.forEach(cid => {
+                const el = document.getElementById(`city-${cid}`);
+                if(el) el.classList.add('ativo');
+            });
+
+            // Count Terreiros
+            const { count: totalTerreiros } = await _supabase.from('unegro_terreiros').select('*', { count: 'exact', head: true });
+            document.getElementById('stat-axe').innerText = totalTerreiros || 0;
         }
 
         async function carregarLiderancas() {
@@ -159,9 +181,14 @@
                 container.innerHTML = data.map(l => `
                     <div class="lider-card">
                         <div class="lider-img" style="background-image: url('${l.foto_url}')"></div>
-                        <div class="lider-info">
-                            <h3>${l.nome}</h3>
-                            <p>${l.cargo || 'Liderança Vale'} • ${l.cidade}</p>
+                        <div class="lider-info-static">
+                            <h4 style="font-size: 10px; font-weight: 900;">${l.nome}</h4>
+                        </div>
+                        <div class="lider-info-hover">
+                            <span style="font-size: 10px; color: var(--laranja); font-weight: 900; letter-spacing: 2px;">${l.cargo || 'LIDERANÇA'}</span>
+                            <h2 style="font-family: 'Syncopate'; font-size: 20px; margin: 10px 0;">${l.nome}</h2>
+                            <p style="font-size: 12px; color: #aaa; margin-bottom: 20px;">Atuante em ${l.cidade}</p>
+                            <a href="${l.instagram_url}" target="_blank" style="color:#fff; text-decoration:none; font-size:10px; font-weight:900; border:1px solid #333; padding:10px 20px; border-radius:30px;">VER INSTAGRAM</a>
                         </div>
                     </div>
                 `).join('');
@@ -171,29 +198,22 @@
         async function iniciarAtmosfera() {
             const overlay = document.getElementById('ancestral-overlay');
             const { data: fotos } = await _supabase.from('liderancas_unegro').select('foto_url');
-            
             const lista = fotos ? fotos.map(f => f.foto_url) : [];
             let i = 0;
 
             function manifestar() {
                 const antigas = document.querySelectorAll('.spirit-face');
                 antigas.forEach(a => { a.style.opacity = '0'; setTimeout(() => a.remove(), 4000); });
-
                 const face = document.createElement('div');
                 face.className = 'spirit-face';
                 face.style.backgroundImage = `url('${lista[i]}')`;
-                face.style.left = Math.random() * 30 + (Math.random() > 0.5 ? 60 : 0) + '%';
-                face.style.top = Math.random() * 40 + '%';
+                face.style.left = Math.random() * 40 + (Math.random() > 0.5 ? 50 : 0) + '%';
+                face.style.top = Math.random() * 30 + '%';
                 overlay.appendChild(face);
-
-                setTimeout(() => { face.style.opacity = '0.4'; face.style.transform = 'scale(1.1)'; }, 100);
+                setTimeout(() => { face.style.opacity = '0.3'; face.style.transform = 'scale(1.1)'; }, 100);
                 i = (i + 1) % lista.length;
             }
-
-            if (lista.length > 0) {
-                manifestar();
-                setInterval(manifestar, 8000);
-            }
+            if (lista.length > 0) { manifestar(); setInterval(manifestar, 8000); }
         }
 
         window.onload = init;
