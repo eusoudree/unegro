@@ -137,8 +137,6 @@
         <a href="quilombo.html">Quilombo Digital</a>
         <a href="terreiros.html">Terreiros</a>
 
-    
-
         <a href="portal.html">Área do Filiado</a>
     </div>
 </nav>
@@ -202,9 +200,15 @@
         const ITENS_POR_PAGINA = 6;
 
         async function init() {
-            // Fetch only approved records
-            const { data: registros } = await _supabase.from('unegro_servicos').select('*, unegro_categorias(nome)').eq('aprovado', true);
-            saberes = registros;
+            // Fetch only approved records using strict boolean check
+            const { data: registros, error } = await _supabase
+                .from('unegro_servicos')
+                .select('*, unegro_categorias(nome)')
+                .is('aprovado', true);
+                
+            if (error) console.error("Database fetch error:", error);
+            
+            saberes = registros || [];
 
             const { data: categorias } = await _supabase.from('unegro_categorias').select('nome').order('ordem');
             const boxCat = document.getElementById('filtros-categoria');
@@ -253,7 +257,7 @@
                     <h2 class="filiado-nome">${o.filiado_nome}</h2>
                     <div class="titulo-trabalho">${o.titulo_servico}</div>
                     <p class="descricao">${o.descricao || 'Filiado à UNEGRO.'}</p>
-                    <a href="https://wa.me/${o.whatsapp}" target="_blank" class="btn-fortalecer">Fortalecer Elo</a>
+                    <a href="https://wa.me/${o.whatsapp}" target="_blank" class="btn-fortalecer">WhatsApp</a>
                 </div>
             `).join('');
         }
