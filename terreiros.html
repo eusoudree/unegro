@@ -62,10 +62,10 @@
             padding-left: 15px;
         }
 
-        /* Container do Mapa */
+        /* Container do Mapa FULL WIDTH */
         .container-mapeamento {
-            padding: 160px 20px 60px;
-            max-width: 1200px;
+            padding: 140px 0 60px 0;
+            max-width: 100%;
             margin: auto;
             text-align: center;
         }
@@ -80,13 +80,13 @@
         }
 
         #map {
-            height: 600px;
+            height: 65vh;
             width: 100%;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 140, 0, 0.2);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            border: none;
+            border-top: 1px solid rgba(255, 140, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 140, 0, 0.2);
             z-index: 1;
-            margin-top: 30px;
+            margin-top: 40px;
         }
 
         /* Customização dos Popups Leaflet */
@@ -118,24 +118,45 @@
         }
         .popup-btn:hover { transform: scale(1.02); }
 
-        /* Estilos da Lista de Terreiros Adicionados */
-        .secao-lista {
-            max-width: 1200px;
-            margin: 0 auto 100px;
-            padding: 0 20px;
-        }
-        .busca-container {
+        /* LAYOUT COM SIDEBAR */
+        .layout-terreiros {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto 100px;
+            padding: 0 50px;
+            gap: 50px;
+            align-items: flex-start;
+        }
+
+        /* SIDEBAR LATERAL */
+        .sidebar-cidades {
+            width: 250px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 120px;
+            background: var(--cinza-card);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #1a1a1a;
+        }
+        .sidebar-titulo { color: var(--laranja-solid); font-family: 'Syncopate'; font-size: 12px; margin-bottom: 20px; letter-spacing: 2px;}
+        .lista-cidades { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .lista-cidades li { 
+            cursor: pointer; font-size: 12px; color: #aaa; transition: 0.3s; 
+            padding: 10px 15px; border-radius: 6px; border: 1px solid transparent; 
+            text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+        }
+        .lista-cidades li:hover { color: #fff; background: #111; }
+        .lista-cidades li.ativo { color: #000; border-color: var(--laranja-solid); background: var(--laranja-solid); }
+
+        .conteudo-lista { flex: 1; }
+
+        .busca-container {
             margin-bottom: 40px;
-            gap: 20px;
-            flex-wrap: wrap;
         }
         .busca-input {
-            flex: 1;
-            min-width: 250px;
-            padding: 15px 20px;
+            width: 100%;
+            padding: 18px 25px;
             background: var(--cinza-card);
             border: 1px solid rgba(255,140,0,0.3);
             border-radius: 8px;
@@ -148,10 +169,12 @@
         .busca-input:focus {
             border-color: var(--laranja-solid);
         }
+
+        /* GRID SEM IMAGEM E COM MODAL */
         .grid-terreiros {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 30px;
+            gap: 20px;
         }
         .card-terreiro {
             background: var(--cinza-card);
@@ -161,32 +184,14 @@
             transition: transform 0.3s, border-color 0.3s;
             display: flex;
             flex-direction: column;
+            cursor: pointer;
         }
         .card-terreiro:hover {
             transform: translateY(-5px);
             border-color: var(--laranja-solid);
         }
-        .card-img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            border-bottom: 1px solid #1a1a1a;
-        }
-        .card-img-placeholder {
-            width: 100%;
-            height: 180px;
-            background: #111;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #555;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border-bottom: 1px solid #1a1a1a;
-        }
         .card-content {
-            padding: 25px;
+            padding: 30px;
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -200,7 +205,7 @@
             margin-bottom: 8px;
         }
         .card-title {
-            font-size: 16px;
+            font-size: 18px;
             color: #fff;
             margin-bottom: 15px;
             font-weight: 900;
@@ -211,29 +216,7 @@
             color: #aaa;
             margin-bottom: 5px;
         }
-        .card-btn-container {
-            margin-top: auto;
-            padding-top: 20px;
-        }
-        .card-btn-container a {
-            display: block;
-            text-align: center;
-            background: transparent;
-            color: var(--laranja-solid);
-            border: 1px solid var(--laranja-solid);
-            padding: 12px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 800;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: 0.3s;
-        }
-        .card-btn-container a:hover {
-            background: var(--laranja-solid);
-            color: #000;
-        }
+
         .paginacao {
             display: flex;
             justify-content: center;
@@ -253,24 +236,40 @@
             font-weight: 600;
             transition: 0.3s;
         }
-        .paginacao button:hover:not(:disabled) {
-            border-color: var(--laranja-solid);
-            color: var(--laranja-solid);
+        .paginacao button:hover:not(:disabled) { border-color: var(--laranja-solid); color: var(--laranja-solid); }
+        .paginacao button.active { background: var(--laranja-solid); color: #000; border-color: var(--laranja-solid); }
+        .paginacao button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* MODAL DE INFORMAÇÕES */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+            z-index: 2000; display: none; justify-content: center; align-items: center;
         }
-        .paginacao button.active {
-            background: var(--laranja-solid);
-            color: #000;
-            border-color: var(--laranja-solid);
+        .modal-content {
+            background: var(--cinza-card); border: 1px solid var(--laranja-solid);
+            padding: 50px; border-radius: 12px; width: 90%; max-width: 500px;
+            position: relative; max-height: 90vh; overflow-y: auto;
         }
-        .paginacao button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .modal-close {
+            position: absolute; top: 20px; right: 25px; color: #fff;
+            font-size: 28px; cursor: pointer; background: none; border: none; transition: 0.3s;
         }
+        .modal-close:hover { color: var(--laranja-solid); }
+        .modal-btn-wpp {
+            background: #25D366; color: #fff; padding: 15px; border-radius: 6px;
+            text-decoration: none; display: block; text-align: center;
+            font-weight: 900; font-size: 11px; text-transform: uppercase; margin-top: 15px;
+            transition: 0.3s;
+        }
+        .modal-btn-wpp:hover { background: #20b858; color: #fff; }
 
         footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; }
 
         @media (max-width: 900px) {
             .nav-logo span { display: none; }
+            .layout-terreiros { flex-direction: column; padding: 0 20px; }
+            .sidebar-cidades { width: 100%; position: relative; top: 0; margin-bottom: 20px; }
         }
 
         @media (max-width: 768px) {
@@ -280,6 +279,7 @@
             .nav-links a { font-size: 9px; letter-spacing: 1px; }
             #map { height: 400px; }
             .secao-titulo { font-size: 1.5rem; }
+            .modal-content { padding: 30px; }
         }
     </style>
 </head>
@@ -309,83 +309,84 @@
         <div id="map"></div>
     </div>
 
-    <!-- Nova Seção de Lista de Terreiros -->
-    <section class="secao-lista" id="secao-lista">
-        <div class="busca-container">
-            <input type="text" id="input-busca" class="busca-input" placeholder="Buscar por nome do terreiro ou cidade..." oninput="lidarBusca(event)">
+    <!-- Layout Dividido: Sidebar e Lista -->
+    <div class="layout-terreiros" id="secao-lista">
+        
+        <aside class="sidebar-cidades">
+            <h3 class="sidebar-titulo">Cidades Mapeadas</h3>
+            <ul class="lista-cidades" id="lista-cidades-sidebar">
+                <!-- Cidades renderizadas via JS -->
+            </ul>
+        </aside>
+
+        <section class="conteudo-lista">
+            <div class="busca-container">
+                <input type="text" id="input-busca" class="busca-input" placeholder="Buscar por nome do terreiro ou endereço..." oninput="lidarBusca(event)">
+            </div>
+            <div class="grid-terreiros" id="grid-terreiros">
+                <!-- Cards rendered via JS -->
+            </div>
+            <div class="paginacao" id="paginacao-container">
+                <!-- Pagination buttons rendered via JS -->
+            </div>
+        </section>
+
+    </div>
+
+    <!-- MODAL DO TERREIRO -->
+    <div class="modal-overlay" id="modal-terreiro" onclick="fecharModalOverlay(event)">
+        <div class="modal-content">
+            <button class="modal-close" onclick="fecharModal()">×</button>
+            <span class="card-city" id="modal-cidade"></span>
+            <h3 class="card-title" id="modal-nome" style="font-size: 26px; margin-bottom: 25px;"></h3>
+            <div id="modal-info"></div>
+            <div id="modal-links" style="margin-top: 30px;"></div>
         </div>
-        <div class="grid-terreiros" id="grid-terreiros">
-            <!-- Cards rendered via JS -->
-        </div>
-        <div class="paginacao" id="paginacao-container">
-            <!-- Pagination buttons rendered via JS -->
-        </div>
-    </section>
+    </div>
 
     <footer>UNEGRO VALE DO PARAÍBA • 2026</footer>
 
     <script>
-        // Configurações do Supabase
         const CONFIG = {
             URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
             KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
         };
         const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
-        // Inicialização do Mapa focado no Vale do Paraíba
         const map = L.map('map', { scrollWheelZoom: false }).setView([-23.18, -45.88], 9); 
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; UNEGRO Vale do Paraíba'
         }).addTo(map);
 
-        // Variables for List, Search and Pagination
         let todosTerreiros = [];
         let terreirosFiltrados = [];
         let paginaAtual = 1;
-        const itensPorPagina = 6;
+        const itensPorPagina = 9; // Aumentado para 9 por página, já que não tem foto
+        
+        let termoBusca = '';
+        let cidadeSelecionada = 'Todas';
 
         async function carregarTerreiros() {
             try {
-                // Busca todos os campos
                 const { data, error } = await _supabase.from('unegro_terreiros').select('*');
                 if (error) throw error;
 
-                // Save data globally for the list
                 todosTerreiros = data || [];
-                inicializarListaTerreiros(); // Call list initialization
+                inicializarListaTerreiros(); 
 
                 data.forEach(t => {
                     if (t.lat && t.lng) {
                         const marker = L.marker([t.lat, t.lng]).addTo(map);
-                        
-                        // Lógica Dinâmica: Se tiver informação exiba, se não, não exiba
                         const content = `
                             <div style="min-width: 220px; max-width: 280px; font-family: 'Inter', sans-serif;">
-                                ${t.foto_url ? `<img src="${t.foto_url}" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:10px; border: 1px solid rgba(255,140,0,0.3);">` : ''}
-                                
                                 <span class="popup-label">${t.cidade || 'Vale do Paraíba'}</span>
                                 <div class="popup-title">${t.nome}</div>
-                                
                                 <div style="display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: #eee; margin-top: 5px;">
                                     ${t.zelador ? `<div><strong style="color:var(--laranja-solid)">Zelador(a):</strong> ${t.zelador}</div>` : ''}
-                                    ${t.endereco ? `<div><strong style="color:var(--laranja-solid)">Endereço:</strong> ${t.endereco}</div>` : ''}
                                 </div>
-
-                                ${t.biografia ? `
-                                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #333; font-size: 11px; color: #ccc; line-height: 1.4; font-style: italic;">
-                                        "${t.biografia}"
-                                    </div>
-                                ` : ''}
-
-                                ${t.instagram_url ? `
-                                    <a href="${t.instagram_url}" target="_blank" class="popup-btn">
-                                        Ver Instagram
-                                    </a>
-                                ` : ''}
                             </div>
                         `;
-                        
                         marker.bindPopup(content);
                     }
                 });
@@ -394,33 +395,47 @@
             }
         }
 
-        // New List Functionality
         function inicializarListaTerreiros() {
-            // Sort by City first, then by Name
             todosTerreiros.sort((a, b) => {
                 const cityA = (a.cidade || '').toLowerCase();
                 const cityB = (b.cidade || '').toLowerCase();
-                
-                if (cityA !== cityB) {
-                    return cityA.localeCompare(cityB);
-                }
-                
-                const nameA = (a.nome || '').toLowerCase();
-                const nameB = (b.nome || '').toLowerCase();
-                return nameA.localeCompare(nameB);
+                if (cityA !== cityB) return cityA.localeCompare(cityB);
+                return (a.nome || '').toLowerCase().localeCompare((b.nome || '').toLowerCase());
             });
             
-            terreirosFiltrados = [...todosTerreiros];
-            renderizarGridTerreiros();
+            renderizarSidebarCidades();
+            aplicarFiltros();
+        }
+
+        function renderizarSidebarCidades() {
+            const cidades = [...new Set(todosTerreiros.map(t => t.cidade).filter(Boolean))].sort();
+            const ul = document.getElementById('lista-cidades-sidebar');
+            ul.innerHTML = `<li class="ativo" onclick="filtrarPorCidade('Todas', this)">Todas as Cidades</li>` + 
+                cidades.map(c => `<li onclick="filtrarPorCidade('${c}', this)">${c}</li>`).join('');
+        }
+
+        function filtrarPorCidade(cidade, elemento) {
+            document.querySelectorAll('#lista-cidades-sidebar li').forEach(li => li.classList.remove('ativo'));
+            if(elemento) elemento.classList.add('ativo');
+            
+            cidadeSelecionada = cidade;
+            aplicarFiltros();
         }
 
         function lidarBusca(event) {
-            const termo = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            
+            termoBusca = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            aplicarFiltros();
+        }
+
+        function aplicarFiltros() {
             terreirosFiltrados = todosTerreiros.filter(t => {
                 const nome = (t.nome || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                const cidade = (t.cidade || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                return nome.includes(termo) || cidade.includes(termo);
+                const endereco = (t.endereco || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                
+                const bateBusca = nome.includes(termoBusca) || endereco.includes(termoBusca);
+                const bateCidade = cidadeSelecionada === 'Todas' || t.cidade === cidadeSelecionada;
+                
+                return bateBusca && bateCidade;
             });
             
             paginaAtual = 1;
@@ -434,46 +449,69 @@
             const itensPaginados = terreirosFiltrados.slice(inicio, fim);
 
             if (itensPaginados.length === 0) {
-                grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color:#888; padding: 40px;">Nenhum território encontrado com essa busca.</p>';
+                grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color:#888; padding: 40px;">Nenhum território encontrado com esses filtros.</p>';
             } else {
-                grid.innerHTML = itensPaginados.map(t => `
-                    <div class="card-terreiro">
-                        ${t.foto_url 
-                            ? `<img src="${t.foto_url}" class="card-img" alt="${t.nome}">` 
-                            : `<div class="card-img-placeholder">Axé</div>`
-                        }
+                grid.innerHTML = itensPaginados.map(t => {
+                    const realIndex = todosTerreiros.indexOf(t);
+                    return `
+                    <div class="card-terreiro" onclick="abrirModal(${realIndex})">
                         <div class="card-content">
                             <span class="card-city">${t.cidade || 'Vale do Paraíba'}</span>
                             <h3 class="card-title">${t.nome}</h3>
                             ${t.zelador ? `<p class="card-info"><strong style="color: var(--laranja-solid);">Zelador(a):</strong> ${t.zelador}</p>` : ''}
                             ${t.endereco ? `<p class="card-info"><strong style="color: var(--laranja-solid);">Endereço:</strong> ${t.endereco}</p>` : ''}
-                            
-                            <div class="card-btn-container">
-                                ${t.instagram_url ? `<a href="${t.instagram_url}" target="_blank">Ver Instagram</a>` : ''}
-                            </div>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
             }
             renderizarPaginacao();
+        }
+
+        function abrirModal(index) {
+            const t = todosTerreiros[index];
+            document.getElementById('modal-cidade').innerText = t.cidade || 'Vale do Paraíba';
+            document.getElementById('modal-nome').innerText = t.nome;
+            
+            let infoHtml = '';
+            if(t.zelador) infoHtml += `<p class="card-info" style="font-size: 14px; margin-bottom: 8px;"><strong style="color: var(--laranja-solid);">Zelador(a):</strong> ${t.zelador}</p>`;
+            if(t.endereco) infoHtml += `<p class="card-info" style="font-size: 14px; margin-bottom: 8px;"><strong style="color: var(--laranja-solid);">Endereço:</strong> ${t.endereco}</p>`;
+            if(t.biografia) infoHtml += `<div style="margin-top: 25px; padding-top: 25px; border-top: 1px solid #222; font-size: 14px; color: #ccc; line-height: 1.6; font-style: italic;">"${t.biografia}"</div>`;
+            document.getElementById('modal-info').innerHTML = infoHtml;
+
+            let linksHtml = '';
+            // Se houver uma coluna telefone, extrai os números para o link do WhatsApp
+            if(t.telefone) {
+                const numero = t.telefone.replace(/\D/g, '');
+                linksHtml += `<a href="https://wa.me/55${numero}" target="_blank" class="modal-btn-wpp">Chamar no WhatsApp</a>`;
+            }
+            if(t.instagram_url) {
+                linksHtml += `<a href="${t.instagram_url}" target="_blank" class="popup-btn">Ver Instagram Oficial</a>`;
+            }
+            document.getElementById('modal-links').innerHTML = linksHtml;
+
+            document.getElementById('modal-terreiro').style.display = 'flex';
+        }
+
+        function fecharModal() {
+            document.getElementById('modal-terreiro').style.display = 'none';
+        }
+
+        function fecharModalOverlay(event) {
+            if (event.target.id === 'modal-terreiro') {
+                fecharModal();
+            }
         }
 
         function renderizarPaginacao() {
             const container = document.getElementById('paginacao-container');
             const totalPaginas = Math.ceil(terreirosFiltrados.length / itensPorPagina);
             
-            if (totalPaginas <= 1) {
-                container.innerHTML = '';
-                return;
-            }
+            if (totalPaginas <= 1) { container.innerHTML = ''; return; }
 
-            let html = '';
-            html += `<button ${paginaAtual === 1 ? 'disabled' : ''} onclick="mudarPagina(${paginaAtual - 1})">Anterior</button>`;
-            
+            let html = `<button ${paginaAtual === 1 ? 'disabled' : ''} onclick="mudarPagina(${paginaAtual - 1})">Anterior</button>`;
             for(let i = 1; i <= totalPaginas; i++) {
                 html += `<button class="${paginaAtual === i ? 'active' : ''}" onclick="mudarPagina(${i})">${i}</button>`;
             }
-            
             html += `<button ${paginaAtual === totalPaginas ? 'disabled' : ''} onclick="mudarPagina(${paginaAtual + 1})">Próximo</button>`;
             
             container.innerHTML = html;
@@ -488,9 +526,8 @@
             }
         }
 
-        // Animação de entrada
         ScrollReveal().reveal('.container-mapeamento', { delay: 200, distance: '50px', origin: 'bottom', opacity: 0 });
-        ScrollReveal().reveal('.secao-lista', { delay: 400, distance: '50px', origin: 'bottom', opacity: 0 });
+        ScrollReveal().reveal('.layout-terreiros', { delay: 400, distance: '50px', origin: 'bottom', opacity: 0 });
         
         window.onload = carregarTerreiros;
     </script>
