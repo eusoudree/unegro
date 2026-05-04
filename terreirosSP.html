@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Territórios de Axé SP | UNEGRO São Paulo</title>
+    
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- ScrollReveal -->
+    <script src="https://unpkg.com/scrollreveal"></script>
+
+    <style>
+        :root {
+            --laranja-solid: #ff8c00;
+            --preto: #000000;
+            --cinza-card: #0d0d0d;
+            --texto: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--preto);
+            color: var(--texto);
+            font-family: 'Inter', sans-serif;
+            background-image: linear-gradient(rgba(0,0,0,0.92), rgba(0,0,0,0.95)), 
+            url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 100 100"><g fill="%23222" fill-opacity="0.3"><path d="M50 20 L40 35 H60 L50 20 M50 80 L60 65 H40 L50 80 M20 50 L35 40 V60 L20 50 M80 50 L65 60 V40 L80 50"/></g></svg>');
+            background-attachment: fixed;
+        }
+
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,140,0,0.2); padding: 15px 0;
+        }
+        
+        .nav-unegro { display: flex; justify-content: flex-end; padding: 25px 50px; background: transparent; }
+        .nav-links { display: flex; gap: 40px; align-items: center; }
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.4); text-decoration: none; font-size: 11px;
+            font-weight: 500; text-transform: uppercase; letter-spacing: 2px;
+            background: none; border: none; cursor: pointer; transition: color 0.4s ease;
+        }
+        .nav-links a:hover { color: #f1b434; }
+
+        .nav-logo { display: flex; align-items: center; gap: 15px; position: absolute; left: 50px; top: 20px;}
+        .nav-logo img { height: 50px; width: auto; }
+        .nav-logo span { 
+            color: #fff; 
+            font-size: 10px; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            font-weight: 800;
+            border-left: 1px solid #333;
+            padding-left: 15px;
+        }
+
+        .container-mapeamento {
+            padding: 160px 20px 60px;
+            max-width: 1200px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .secao-titulo { 
+            color: var(--laranja-solid); 
+            text-transform: uppercase; 
+            letter-spacing: 5px; 
+            margin-bottom: 10px; 
+            font-size: 2.2rem; 
+            font-weight: 900; 
+        }
+
+        #map {
+            height: 600px;
+            width: 100%;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 140, 0, 0.2);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            z-index: 1;
+            margin-top: 30px;
+        }
+
+        .leaflet-popup-content-wrapper {
+            background: var(--cinza-card) !important;
+            color: #fff !important;
+            border: 1px solid var(--laranja-solid) !important;
+            border-radius: 12px !important;
+            padding: 5px !important;
+        }
+        .leaflet-popup-tip { background: var(--laranja-solid) !important; }
+
+        .popup-label { color: var(--laranja-solid); font-size: 9px; text-transform: uppercase; font-weight: 800; }
+        .popup-title { font-size: 18px; font-weight: 900; margin: 5px 0; text-transform: uppercase; color: #fff; }
+        
+        .popup-btn {
+            display: block;
+            background: var(--laranja-solid);
+            color: #000;
+            text-align: center;
+            padding: 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-top: 10px;
+            transition: transform 0.2s ease;
+        }
+        .popup-btn:hover { transform: scale(1.02); }
+
+        .secao-lista {
+            max-width: 1200px;
+            margin: 0 auto 100px;
+            padding: 0 20px;
+        }
+        .busca-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .busca-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px 20px;
+            background: var(--cinza-card);
+            border: 1px solid rgba(255,140,0,0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .busca-input:focus {
+            border-color: var(--laranja-solid);
+        }
+        .grid-terreiros {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+        .card-terreiro {
+            background: var(--cinza-card);
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s, border-color 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-terreiro:hover {
+            transform: translateY(-5px);
+            border-color: var(--laranja-solid);
+        }
+        .card-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .card-img-placeholder {
+            width: 100%;
+            height: 180px;
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .card-content {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-city {
+            color: var(--laranja-solid);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .card-title {
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 15px;
+            font-weight: 900;
+            line-height: 1.3;
+        }
+        .card-info {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+        .card-btn-container {
+            margin-top: auto;
+            padding-top: 20px;
+        }
+        .card-btn-container a {
+            display: block;
+            text-align: center;
+            background: transparent;
+            color: var(--laranja-solid);
+            border: 1px solid var(--laranja-solid);
+            padding: 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .card-btn-container a:hover {
+            background: var(--laranja-solid);
+            color: #000;
+        }
+        .paginacao {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+        .paginacao button {
+            background: var(--cinza-card);
+            color: #fff;
+            border: 1px solid #333;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .paginacao button:hover:not(:disabled) {
+            border-color: var(--laranja-solid);
+            color: var(--laranja-solid);
+        }
+        .paginacao button.active {
+            background: var(--laranja-solid);
+            color: #000;
+            border-color: var(--laranja-solid);
+        }
+        .paginacao button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; }
+
+        @media (max-width: 900px) {
+            .nav-logo span { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-unegro { padding: 15px 20px; }
+            .nav-logo img { height: 40px; }
+            .nav-links { gap: 15px; }
+            .nav-links a { font-size: 9px; letter-spacing: 1px; }
+            #map { height: 400px; }
+            .secao-titulo { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-logo">
+            <img src="https://unegroes.org.br/wp-content/uploads/2024/12/UNEGRO-LOGO-e1734363397338.png" alt="UNEGRO">
+            <span>São Paulo</span>
+        </div>
+        <div class="nav-unegro">
+            <div class="nav-links">
+                <a href="index.html">Início</a>
+                <a href="quilombo.html">Quilombo Digital</a>
+                <a href="terreiros_sp.html" style="color: var(--laranja-solid);">Terreiros</a>
+                <a href="portal.html">Área do Filiado</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-mapeamento">
+        <h2 class="secao-titulo">Territórios de Axé - SP</h2>
+        <p style="color: #666; letter-spacing: 3px; text-transform: uppercase; font-size: 10px;">
+            Mapeamento Estadual • UNEGRO São Paulo
+        </p>
+
+        <div id="map"></div>
+    </div>
+
+    <section class="secao-lista" id="secao-lista">
+        <div class="busca-container">
+            <input type="text" id="input-busca" class="busca-input" placeholder="Buscar por nome do terreiro ou cidade..." oninput="handleSearch(event)">
+        </div>
+        <div class="grid-terreiros" id="grid-terreiros">
+            <!-- Cards rendered via JS -->
+        </div>
+        <div class="paginacao" id="paginacao-container">
+            <!-- Pagination buttons rendered via JS -->
+        </div>
+    </section>
+
+    <footer>UNEGRO SÃO PAULO • 2026</footer>
+
+    <script>
+        // Supabase configuration
+        const CONFIG = {
+            URL: 'https://huxemmuzhlntwimgiukt.supabase.co',
+            KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1eGVtbXV6aGxudHdpbWdpdWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NzAyMDYsImV4cCI6MjA5MDM0NjIwNn0.Y85R3XQ9w4vMUGiH9zNmwpFpEj6jRPHc7lSjyYN_VVs'
+        };
+        const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
+
+        // Map initialization focused on São Paulo State coordinates
+        const map = L.map('map', { scrollWheelZoom: false }).setView([-22.5, -48.0], 7); 
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; UNEGRO São Paulo'
+        }).addTo(map);
+
+        // Variables for List, Search and Pagination
+        let allTerreiros = [];
+        let filteredTerreiros = [];
+        let currentPage = 1;
+        const itemsPerPage = 6;
+
+        async function loadTerreiros() {
+            try {
+                // Fetch all records from database
+                const { data, error } = await _supabase.from('unegro_terreiros').select('*');
+                if (error) throw error;
+
+                // Save data globally for the list rendering
+                allTerreiros = data || [];
+                initializeTerreirosList();
+
+                data.forEach(t => {
+                    if (t.lat && t.lng) {
+                        const marker = L.marker([t.lat, t.lng]).addTo(map);
+                        
+                        // Dynamic logic: render information only if data is available
+                        const content = `
+                            <div style="min-width: 220px; max-width: 280px; font-family: 'Inter', sans-serif;">
+                                ${t.foto_url ? `<img src="${t.foto_url}" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:10px; border: 1px solid rgba(255,140,0,0.3);">` : ''}
+                                
+                                <span class="popup-label">${t.cidade || 'São Paulo'}</span>
+                                <div class="popup-title">${t.nome}</div>
+                                
+                                <div style="display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: #eee; margin-top: 5px;">
+                                    ${t.zelador ? `<div><strong style="color:var(--laranja-solid)">Zelador(a):</strong> ${t.zelador}</div>` : ''}
+                                    ${t.endereco ? `<div><strong style="color:var(--laranja-solid)">Endereço:</strong> ${t.endereco}</div>` : ''}
+                                </div>
+
+                                ${t.biografia ? `
+                                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #333; font-size: 11px; color: #ccc; line-height: 1.4; font-style: italic;">
+                                        "${t.biografia}"
+                                    </div>
+                                ` : ''}
+
+                                ${t.instagram_url ? `
+                                    <a href="${t.instagram_url}" target="_blank" class="popup-btn">
+                                        Ver Instagram
+                                    </a>
+                                ` : ''}
+                            </div>
+                        `;
+                        
+                        marker.bindPopup(content);
+                    }
+                });
+            } catch (err) {
+                console.error("Error loading data from Supabase:", err.message);
+            }
+        }
+
+        // Initialize list sorting and rendering
+        function initializeTerreirosList() {
+            // Sort by City first, then by Name alphabetically
+            allTerreiros.sort((a, b) => {
+                const cityA = (a.cidade || '').toLowerCase();
+                const cityB = (b.cidade || '').toLowerCase();
+                
+                if (cityA !== cityB) {
+                    return cityA.localeCompare(cityB);
+                }
+                
+                const nameA = (a.nome || '').toLowerCase();
+                const nameB = (b.nome || '').toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
+            
+            filteredTerreiros = [...allTerreiros];
+            renderTerreirosGrid();
+        }
+
+        // Handle search input events
+        function handleSearch(event) {
+            const term = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            
+            filteredTerreiros = allTerreiros.filter(t => {
+                const name = (t.nome || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const city = (t.cidade || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                return name.includes(term) || city.includes(term);
+            });
+            
+            currentPage = 1;
+            renderTerreirosGrid();
+        }
+
+        // Render the grid based on current page and filters
+        function renderTerreirosGrid() {
+            const grid = document.getElementById('grid-terreiros');
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedItems = filteredTerreiros.slice(start, end);
+
+            if (paginatedItems.length === 0) {
+                grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color:#888; padding: 40px;">Nenhum território encontrado com essa busca.</p>';
+            } else {
+                grid.innerHTML = paginatedItems.map(t => `
+                    <div class="card-terreiro">
+                        ${t.foto_url 
+                            ? `<img src="${t.foto_url}" class="card-img" alt="${t.nome}">` 
+                            : `<div class="card-img-placeholder">Axé</div>`
+                        }
+                        <div class="card-content">
+                            <span class="card-city">${t.cidade || 'São Paulo'}</span>
+                            <h3 class="card-title">${t.nome}</h3>
+                            ${t.zelador ? `<p class="card-info"><strong style="color: var(--laranja-solid);">Zelador(a):</strong> ${t.zelador}</p>` : ''}
+                            ${t.endereco ? `<p class="card-info"><strong style="color: var(--laranja-solid);">Endereço:</strong> ${t.endereco}</p>` : ''}
+                            
+                            <div class="card-btn-container">
+                                ${t.instagram_url ? `<a href="${t.instagram_url}" target="_blank">Ver Instagram</a>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            renderPagination();
+        }
+
+        // Render pagination controls
+        function renderPagination() {
+            const container = document.getElementById('paginacao-container');
+            const totalPages = Math.ceil(filteredTerreiros.length / itemsPerPage);
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            html += `<button ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">Anterior</button>`;
+            
+            for(let i = 1; i <= totalPages; i++) {
+                html += `<button class="${currentPage === i ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            }
+            
+            html += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">Próximo</button>`;
+            
+            container.innerHTML = html;
+        }
+
+        // Change current page and scroll to top of list
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredTerreiros.length / itemsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderTerreirosGrid();
+                document.getElementById('secao-lista').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Entry animations
+        ScrollReveal().reveal('.container-mapeamento', { delay: 200, distance: '50px', origin: 'bottom', opacity: 0 });
+        ScrollReveal().reveal('.secao-lista', { delay: 400, distance: '50px', origin: 'bottom', opacity: 0 });
+        
+        window.onload = loadTerreiros;
+    </script>
+</body>
+</html>
