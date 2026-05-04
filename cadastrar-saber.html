@@ -1,3 +1,6 @@
+Aqui está o código completo, consolidado com as nossas substituições. Como combinado, a estrutura original do front-end não foi alterada, a intervenção foi estritamente na lógica do envio de dados e checagem, e todos os comentários no código foram passados para o inglês para manter seu padrão.
+
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -175,7 +178,7 @@ Ao cadastrar seu produto ou serviço, você passa a fazer parte do ecossistema d
         const _supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
         async function init() {
-            // Carrega Cidades do IBGE
+            // Load cities from IBGE
             try {
                 const res = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/SP/municipios');
                 const cidades = await res.json();
@@ -186,7 +189,7 @@ Ao cadastrar seu produto ou serviço, você passa a fazer parte do ecossistema d
                 console.error("Erro ao puxar cidades do IBGE", e);
             }
 
-            // Carrega Categorias
+            // Load Categories
             const { data } = await _supabase.from('unegro_categorias').select('*').order('nome');
             const selCat = document.getElementById('categoriaSelect');
             selCat.innerHTML = '<option value="">Selecione a Categoria...</option>';
@@ -212,10 +215,21 @@ Ao cadastrar seu produto ou serviço, você passa a fazer parte do ecossistema d
             const emailInput = document.getElementById('emailVerificacao').value;
             btn.innerText = 'Buscando na base de Filiados...';
 
-            // 1. CHECAGEM DE FILIAÇÃO (Chama a função RPC)
-            const { data: isFiliado, error: rpcError } = await _supabase.rpc('check_filiado_ativo', { email_busca: emailInput });
+            // 1. Check membership in unegro_filiados table directly
+            const { data: filiadoData, error: filiadoError } = await _supabase
+                .from('unegro_filiados')
+                .select('email')
+                .eq('email', emailInput);
 
-            if (!isFiliado) {
+            if (filiadoError) {
+                alert(`Erro ao verificar e-mail no banco: ${filiadoError.message}`);
+                console.error(filiadoError);
+                btn.innerText = 'Enviar para Validação';
+                return;
+            }
+
+            // If empty array, email does not exist in the database
+            if (!filiadoData || filiadoData.length === 0) {
                 alert('Acesso negado. Esse e-mail não consta na base de filiados da UNEGRO. Você será direcionado para se afiliar e fortalecer o movimento.');
                 window.location.href = 'https://www.unegro.online/';
                 return;
@@ -223,7 +237,7 @@ Ao cadastrar seu produto ou serviço, você passa a fazer parte do ecossistema d
 
             btn.innerText = 'Enviando Dados...';
 
-            // 2. INSERE OS DADOS (Com aprovado = false por padrão)
+            // 2. Insert data (default aprovado = false)
             const payload = {
                 filiado_nome: document.getElementById('filiadoNome').value,
                 titulo_servico: document.getElementById('tituloServico').value,
@@ -232,17 +246,18 @@ Ao cadastrar seu produto ou serviço, você passa a fazer parte do ecossistema d
                 categoria_id: document.getElementById('categoriaSelect').value,
                 subcategoria_id: document.getElementById('subcategoriaSelect').value,
                 descricao: document.getElementById('descricao').value,
-                aprovado: false // Trava de segurança para aprovação
+                aprovado: false // Security lock for approval
             };
 
             const { error } = await _supabase.from('unegro_servicos').insert([payload]);
 
             if (error) {
-                alert('Erro na comunicação com o banco. Chama a coordenação.');
+                // Fetch the exact error message from Supabase to diagnose backend rejection
+                alert(`Erro na comunicação com o banco: ${error.message} \nDetalhes: ${error.details || 'Nenhum'}`);
                 console.error(error);
                 btn.innerText = 'Enviar para Validação';
             } else {
-                // Sucesso: Mostra o modal e zera o form
+                // Success: Show modal and reset form
                 document.getElementById('modalSucesso').style.display = 'flex';
                 document.getElementById('formCadastro').reset();
                 btn.innerText = 'Enviar para Validação';
@@ -251,7 +266,7 @@ Ao cadastrar seu produto ou serviço, você passa a fazer parte do ecossistema d
 
         function fecharModal() {
             document.getElementById('modalSucesso').style.display = 'none';
-            // Opcional: Redireciona o usuário para a página do Quilombo após fechar o modal
+            // Optional: Redirect user to Quilombo page after closing the modal
             window.location.href = 'quilombo.html';
         }
 
@@ -259,3 +274,4 @@ Ao cadastrar seu produto ou serviço, você passa a fazer parte do ecossistema d
     </script>
 </body>
 </html>
+```
